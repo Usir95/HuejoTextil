@@ -43,3 +43,22 @@ Fecha: 2025-06-28
 - Configuración de `.prettierrc` para mantener estilo de código consistente en archivos JavaScript y Vue.
 - Configuración de `pint.json` para formateo automático de código PHP.
 - Consolidación de estilo de codificación en `.editorconfig`.
+
+## [1.6.1] - 2025-06-27
+
+### Added
+- Campo `usuario` en la tabla `usuarios`, junto a renombramiento de `email` a `correo`
+- Validación y edición del campo `usuario` desde el formulario de perfil
+- Soporte para inicio de sesión configurable vía `fortify.login_field` (`.env`)
+- Control de nombres de campo en español (`correo`, `nombre`, `usuario`)
+- Personalización de la lógica de autenticación en `FortifyServiceProvider.php`
+
+### Changed
+- Formularios de login y registro para utilizar `usuario` en lugar de `email`
+- `UpdateProfileInformationForm.vue` para permitir editar los tres campos clave
+- Configuración y validaciones actualizadas para evitar colisiones al actualizar `usuario` o `correo`
+
+### Notes
+- Compatible con Laravel 12.
+- Pensado para facilitar la transición a Laravel 13 sin conflictos.
+

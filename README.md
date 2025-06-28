@@ -57,3 +57,10 @@ Este proyecto mantiene un estilo de codificación consistente para todos los col
 - **Laravel Pint** (`pint.json`): Formateador de código PHP basado en reglas del ecosistema Laravel.
 
 Ejecutar Pint manualmente: composer lint
+
+### Autenticación
+
+Este proyecto usa Laravel Fortify y permite configurar el campo de inicio de sesión mediante `.env`:
+
+## env
+LOGIN_FIELD=usuario
