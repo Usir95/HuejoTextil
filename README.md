@@ -4,7 +4,7 @@
 
 # DarkPirate ⚓️
 
-**DarkPirate** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 3 + Tailwind.  
+**DarkPirate** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 3 + Tailwind.
 Está diseñado para servir como plantilla inicial para sistemas administrativos y ERP, permitiendo clonar, escalar y extender con mínimos cambios.
 
 ---
@@ -22,7 +22,6 @@ Está diseñado para servir como plantilla inicial para sistemas administrativos
 
 ## 🧰 Instalación
 
-```bash
 git clone https://github.com/Usir95/DarkPirate.git
 cd DarkPirate
 cp .env.example .env
@@ -32,3 +31,18 @@ npm install && npm run dev
 php artisan key:generate
 php artisan migrate
 
+## 🛠 Comandos personalizados Artisan
+
+### `php artisan make:module Nombre`
+
+Crea:
+
+- Modelo con migración y seeder
+- Controlador tipo resource
+- Vista Inertia en `resources/js/Pages/Nombre/Nombre.vue` con plantilla base
+
+### `php artisan make:view Nombre`
+
+Crea:
+
+- Carpeta y archivo Inertia `resources/js/Pages/Nombre/Nombre.vue` con estructura base, sin controlador ni modelo

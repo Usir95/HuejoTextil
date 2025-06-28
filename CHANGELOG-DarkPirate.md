@@ -11,6 +11,11 @@ Fecha: 2025-06-28
 - Commit asociado: Actualización a Tailwind 4.
 - Etiquetas y ramas de Git configuradas para control de versiones.
 
+### Added
+
+- Comando `make:module` para generar modelo, migración, seeder, controlador Inertia y vista Vue con plantilla estructurada.
+- Comando `make:view` para crear una vista Inertia con estructura base Vue, sin modelo asociado.
+
 ### 🌐 Localización
 
 - Laravel configurado en idioma español (`lang/es` publicado y activo).
