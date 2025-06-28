@@ -15,8 +15,9 @@ const props = defineProps({
 
 const form = useForm({
     _method: 'PUT',
-    name: props.user.name,
-    email: props.user.email,
+    nombre: props.user.nombre,
+    usuario: props.user.usuario,
+    correo: props.user.correo,
     photo: null,
 });
 
@@ -101,13 +102,13 @@ const clearPhotoFileInput = () => {
 
                 <!-- Current Profile Photo -->
                 <div v-show="! photoPreview" class="mt-2">
-                    <img :src="user.profile_photo_url" :alt="user.name" class="rounded-full size-20 object-cover">
+                    <img :src="user.profile_photo_url" :alt="user.name" class="object-cover rounded-full size-20">
                 </div>
 
                 <!-- New Profile Photo Preview -->
                 <div v-show="photoPreview" class="mt-2">
                     <span
-                        class="block rounded-full size-20 bg-cover bg-no-repeat bg-center"
+                        class="block bg-center bg-no-repeat bg-cover rounded-full size-20"
                         :style="'background-image: url(\'' + photoPreview + '\');'"
                     />
                 </div>
@@ -130,47 +131,61 @@ const clearPhotoFileInput = () => {
 
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="nombre" value="Nombre" />
                 <TextInput
-                    id="name"
-                    v-model="form.name"
+                    id="nombre"
+                    v-model="form.nombre"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="block w-full mt-1"
                     required
-                    autocomplete="name"
+                    autocomplete="nombre"
                 />
-                <InputError :message="form.errors.name" class="mt-2" />
+                <InputError :message="form.errors.nombre" class="mt-2" />
+            </div>
+
+            <!-- Username -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="usuario" value="Nombre de usuario" />
+                <TextInput
+                    id="usuario"
+                    v-model="form.usuario"
+                    type="text"
+                    class="block w-full mt-1"
+                    required
+                    autocomplete="username"
+                />
+                <InputError :message="form.errors.usuario" class="mt-2" />
             </div>
 
             <!-- Email -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="correo" value="Correo Electrónico" />
                 <TextInput
-                    id="email"
-                    v-model="form.email"
+                    id="correo"
+                    v-model="form.correo"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="block w-full mt-1"
                     required
                     autocomplete="username"
                 />
-                <InputError :message="form.errors.email" class="mt-2" />
+                <InputError :message="form.errors.correo" class="mt-2" />
 
                 <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
-                    <p class="text-sm mt-2 dark:text-white">
+                    <p class="mt-2 text-sm dark:text-white">
                         Your email address is unverified.
 
                         <Link
                             :href="route('verification.send')"
                             method="post"
                             as="button"
-                            class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                            class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                             @click.prevent="sendEmailVerification"
                         >
                             Click here to re-send the verification email.
                         </Link>
                     </p>
 
-                    <div v-show="verificationLinkSent" class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
+                    <div v-show="verificationLinkSent" class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
                         A new verification link has been sent to your email address.
                     </div>
                 </div>
