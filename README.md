@@ -26,7 +26,9 @@ Está diseñado para servir como plantilla inicial para sistemas administrativos
 git clone https://github.com/Usir95/DarkPirate.git
 cd DarkPirate
 cp .env.example .env
+npx @tailwindcss/upgrade
 composer install
 npm install && npm run dev
 php artisan key:generate
 php artisan migrate
+
