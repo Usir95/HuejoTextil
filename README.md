@@ -46,3 +46,14 @@ Crea:
 Crea:
 
 - Carpeta y archivo Inertia `resources/js/Pages/Nombre/Nombre.vue` con estructura base, sin controlador ni modelo
+
+
+## Estilo de Código
+
+Este proyecto mantiene un estilo de codificación consistente para todos los colaboradores mediante las siguientes herramientas:
+
+- **EditorConfig** (`.editorconfig`): Define reglas generales para todos los archivos (indentación, saltos de línea, etc.).
+- **Prettier** (`.prettierrc`): Formato para archivos JavaScript y Vue.
+- **Laravel Pint** (`pint.json`): Formateador de código PHP basado en reglas del ecosistema Laravel.
+
+Ejecutar Pint manualmente: composer lint

@@ -33,3 +33,13 @@ Fecha: 2025-06-28
 
 - Control de versiones claro: commits atómicos, ramas por feature, uso de etiquetas Git.
 - Proyecto listo para migración futura a Laravel 13.
+
+## [v1.5.0] - Agregado soporte para idioma español
+- Se agregaron archivos de traducción en `resources/lang/es`
+- Se configuró Laravel para usar `locale = es`
+
+## [v1.6.0] - 2025-06-27
+### Añadido
+- Configuración de `.prettierrc` para mantener estilo de código consistente en archivos JavaScript y Vue.
+- Configuración de `pint.json` para formateo automático de código PHP.
+- Consolidación de estilo de codificación en `.editorconfig`.
