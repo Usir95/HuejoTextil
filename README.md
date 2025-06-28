@@ -62,5 +62,17 @@ Ejecutar Pint manualmente: composer lint
 
 Este proyecto usa Laravel Fortify y permite configurar el campo de inicio de sesión mediante `.env`:
 
-## env
+### .env
+
+```env
 LOGIN_FIELD=usuario
+
+## Configuración de sesiones múltiples
+
+El sistema permite controlar si un usuario puede tener varias sesiones abiertas al mismo tiempo.
+
+### .env
+
+```env
+MULTIPLE_SESSIONS=false
+

@@ -6,11 +6,15 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
@@ -36,18 +40,30 @@ class FortifyServiceProvider extends ServiceProvider {
         // Obtiene el campo de login desde config/fortify.php (usualmente 'usuario' o 'correo')
         $username = config('fortify.username');
 
+        $multi_sessions = config('fortify.multiple_sessions');
+
         // Indica a Fortify que ese será el campo usado para identificar al usuario al iniciar sesión
         Fortify::username($username);
 
         /* ========================= lOGIN DEL SISTEMA ========================= */
-        Fortify::authenticateUsing(function (Request $request) use ($username) {
-            Log::info($request->usuario);
-            if (Auth::attempt([
-                $username => $request->usuario,
-                'password' => $request->password
-            ], $request->boolean('remember'))) {
-                return Auth::user();
+        Fortify::authenticateUsing(function (Request $request) use ($username, $multi_sessions) {
+            $user = User::where($username, $request->input($username))->first();
+
+            if ($user && Hash::check($request->input('password'), $user->password)) {
+                $currentSessionId = Session::getId();
+
+                if (!$multi_sessions) {
+                    // Buscar otras sesiones activas del mismo usuario para quitarlas
+                    $otherSessions = DB::table('sessions')
+                        ->where('user_id', $user->id)
+                        ->where('id', '!=', $currentSessionId)
+                        ->delete();
+                }
+
+                return $user;
             }
+
+            return null;
         });
 
         /* ========================= LIMITADOR DE INTENTOS DE LOGIN ========================= */

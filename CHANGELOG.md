@@ -62,3 +62,16 @@ Fecha: 2025-06-28
 - Compatible con Laravel 12.
 - Pensado para facilitar la transición a Laravel 13 sin conflictos.
 
+## [v1.7.0] - 2025-06-28
+
+### Added
+- Configuración `MULTIPLE_SESSIONS` en `.env` para permitir o restringir múltiples sesiones por usuario.
+- Validación automática en el login para cerrar sesiones anteriores si `MULTIPLE_SESSIONS=false`.
+
+### Changed
+- Fortify ahora utiliza la sesión actual y elimina otras sesiones activas si la opción está deshabilitada.
+
+### Security
+- Mejora en la protección de sesiones activas por usuario, evitando accesos simultáneos no autorizados.
+
+

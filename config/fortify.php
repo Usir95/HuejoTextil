@@ -45,7 +45,9 @@ return [
     |
     */
 
+
     'username' => env('USERNAME_FIELD', 'usuario'),
+    'multiple_sessions' => env('MULTIPLE_SESSIONS', true),
     'email' => 'email',
 
     /*
