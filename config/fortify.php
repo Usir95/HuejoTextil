@@ -45,8 +45,7 @@ return [
     |
     */
 
-    'username' => 'email',
-
+    'username' => env('USERNAME_FIELD', 'usuario'),
     'email' => 'email',
 
     /*
@@ -60,7 +59,7 @@ return [
     |
     */
 
-    'lowercase_usernames' => true,
+    'lowercase_usernames' => false,
 
     /*
     |--------------------------------------------------------------------------
