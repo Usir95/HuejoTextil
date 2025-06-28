@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+
+class {{ class }} extends Controller {
+
+    public function index() {
+        //$items = Model::get();
+        //return Inertia::render('Ruta/Index', compact('items'));
+    }
+
+    public function MyFunction(Request $request) {
+        return "MyFunction";
+    }
+}
