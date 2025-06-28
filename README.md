@@ -76,3 +76,6 @@ El sistema permite controlar si un usuario puede tener varias sesiones abiertas 
 ```env
 MULTIPLE_SESSIONS=false
 
+#APP_NOMBRE=
+#APP_LOGO=
+#APP_SOPORTE_EMAIL=

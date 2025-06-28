@@ -74,4 +74,8 @@ Fecha: 2025-06-28
 ### Security
 - Mejora en la protección de sesiones activas por usuario, evitando accesos simultáneos no autorizados.
 
+## [v1.8.0] - 2025-06-28
+### Agregado
+- Se agregó archivo `config/proyecto.php` para centralizar parámetros personalizados (nombre, logo, soporte, colores).
+
 
