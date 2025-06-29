@@ -92,4 +92,7 @@ Fecha: 2025-06-28
 - Soporte para configuración dinámica de reglas de contraseña mediante archivo `.env`.
 - Nueva config `config/password_rules.php` con opciones `min`, `max`, `mixed_case`, `letters`, `numbers`, `symbols`, `uncompromised`, y `threshold`.
 
-
+## [1.11.0] - 2025-06-29
+### Added
+- Instalación y configuración de Laravel Pulse para monitoreo en tiempo real.
+- Migración `pulse_entries` publicada y ejecutada manualmente.

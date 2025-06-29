@@ -87,3 +87,13 @@ MULTIPLE_SESSIONS=false
 #APP_SOPORTE_EMAIL=
 
 # Proyecto Base Laravel + Inertia + Tailwind
+
+## Monitoreo con Laravel Pulse
+
+Este proyecto incluye Laravel Pulse como herramienta de monitoreo en tiempo real de rendimiento. Para usarlo:
+
+1. Asegúrate de tener una base de datos compatible (PostgreSQL recomendado).
+2. Si la tabla `pulse_entries` no existe, ejecuta:
+   ```bash
+   php artisan vendor:publish --tag=pulse-migrations
+   php artisan migrate
