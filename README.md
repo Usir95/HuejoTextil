@@ -103,3 +103,9 @@ Este proyecto incluye Laravel Pulse como herramienta de monitoreo en tiempo real
     2. php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
 
 
+## 📦 Librerías incluidas en el proyecto base
+
+- [Laravel Excel](https://laravel-excel.com/) — Para exportar/importar archivos Excel.
+- [Laravel DomPDF](https://github.com/barryvdh/laravel-dompdf) — Para generar PDFs desde vistas Blade.
+
+

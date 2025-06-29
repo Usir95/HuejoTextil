@@ -100,3 +100,22 @@ Fecha: 2025-06-28
 ## [1.12.0]
 ### Added
 - Se integró el paquete spatie/laravel-permission
+
+## [1.13.0]
+ Cambios principales
+
+    🔧 Instalada la librería Laravel Excel
+
+        Paquete: maatwebsite/excel
+
+        Comando: composer require maatwebsite/excel
+
+        Opcional: php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider"
+
+    📄 Instalada la librería Laravel PDF
+
+        Paquete: barryvdh/laravel-dompdf
+
+        Comando: composer require barryvdh/laravel-dompdf
+
+        Opcional: php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
