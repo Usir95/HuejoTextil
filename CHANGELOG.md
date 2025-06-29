@@ -87,3 +87,9 @@ Fecha: 2025-06-28
 - Definición de la fuente --font-sans con fallback personalizado para Tailwind CSS v4.
 - Soporte para uso directo de SVGs como código y como importación.
 
+## [1.10.0] - 2025-06-29
+### Añadido
+- Soporte para configuración dinámica de reglas de contraseña mediante archivo `.env`.
+- Nueva config `config/password_rules.php` con opciones `min`, `max`, `mixed_case`, `letters`, `numbers`, `symbols`, `uncompromised`, y `threshold`.
+
+

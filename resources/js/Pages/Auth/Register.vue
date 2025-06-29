@@ -65,7 +65,7 @@ const submit = () => {
                 <TextInput
                     id="correo"
                     v-model="form.correo"
-                    type="correo"
+                    type="text"
                     class="block w-full mt-1"
                     required
                     autocomplete="correo"
