@@ -1,121 +1,128 @@
-# Registro de cambios - Proyecto Base DarkPirate
+# 📓 Registro de cambios - Proyecto Base DarkPirate
 
-Fecha: 2025-06-28
+📅 **Fecha de inicio:** 2025-06-27  
+🚀 **Stack:** Laravel 12 + Inertia.js + Vue 3 + Tailwind CSS 4  
+📂 **Convención de versiones:** SemVer (`vX.Y.Z`)
 
-## Versión: v1.0.0
+---
 
-### 🔧 Configuraciones iniciales
+## ✅ [v1.0.0] - Proyecto base inicial
 
-- Laravel 12 con Inertia.js + Vue 3 + Tailwind CSS.
-- Actualización completa a Tailwind CSS v4 usando `npx @tailwindcss/upgrade`.
-- Commit asociado: Actualización a Tailwind 4.
-- Etiquetas y ramas de Git configuradas para control de versiones.
+### 🔧 Configuración
+- Laravel Jetstream con Inertia.js y Vue 3.
+- Integración con Tailwind CSS 4 usando `@tailwindcss/upgrade`.
+- Proyecto base listo para clonado y reutilización.
 
-### Added
-
-- Comando `make:module` para generar modelo, migración, seeder, controlador Inertia y vista Vue con plantilla estructurada.
-- Comando `make:view` para crear una vista Inertia con estructura base Vue, sin modelo asociado.
+### ✨ Funcionalidades agregadas
+- Comando `make:modulo` (modelo, migración, factory, seeder, controlador e Inertia view).
+- Comando `make:vista` para generar vistas Inertia básicas.
 
 ### 🌐 Localización
+- Laravel configurado en español.
+- Archivos `lang/es` publicados.
 
-- Laravel configurado en idioma español (`lang/es` publicado y activo).
-- Commit: Configuración de idioma base.
+### ⚙️ Personalización de stubs
+- `model.stub`: incluye `SoftDeletes`, `Auditable`, timestamps, ocultamiento de campos y constantes de fechas.
 
-### ⚙️ Personalización de Stubs
+---
 
-#### `model.stub`
+## 🧩 [v1.5.0] - Soporte completo para idioma español
 
-- Uso de `SoftDeletes` y `OwenIt\Auditing` en modelos por defecto.
-- Ocultamiento automático de estos campos (`$hidden`).
-- Configuración de constantes `CREATED_AT`, `UPDATED_AT`, `DELETED_AT`.
+- Archivos `lang/es` cargados.
+- Laravel configurado con `locale = es`.
 
-### ✅ Buenas prácticas
+---
 
-- Control de versiones claro: commits atómicos, ramas por feature, uso de etiquetas Git.
-- Proyecto listo para migración futura a Laravel 13.
+## 💅 [v1.6.0] - Estilo de código y buenas prácticas
 
-## [v1.5.0] - Agregado soporte para idioma español
-- Se agregaron archivos de traducción en `resources/lang/es`
-- Se configuró Laravel para usar `locale = es`
+### ➕ Añadido
+- `.prettierrc` para JavaScript y Vue.
+- `pint.json` para formateo de código PHP.
+- `.editorconfig` para estilo uniforme en todo el proyecto.
 
-## [v1.6.0]
-### Añadido
-- Configuración de `.prettierrc` para mantener estilo de código consistente en archivos JavaScript y Vue.
-- Configuración de `pint.json` para formateo automático de código PHP.
-- Consolidación de estilo de codificación en `.editorconfig`.
+---
 
-## [1.6.1]
+## 👤 [v1.6.1] - Personalización de login y perfil
 
-### Added
-- Campo `usuario` en la tabla `usuarios`, junto a renombramiento de `email` a `correo`
-- Validación y edición del campo `usuario` desde el formulario de perfil
-- Soporte para inicio de sesión configurable vía `fortify.login_field` (`.env`)
-- Control de nombres de campo en español (`correo`, `nombre`, `usuario`)
-- Personalización de la lógica de autenticación en `FortifyServiceProvider.php`
+### ➕ Added
+- Campo `usuario` en lugar de `email`.
+- Edición de `nombre`, `correo`, `usuario` desde perfil.
+- Login configurable vía `.env` con `fortify.login_field`.
 
-### Changed
-- Formularios de login y registro para utilizar `usuario` en lugar de `email`
-- `UpdateProfileInformationForm.vue` para permitir editar los tres campos clave
-- Configuración y validaciones actualizadas para evitar colisiones al actualizar `usuario` o `correo`
+### 🔁 Changed
+- Vistas de login y registro adaptadas a nuevos campos.
+- Validaciones actualizadas en backend.
 
-### Notes
-- Compatible con Laravel 12.
-- Pensado para facilitar la transición a Laravel 13 sin conflictos.
+---
 
-## [v1.7.0]
+## 🔐 [v1.7.0] - Control de sesiones
 
-### Added
-- Configuración `MULTIPLE_SESSIONS` en `.env` para permitir o restringir múltiples sesiones por usuario.
-- Validación automática en el login para cerrar sesiones anteriores si `MULTIPLE_SESSIONS=false`.
+- Agregado `.env/MULTIPLE_SESSIONS`.
+- Cierre de sesiones anteriores si está desactivado.
+- Protección contra múltiples accesos simultáneos.
 
-### Changed
-- Fortify ahora utiliza la sesión actual y elimina otras sesiones activas si la opción está deshabilitada.
+---
 
-### Security
-- Mejora en la protección de sesiones activas por usuario, evitando accesos simultáneos no autorizados.
+## 🎨 [v1.8.0] - Parámetros del sistema centralizados
 
-## [v1.8.0]
-### Agregado
-- Se agregó archivo `config/proyecto.php` para centralizar parámetros personalizados (nombre, logo, soporte, colores).
+- Agregado archivo `config/proyecto.php`: nombre, logo, soporte, colores.
 
-# Changelog
+---
 
-## [v1.9.0]
-### Añadido
-- Fuentes personalizadas de Google Fonts: Fredoka, Patrick Hand, Caveat.
-- Aplicación global de la fuente Caveat a todas las etiquetas h1–h6 con `font-weight: 800`.
-- Definición de la fuente --font-sans con fallback personalizado para Tailwind CSS v4.
-- Soporte para uso directo de SVGs como código y como importación.
+## 🔤 [v1.9.0] - Tipografía y estilo visual
 
-## [1.10.0]
-### Añadido
-- Soporte para configuración dinámica de reglas de contraseña mediante archivo `.env`.
-- Nueva config `config/password_rules.php` con opciones `min`, `max`, `mixed_case`, `letters`, `numbers`, `symbols`, `uncompromised`, y `threshold`.
+- Fuentes: Fredoka, Patrick Hand, Caveat.
+- Estilo h1–h6 con `font-weight: 800`.
+- Fuente personalizada para `--font-sans` y soporte de SVG directo.
 
-## [1.11.0]
-### Added
-- Instalación y configuración de Laravel Pulse para monitoreo en tiempo real.
-- Migración `pulse_entries` publicada y ejecutada manualmente.
+---
 
-## [1.12.0]
-### Added
-- Se integró el paquete spatie/laravel-permission
+## 🔑 [v1.10.0] - Reglas de contraseña configurables
 
-## [1.13.0]
- Cambios principales
+- Nuevo archivo `config/password_rules.php`.
+- Soporte `.env` para personalizar: longitud, símbolos, números, etc.
 
-    🔧 Instalada la librería Laravel Excel
+---
 
-        Paquete: maatwebsite/excel
+## 📊 [v1.12.0] - Monitoreo en tiempo real
 
-        Comando: composer require maatwebsite/excel
+- Instalación de Laravel Pulse.
+- Migración `pulse_entries` aplicada.
+- Dashboard habilitado.
 
-        Opcional: php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider"
+---
 
-    📄 Instalada la librería Laravel PDF
+## 🔐 [v1.13.0] - Roles y permisos
 
-        Paquete: barryvdh/laravel-dompdf
+- Integración del paquete `spatie/laravel-permission`.
+- Listo para configuración personalizada por módulo o rol.
 
-        Comando: composer require barryvdh/laravel-dompdf
+---
 
-        Opcional: php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
+## 📄 [v1.14.0] - Librerías comunes
+
+### Excel
+- Paquete: `maatwebsite/excel`
+- Instalado y publicado.
+
+### PDF
+- Paquete: `barryvdh/laravel-dompdf`
+- Instalado y publicado.
+
+---
+
+## 🕵️ [v1.15.0] - Auditoría de modelos
+
+### ➕ Added
+- Instalación de `owen-it/laravel-auditing`.
+- Migración `create_audits_table` ejecutada.
+- Configuración `audit.php` publicada.
+
+### 📌 Uso
+```php
+use OwenIt\Auditing\Contracts\Auditable;
+
+class MiModelo extends Model implements Auditable
+{
+    use \OwenIt\Auditing\Auditable;
+}

@@ -9,9 +9,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Jetstream\HasProfilePhoto;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable {
+class User extends Authenticatable implements Auditable {
     use HasApiTokens;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -20,6 +22,7 @@ class User extends Authenticatable {
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+    use Auditable;
 
     protected $table = 'usuarios';
 
