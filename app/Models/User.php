@@ -13,7 +13,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use OwenIt\Auditing\Auditable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements Auditable {
+class User extends Authenticatable implements AuditableContract {
     use HasApiTokens;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
