@@ -4,15 +4,21 @@
 
 # DarkPirate ⚓️
 
-**DarkPirate** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 3 + Tailwind.
+**DarkPirate** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 4 + Tailwind.
 Está diseñado para servir como plantilla inicial para sistemas administrativos y ERP, permitiendo clonar, escalar y extender con mínimos cambios.
+
+## Características
+- Tipografías personalizadas (Fredoka, Patrick Hand, Caveat)
+- Soporte para SVGs dinámicos en vistas
+- Compatible con Laravel 12 y Tailwind v4 sin `tailwind.config.js`
+- Layout inicial listo para personalización
 
 ---
 
 ## 🚀 Stack Tecnológico
 
 - Laravel 12
-- Jetstream (Inertia + Vue)
+- Jetstream (Inertia + Vue 4)
 - Tailwind CSS (con modo oscuro)
 - Laravel Sanctum (API)
 - Verificación de email
@@ -79,3 +85,5 @@ MULTIPLE_SESSIONS=false
 #APP_NOMBRE=
 #APP_LOGO=
 #APP_SOPORTE_EMAIL=
+
+# Proyecto Base Laravel + Inertia + Tailwind

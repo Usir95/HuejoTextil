@@ -78,4 +78,12 @@ Fecha: 2025-06-28
 ### Agregado
 - Se agregó archivo `config/proyecto.php` para centralizar parámetros personalizados (nombre, logo, soporte, colores).
 
+# Changelog
+
+## [v1.9.0] - 2025-06-28
+### Añadido
+- Fuentes personalizadas de Google Fonts: Fredoka, Patrick Hand, Caveat.
+- Aplicación global de la fuente Caveat a todas las etiquetas h1–h6 con `font-weight: 800`.
+- Definición de la fuente --font-sans con fallback personalizado para Tailwind CSS v4.
+- Soporte para uso directo de SVGs como código y como importación.
 
