@@ -38,13 +38,13 @@ Fecha: 2025-06-28
 - Se agregaron archivos de traducción en `resources/lang/es`
 - Se configuró Laravel para usar `locale = es`
 
-## [v1.6.0] - 2025-06-27
+## [v1.6.0]
 ### Añadido
 - Configuración de `.prettierrc` para mantener estilo de código consistente en archivos JavaScript y Vue.
 - Configuración de `pint.json` para formateo automático de código PHP.
 - Consolidación de estilo de codificación en `.editorconfig`.
 
-## [1.6.1] - 2025-06-27
+## [1.6.1]
 
 ### Added
 - Campo `usuario` en la tabla `usuarios`, junto a renombramiento de `email` a `correo`
@@ -62,7 +62,7 @@ Fecha: 2025-06-28
 - Compatible con Laravel 12.
 - Pensado para facilitar la transición a Laravel 13 sin conflictos.
 
-## [v1.7.0] - 2025-06-28
+## [v1.7.0]
 
 ### Added
 - Configuración `MULTIPLE_SESSIONS` en `.env` para permitir o restringir múltiples sesiones por usuario.
@@ -74,25 +74,29 @@ Fecha: 2025-06-28
 ### Security
 - Mejora en la protección de sesiones activas por usuario, evitando accesos simultáneos no autorizados.
 
-## [v1.8.0] - 2025-06-28
+## [v1.8.0]
 ### Agregado
 - Se agregó archivo `config/proyecto.php` para centralizar parámetros personalizados (nombre, logo, soporte, colores).
 
 # Changelog
 
-## [v1.9.0] - 2025-06-28
+## [v1.9.0]
 ### Añadido
 - Fuentes personalizadas de Google Fonts: Fredoka, Patrick Hand, Caveat.
 - Aplicación global de la fuente Caveat a todas las etiquetas h1–h6 con `font-weight: 800`.
 - Definición de la fuente --font-sans con fallback personalizado para Tailwind CSS v4.
 - Soporte para uso directo de SVGs como código y como importación.
 
-## [1.10.0] - 2025-06-29
+## [1.10.0]
 ### Añadido
 - Soporte para configuración dinámica de reglas de contraseña mediante archivo `.env`.
 - Nueva config `config/password_rules.php` con opciones `min`, `max`, `mixed_case`, `letters`, `numbers`, `symbols`, `uncompromised`, y `threshold`.
 
-## [1.11.0] - 2025-06-29
+## [1.11.0]
 ### Added
 - Instalación y configuración de Laravel Pulse para monitoreo en tiempo real.
 - Migración `pulse_entries` publicada y ejecutada manualmente.
+
+## [1.12.0]
+### Added
+- Se integró el paquete spatie/laravel-permission

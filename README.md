@@ -97,3 +97,9 @@ Este proyecto incluye Laravel Pulse como herramienta de monitoreo en tiempo real
    ```bash
    php artisan vendor:publish --tag=pulse-migrations
    php artisan migrate
+
+## Laravel spatie / laravel-permission
+    1. composer require spatie/laravel-permission
+    2. php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+
+
