@@ -2,6 +2,10 @@
     <AppLayout title="Roles y permisos del sistema">
         <template #options>
         </template>
+
+        <section>
+
+        </section>
     </AppLayout>
 </template>
 

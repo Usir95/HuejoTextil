@@ -7,6 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import UseToastify from './Plugins/toastify';
 import UseNotiflix from './Plugins/notiflix';
+import UseFilePond from './Plugins/filepond';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -22,6 +23,7 @@ createInertiaApp({
 
         UseToastify(app);
         UseNotiflix(app);
+        UseFilePond(app);
 
         app.mount(el);
     },
