@@ -16,13 +16,13 @@ const props = defineProps({
 });
 
 /* ============================================ Variables ============================================ */
-// const toast = inject('\$toast');
+const toast = inject('$toast');
 // const loading = inject('\$loading');
 const items = ref([]);
 
 /* ============================================ Mounted ============================================ */
 onMounted(() => {
-    // Fetch or initialize data here
+
 });
 
 /* ============================================ Functions ============================================ */

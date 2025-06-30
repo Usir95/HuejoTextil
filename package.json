@@ -20,5 +20,8 @@
         "tailwindcss": "^4.1.11",
         "vite": "^6.2.4",
         "vue": "^3.3.13"
+    },
+    "dependencies": {
+        "vue3-toastify": "^0.2.8"
     }
 }
