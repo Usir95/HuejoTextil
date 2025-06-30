@@ -17,12 +17,16 @@ const props = defineProps({
 
 /* ============================================ Variables ============================================ */
 const toast = inject('$toast');
-// const loading = inject('\$loading');
+const confirm = inject('$confirm');
+const report = inject('$report');
+const block = inject('$block');
+const notify = inject('$notify');
+
 const items = ref([]);
 
 /* ============================================ Mounted ============================================ */
 onMounted(() => {
-
+ notify('Probando Notiflix', 'success');
 });
 
 /* ============================================ Functions ============================================ */
