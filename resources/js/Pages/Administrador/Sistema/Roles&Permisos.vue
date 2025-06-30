@@ -3,22 +3,16 @@
         <template #options>
         </template>
 
-        <section>
-
-            <!-- Forma básica -->
-            <button v-tooltip="'Guardar cambios'" class="p-2 mx-4 bg-white">💾 Guardar</button>
-
-            <!-- Forma avanzada con opciones -->
-            <button v-tooltip="{ content: 'Guardar cambios', placement: 'bottom' }" class="p-2 mx-4 bg-white">💾 Guardar</button>
-
-
-        </section>
+    <section>
+      <AgGrid :rowData="usuarios" />
+    </section>
     </AppLayout>
 </template>
 
 <script setup>
 import { ref, defineProps, inject, computed, onMounted } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import AgGrid from '@/Components/Dependencies/AgGrid.vue'
 
 /* ============================================ Props ============================================ */
 const props = defineProps({
@@ -29,11 +23,7 @@ const props = defineProps({
 /* ============================================ Variables ============================================ */
 const toast = inject('$toast');
 const confirm = inject('$confirm');
-const report = inject('$report');
-const block = inject('$block');
 const notify = inject('$notify');
-
-const items = ref([]);
 
 /* ============================================ Mounted ============================================ */
 onMounted(() => {
@@ -41,5 +31,8 @@ onMounted(() => {
 });
 
 /* ============================================ Functions ============================================ */
-
+const usuarios = [
+  { nombre: 'Arianna', correo: 'ari@example.com', edad: 25 },
+  { nombre: 'Siomara', correo: 'sio@example.com', edad: 30 },
+]
 </script>

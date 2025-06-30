@@ -10,6 +10,8 @@ import UseNotiflix from './Plugins/notiflix';
 import UseFilePond from './Plugins/filepond';
 import UseTippy from './Plugins/tippy';
 
+import './Plugins/aggrid';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
