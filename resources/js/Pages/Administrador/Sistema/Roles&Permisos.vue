@@ -5,6 +5,13 @@
 
         <section>
 
+            <!-- Forma básica -->
+            <button v-tooltip="'Guardar cambios'" class="p-2 mx-4 bg-white">💾 Guardar</button>
+
+            <!-- Forma avanzada con opciones -->
+            <button v-tooltip="{ content: 'Guardar cambios', placement: 'bottom' }" class="p-2 mx-4 bg-white">💾 Guardar</button>
+
+
         </section>
     </AppLayout>
 </template>
