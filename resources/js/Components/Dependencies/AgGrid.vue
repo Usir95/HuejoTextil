@@ -8,6 +8,7 @@
         :pagination="pagination"
         :paginationPageSize="paginationPageSize"
         :suppressMenuHide="true"
+        :rowClassRules="rowClassRules"
         @cellClicked="emitCellClicked"
         @grid-ready="onGridReady"
     />
@@ -26,6 +27,7 @@ import {
     PaginationModule,
     RowSelectionModule,
     ColumnAutoSizeModule,
+    RowStyleModule,
 } from 'ag-grid-community'
 
 ModuleRegistry.registerModules([
@@ -37,6 +39,7 @@ ModuleRegistry.registerModules([
     PaginationModule,
     RowSelectionModule,
     ColumnAutoSizeModule,
+    RowStyleModule
 ])
 
 // Props
@@ -46,6 +49,7 @@ const props = defineProps({
     pagination: { type: Boolean, default: true },
     paginationPageSize: { type: Number, default: 50 },
     height: { type: String, default: '80vh' },
+    // headerColor: { type: String, default: 'bg-sky-800' },
 })
 
 // Emits
@@ -55,8 +59,8 @@ const emit = defineEmits(['cell-clicked'])
 const rowData = ref(props.initialRowData)
 const columnDefs = ref(
     props.initialColumnDefs.length
-    ? props.initialColumnDefs
-    : [
+        ? props.initialColumnDefs
+        : [
             {
                 headerName: 'Datos',
                 field: 'json',
@@ -75,6 +79,12 @@ const defaultColDef = {
     filter: true,
     floatingFilter: true,
     flex: 1,
+    // headerClass: `${props.headerColor} text-white uppercase`,
+}
+
+// Reglas visuales de filas alternadas (estilo zebra)
+const rowClassRules = {
+    // 'ag-row-odd': (params) => params.node.rowIndex % 2 === 1,
 }
 
 // Reactividad
@@ -93,3 +103,27 @@ function onGridReady(params) {
     params.api.sizeColumnsToFit()
 }
 </script>
+
+<style>
+.ag-theme-quartz {
+    --ag-background-color: #0F172A;
+    --ag-header-cell-font-family: 'Patrick Hand', sans-serif;
+    --ag-header-background-color: #075985;
+    --ag-header-cell-hover-background-color: #08679b;
+    --ag-header-foreground-color: #075985;
+
+    --ag-header-row-height: 42px;
+    --ag-header-font-size: 14px;
+    --ag-header-font-weight: 600;
+    --ag-foreground-color: #F8FAFC;
+
+    --ag-accent-color: #f838ef;
+    --ag-odd-row-background-color: #1C2C37F0;
+    --ag-border-color: #2c3e50;
+    --ag-row-border-width: 1px;
+    --ag-font-family: 'Fredoka', sans-serif;
+}
+
+
+
+</style>

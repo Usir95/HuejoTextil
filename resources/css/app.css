@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
@@ -8,24 +7,11 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-  --font-sans:
-    'Fredoka',
-    'Patrick Hand',
-    'Caveat',
-    cursive, sans-serif;
+    --font-sans: 'Fredoka', 'Patrick Hand', 'Caveat', cursive, sans-serif;
 }
 
-
-
-/*
-    The default border color has changed to `currentcolor` in Tailwind CSS v4,
-    so we've added these compatibility styles to make sure everything still
-    looks the same as it did with Tailwind CSS v3.
-
-    If we ever want to remove these styles, we need to add an explicit border
-    color utility to any element that depends on these defaults.
-*/
 @layer base {
+    /* Compatibilidad Tailwind v3 → v4 */
     *,
     ::after,
     ::before,
@@ -34,12 +20,44 @@
         border-color: var(--color-gray-200, currentcolor);
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         font-family: 'Caveat';
         font-weight: 800;
     }
+
+    /* ✅ Tus estilos globales */
+    html,
+    body {
+        touch-action: manipulation;
+        overscroll-behavior: none;
+    }
+
+    input,
+    textarea,
+    select {
+        font-size: 16px !important;
+    }
+
+    input:focus,
+    input:focus-visible {
+        outline: none;
+        border-color: #000000;
+        box-shadow: none;
+        --tw-ring-color: none;
+    }
+
+    [type='text']:focus,
+    [type='time']:focus {
+        border-color: transparent;
+    }
 }
 
+/* Oculta elementos con x-cloak (Alpine) */
 [x-cloak] {
     display: none;
 }
