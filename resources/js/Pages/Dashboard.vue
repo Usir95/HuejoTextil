@@ -1,6 +1,14 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Welcome from '@/Components/Welcome.vue';
+import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
+import { useForm } from '@inertiajs/vue3'
+
+const form = useForm({
+    nombre: '',
+})
+
+
 </script>
 
 <template>
@@ -11,12 +19,19 @@ import Welcome from '@/Components/Welcome.vue';
             </h2>
         </template>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                    <Welcome />
-                </div>
+        <section class="m-8">
+            <div>
+                <MdTextInput
+                    v-model="form.nombre"
+                    label="Nombre completo"
+                    :required="true"
+                    :maxlength="50"
+                    :minlength="5"
+                    :uppercase="false"
+                    iconClass="fa fa-user"
+                    :error="form.errors.nombre"
+                />
             </div>
-        </div>
+        </section>
     </AppLayout>
 </template>
