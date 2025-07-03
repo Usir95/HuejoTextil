@@ -93,6 +93,14 @@
     gap: 1rem;
 }
 
+@media (max-width: 1024px) {
+    .ag-theme-quartz .ag-paging-panel,
+    .ag-theme-quartz-dark .ag-paging-panel {
+        padding: 2rem 1.5rem !important;
+        font-size: 14px;
+    }
+}
+
 .ag-theme-quartz .ag-paging-row-summary-panel,
 .ag-theme-quartz-dark .ag-paging-row-summary-panel {
     display: flex;
