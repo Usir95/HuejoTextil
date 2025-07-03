@@ -9,6 +9,8 @@ import UseToastify from './Plugins/toastify';
 import UseNotiflix from './Plugins/notiflix';
 import UseFilePond from './Plugins/filepond';
 import UseTippy from './Plugins/tippy';
+import '@fortawesome/fontawesome-free/css/all.min.css'
+
 
 // import './Plugins/aggrid';
 
