@@ -74,7 +74,7 @@
         <button
             v-if="internalValue && !readonly && !disabled"
             class="absolute right-3 transform -translate-y-1/2 cursor-pointer flex items-center justify-center transition-colors duration-200 text-[var(--color-primary)] hover:text-[var(--color-primary-light)]"
-            :style="{ top: errorText ? 'calc(1/2 * 55%)' : 'calc(1/2 * 73%)' }"
+            style="top: calc(1/2 * 73%);"
             @click.prevent="limpiar"
             tabindex="-1"
         >
@@ -89,7 +89,6 @@
 <script setup>
 import { ref, watch, computed, useSlots, onMounted } from 'vue'
 
-/* ======================= Props ========================== */
 const props = defineProps({
     modelValue: [String, Number],
     required: Boolean,
@@ -109,30 +108,24 @@ const props = defineProps({
     regex: RegExp,
     inputRestrict: {
         type: String,
-        validator: (val) => ['letters', 'numbers', 'alphanumeric', 'none'].includes(val),
-        default: 'none'
+        validator: (val) => ['numbers', 'decimal'].includes(val),
+        default: 'numbers'
     },
-    helper: {
-        type: String,
-        default: ''
-    },
+    helper: { type: String, default: '' }
 })
 
-/* ======================= Emits ========================== */
 const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
 
-/* ======================= Refs ========================== */
 const isFocused = ref(false)
-const internalValue = ref(props.modelValue ?? '')
+const internalValue = ref(props.modelValue?.toString() ?? '')
 const internalError = ref('')
 const isDark = ref(false)
 const slots = useSlots()
 const inputRef = ref(null)
 const showRealPlaceholder = false
 
-/* ======================= Watch modelValue ========================== */
 watch(() => props.modelValue, (val) => {
-    internalValue.value = val
+    internalValue.value = val?.toString() ?? ''
 })
 
 watch(internalValue, (val) => {
@@ -149,7 +142,6 @@ watch(internalValue, (val) => {
     }
 })
 
-/* ======================= Computed ========================== */
 const iconLeft = computed(() => !!slots.iconLeft)
 
 const backgroundColor = computed(() =>
@@ -189,16 +181,14 @@ const showCharCounter = computed(() =>
     typeof props.maxlength === 'number' && !props.readonly && !props.disabled
 )
 
-/* ======================= Functions ========================== */
 function updateValue(val) {
     let finalValue = val
 
-    if (props.inputRestrict === 'letters') {
-        finalValue = finalValue.replace(/[^a-zA-ZÁÉÍÓÚÜÑáéíóúüñ\s\-]/g, '')
-    } else if (props.inputRestrict === 'numbers') {
+    if (props.inputRestrict === 'numbers') {
         finalValue = finalValue.replace(/[^0-9]/g, '')
-    } else if (props.inputRestrict === 'alphanumeric') {
-        finalValue = finalValue.replace(/[^a-zA-Z0-9ÁÉÍÓÚÜÑáéíóúüñ\s\-_.,;]/g, '')
+    } else if (props.inputRestrict === 'decimal') {
+        finalValue = finalValue.replace(/[^0-9.]/g, '')
+        finalValue = finalValue.replace(/^(\d*\.\d*).*$/, '$1')
     }
 
     if (props.uppercase) {
@@ -206,31 +196,25 @@ function updateValue(val) {
     }
 
     internalValue.value = finalValue
-    emit('update:modelValue', finalValue)
+    emit('update:modelValue', Number(finalValue))
 }
 
 function onKeydown(event) {
-    if (event.key === 'Tab') {
-        const valid = validate()
-        if (!valid) {
-            event.preventDefault()
-        }
+    const navKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete']
+
+    if (navKeys.includes(event.key)) return
+
+    if (props.inputRestrict === 'numbers' && !/[0-9]/.test(event.key)) {
+        event.preventDefault()
     }
 
-    const navigationKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete']
-
-    if (navigationKeys.includes(event.key)) return
-
-    if (props.inputRestrict === 'letters') {
-        if (!/[a-zA-ZÁÉÍÓÚÜÑáéíóúüñ\s\-]/.test(event.key)) {
+    if (props.inputRestrict === 'decimal') {
+        const current = internalValue.value
+        const nextChar = event.key
+        if (!/[0-9.]/.test(nextChar)) {
             event.preventDefault()
         }
-    } else if (props.inputRestrict === 'numbers') {
-        if (!/[0-9]/.test(event.key)) {
-            event.preventDefault()
-        }
-    } else if (props.inputRestrict === 'alphanumeric') {
-        if (!/[a-zA-Z0-9ÁÉÍÓÚÜÑáéíóúüñ\s\-_.,;]/.test(event.key)) {
+        if (nextChar === '.' && current.includes('.')) {
             event.preventDefault()
         }
     }
@@ -254,11 +238,8 @@ function limpiar() {
     emit('update:modelValue', '')
 }
 
-defineExpose({
-    validate,
-})
+defineExpose({ validate })
 
-// Validación externa
 function validate() {
     let message = ''
 
@@ -276,7 +257,6 @@ function validate() {
     return message === ''
 }
 
-/* ======================= Dark Mode ========================== */
 onMounted(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
     isDark.value = prefersDark.matches
