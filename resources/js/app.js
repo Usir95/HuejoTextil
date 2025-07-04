@@ -11,6 +11,7 @@ import UseFilePond from './Plugins/filepond';
 import UseTippy from './Plugins/tippy';
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
+import FormValidatePlugin from './Plugins/validacion'
 
 // import './Plugins/aggrid';
 
@@ -25,6 +26,7 @@ createInertiaApp({
 
         app.use(plugin);
         app.use(ZiggyVue);
+        app.use(FormValidatePlugin);
 
         UseToastify(app);
         UseNotiflix(app);
@@ -35,5 +37,6 @@ createInertiaApp({
     },
     progress: {
         color: '#4B5563',
+        height: '3px',
     },
 });

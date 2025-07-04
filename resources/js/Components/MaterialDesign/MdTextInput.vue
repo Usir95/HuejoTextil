@@ -1,5 +1,5 @@
 <template>
-    <div class="relative w-full my-3 px-1">
+    <div class="relative w-full my-3 px-1" data-md-input="true" ref="rootRef">
         <!-- Label flotante -->
         <label v-if="label" :for="id"
             class="absolute text-sm  transition-all duration-300 ease-in-out px-1 pointer-events-none z-10 flex items-center gap-1 transform"
@@ -45,7 +45,8 @@
             @input="updateValue($event.target.value)" :style="{
                 backgroundColor,
                 borderColor,
-                '--tw-ring-color': borderColor
+                '--tw-ring-color': borderColor,
+                transition: 'border-color 0.3s ease, background-color 0.3s ease'
             }" />
 
         <!-- Error textual -->
@@ -63,12 +64,25 @@
             </div>
 
             <!-- Contador de caracteres -->
-            <div v-if="showCharCounter" :class="charCountColor">
+            <div v-if="showCharCounter" :class="charCountColor" class="transition-all duration-300">
                 {{ internalValue.length }} / {{ maxlength }}
             </div>
 
         </div>
 
+        <!-- Botón clear -->
+        <button
+            v-if="internalValue && !readonly && !disabled"
+            class="absolute right-3 transform -translate-y-1/2 cursor-pointer flex items-center justify-center transition-colors duration-200 text-[var(--color-primary)] hover:text-[var(--color-primary-light)]"
+            style="top: calc(1/2 * 73%);"
+            @click.prevent="limpiar"
+            tabindex="-1"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+                viewBox="0 0 28 28" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 </template>
 
@@ -196,16 +210,27 @@ function updateValue(val) {
 }
 
 function onKeydown(event) {
+    if (event.key === 'Tab') {
+        const valid = validate()
+        if (!valid) {
+            event.preventDefault()
+        }
+    }
+
+    const navigationKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete']
+
+    if (navigationKeys.includes(event.key)) return
+
     if (props.inputRestrict === 'letters') {
-        if (!/[a-zA-ZÁÉÍÓÚÜÑáéíóúüñ\s\-]/.test(event.key) && event.key !== 'Backspace') {
+        if (!/[a-zA-ZÁÉÍÓÚÜÑáéíóúüñ\s\-]/.test(event.key)) {
             event.preventDefault()
         }
     } else if (props.inputRestrict === 'numbers') {
-        if (!/[0-9]/.test(event.key) && event.key !== 'Backspace') {
+        if (!/[0-9]/.test(event.key)) {
             event.preventDefault()
         }
     } else if (props.inputRestrict === 'alphanumeric') {
-        if (!/[a-zA-Z0-9ÁÉÍÓÚÜÑáéíóúüñ\s\-_.,;]/.test(event.key) && event.key !== 'Backspace') {
+        if (!/[a-zA-Z0-9ÁÉÍÓÚÜÑáéíóúüñ\s\-_.,;]/.test(event.key)) {
             event.preventDefault()
         }
     }
@@ -222,6 +247,33 @@ function onBlur(e) {
         internalError.value = 'El formato no es válido'
     }
     emit('blur', e)
+}
+
+function limpiar() {
+    internalValue.value = ''
+    emit('update:modelValue', '')
+}
+
+defineExpose({
+    validate,
+})
+
+// Validación externa
+function validate() {
+    let message = ''
+
+    if (props.required && !internalValue.value) {
+        message = 'Este campo es obligatorio'
+    } else if (props.minlength && internalValue.value.length < props.minlength) {
+        message = `Debe tener al menos ${props.minlength} caracteres`
+    } else if (props.maxlength && internalValue.value.length > props.maxlength) {
+        message = `Debe tener máximo ${props.maxlength} caracteres`
+    } else if (props.regex && !props.regex.test(internalValue.value)) {
+        message = 'El formato no es válido'
+    }
+
+    internalError.value = message
+    return message === ''
 }
 
 /* ======================= Dark Mode ========================== */
