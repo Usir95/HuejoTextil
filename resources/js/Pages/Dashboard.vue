@@ -67,6 +67,8 @@ function GuardaFormaulario() {
                     label="Correo electrónico"
                     iconClass="fa fa-envelope"
                     helper="Ejemplo: usuario@dominio.com"
+                    :error="form.errors.correo"
+                    :success="!form.errors.correo"
                 />
 
                 <NumberInput
