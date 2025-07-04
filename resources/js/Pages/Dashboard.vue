@@ -8,18 +8,22 @@ import TextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 import NumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import PasswordInput from '@/Components/MaterialDesign/MdPasswordInput.vue'
 import EmailInput from '@/Components/MaterialDesign/MdEmailInput.vue'
+import TextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
+import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
 
 const form = useForm({
     nombre: '',
+    fecha_nacimiento: '',
     correo: '',
     edad: '',
     telefono: '',
     rfc: '',
     curp: '',
     password: '',
+    descripcion: '',
 });
 
 
@@ -44,7 +48,7 @@ function GuardaFormaulario() {
             </h2>
         </template>
 
-        <section  ref="FormSection">
+        <section  ref="FormSection" class="my-2 mx-4">
             <div>
                 <TextInput
                     v-model="form.nombre"
@@ -59,6 +63,18 @@ function GuardaFormaulario() {
                     iconClass="fa fa-user"
                     :error="form.errors.nombre"
                     :success="!form.errors.nombre"
+                />
+
+                <DateInput
+                    v-model="form.fecha_nacimiento"
+                    label="Fecha de nacimiento"
+                    name="fecha_nacimiento"
+                    id="fecha_nacimiento"
+                    required
+                    iconClass="fa fa-calendar"
+                    helper="Formato: año-mes-día"
+                    :error="form.errors.fecha_nacimiento"
+                    :success="!form.errors.fecha_nacimiento"
                 />
 
                 <EmailInput
@@ -148,6 +164,21 @@ function GuardaFormaulario() {
                     :error="form.errors.curp"
                     :success="!form.errors.curp"
                 />
+
+                <TextareaInput
+                    v-model="form.descripcion"
+                    label="Descripción"
+                    name="descripcion"
+                    id="descripcion"
+                    required
+                    :minlength="10"
+                    :maxlength="200"
+                    iconClass="fa fa-align-left"
+                    helper="Describe brevemente el problema"
+                    :error="form.errors.descripcion"
+                    :success="!form.errors.descripcion"
+                />
+
 
 
 
