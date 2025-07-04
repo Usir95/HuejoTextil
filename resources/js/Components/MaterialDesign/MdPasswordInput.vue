@@ -19,7 +19,7 @@
 
             <!-- Palomita si success sin error -->
             <svg
-                v-else-if="success && !error"
+                v-else-if="success && !errorText"
                 xmlns="http://www.w3.org/2000/svg"
                 class="w-4 h-4 text-[var(--color-primary-hover)] ml-1 transition-all duration-300 transform scale-100"
                 fill="none"
@@ -74,25 +74,17 @@
                 transition: 'border-color 0.3s ease, background-color 0.3s ease'
             }" />
 
-        <!-- Error textual -->
-        <div v-if="errorText" class="mt-1 text-sm text-[var(--color-complement-2)] px-1">
-            {{ errorText }}
-        </div>
-
-        <!-- Ayuda izquierda + contador derecha -->
-        <div v-if="helper  || showCharCounter"
-            class="flex items-center justify-between text-xs px-1 mt-1 leading-tight">
-
-            <!-- Texto ejemplo o ayuda -->
-            <div v-if="helper" class="text-gray-400 ml-1">
-                {{ helper }}
+        <!-- Error o ayuda + contador -->
+        <div class="flex items-center justify-between text-xs px-1 mt-1 leading-tight">
+            <!-- Muestra error si existe, si no muestra helper -->
+            <div class="ml-1" :class="errorText ? 'text-[var(--color-complement-2)] text-sm' : 'text-gray-400'">
+                {{ errorText || helper }}
             </div>
 
             <!-- Contador de caracteres -->
             <div v-if="showCharCounter" :class="charCountColor" class="transition-all duration-300">
                 {{ internalValue.length }} / {{ maxlength }}
             </div>
-
         </div>
 
         <!-- Toggle visibility -->
