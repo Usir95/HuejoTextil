@@ -25,6 +25,7 @@
         "@fortawesome/fontawesome-free": "^6.7.2",
         "ag-grid-community": "^34.0.0",
         "ag-grid-vue3": "^34.0.0",
+        "dayjs": "^1.11.13",
         "filepond": "^4.32.8",
         "filepond-plugin-file-validate-type": "^1.2.9",
         "filepond-plugin-image-preview": "^4.6.12",
