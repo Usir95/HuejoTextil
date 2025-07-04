@@ -118,11 +118,37 @@
 - Migración `create_audits_table` ejecutada.
 - Configuración `audit.php` publicada.
 
+
 ### 📌 Uso
 ```php
 use OwenIt\Auditing\Contracts\Auditable;
 
-class MiModelo extends Model implements Auditable
-{
+class MiModelo extends Model implements Auditable {
     use \OwenIt\Auditing\Auditable;
 }
+```
+
+---
+
+## 🧱 [v1.22.0] - Componente MdTextInput.vue
+
+### ✨ Funcionalidades agregadas
+- Nuevo componente MdTextInput.vue con diseño Material Design.
+- Soporte para:
+    - Máscaras de entrada mediante IMask.
+    - Modo oscuro automático (prefers-color-scheme).
+    - Etiqueta flotante animada.
+    - Icono izquierdo (slot o clase CSS).
+    - Indicadores visuales de éxito y error.
+    - Contador de caracteres con semáforo visual.
+
+### 🔐 Validaciones y restricciones
+- Propiedad inputRestrict para restringir el tipo de caracteres permitidos:
+    - letters: solo letras, tildes, guiones y espacios.
+    - numbers: solo números, comas, puntos, espacios y guiones.
+    - alphanumeric: letras, números, tildes, guiones, guion bajo, punto, coma, punto y coma.
+    - none (por defecto): sin restricción.
+
+### ⚙️ Opciones adicionales
+- Soporte para mayúsculas automáticas (uppercase).
+- Props readonly, disabled, minlength, maxlength, mask, success, error.
