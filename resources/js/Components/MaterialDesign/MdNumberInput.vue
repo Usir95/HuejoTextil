@@ -148,7 +148,7 @@ watch(() => props.modelValue, (val) => {
 watch(internalValue, (val) => {
     internalError.value = ''
 
-    if (props.required && !val) {
+    if (props.required && val === '') {
         internalError.value = 'Este campo es obligatorio'
     } else if (props.minlength && val.length < props.minlength) {
         internalError.value = `Debe tener al menos ${props.minlength} caracteres`
@@ -217,6 +217,13 @@ function updateValue(val) {
 }
 
 function onKeydown(event) {
+    if (event.key === 'Tab') {
+    const valid = validate()
+    if (!valid) {
+        event.preventDefault()
+    }
+}
+
     const navKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete']
 
     if (navKeys.includes(event.key)) return
@@ -260,7 +267,7 @@ defineExpose({ validate })
 function validate() {
     let message = ''
 
-    if (props.required && !internalValue.value) {
+    if (props.required && internalValue.value === '') {
         message = 'Este campo es obligatorio'
     } else if (props.minlength && internalValue.value.length < props.minlength) {
         message = `Debe tener al menos ${props.minlength} caracteres`
