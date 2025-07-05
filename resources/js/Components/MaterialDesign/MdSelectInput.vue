@@ -85,6 +85,9 @@
             <ul v-if="isOpen && options.length"
                 class="absolute z-20 left-2 right-2 mt-1 max-h-60 overflow-auto rounded-xl border border-[var(--color-primary-light)] bg-[#f3f4f6] dark:bg-[#101828] shadow-lg text-sm text-gray-800 dark:text-gray-100"
             >
+                <li @click.stop="clearSelection" class="px-4 py-2 italic text-gray-500 hover:bg-[var(--color-primary-light)] cursor-pointer transition-colors">
+                    — Limpiar selección —
+                </li>
                 <li
                     v-for="(option, index) in options"
                     :key="index"
@@ -202,6 +205,15 @@ function validate() {
     }
     internalError.value = ''
     return true
+}
+
+function clearSelection() {
+    if (props.multiple) {
+        emit('update:modelValue', [])
+    } else {
+        emit('update:modelValue', null)
+    }
+    isOpen.value = false
 }
 
 onMounted(() => {
