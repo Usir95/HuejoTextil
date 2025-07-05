@@ -11,6 +11,7 @@ import EmailInput from '@/Components/MaterialDesign/MdEmailInput.vue'
 import TextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
+import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -25,6 +26,7 @@ const form = useForm({
     curp: '',
     password: '',
     descripcion: '',
+    hora: '',
     rango: {
         start: '',
         end: ''
@@ -97,6 +99,14 @@ function GuardaFormaulario() {
                     :error="form.errors.rango"
                     :success="!form.errors.rango"
                     :modelRange="form.rango"
+                />
+
+                <TimeInput
+                    v-model="form.hora"
+                    label="Hora de entrada"
+                    required
+                    iconClass="fa fa-clock"
+                    helper="Selecciona la hora exacta"
                 />
 
                 <EmailInput
