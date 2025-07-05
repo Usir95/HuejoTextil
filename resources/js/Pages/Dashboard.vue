@@ -12,6 +12,7 @@ import TextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
 import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
+import MdSelect from '@/Components/MaterialDesign/MdSelect.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -30,8 +31,22 @@ const form = useForm({
     rango: {
         start: '',
         end: ''
-    }
+    },
+    color: '',
+    colores: [
+        { value: '1', label: 'Rojo' },
+        { value: '2', label: 'Azul' },
+        { value: '3', label: 'Verde' }
+    ]
 });
+
+const colorSeleccionado = ref(null)
+
+const colores = [
+    { value: '1', label: 'Rojo' },
+    { value: '2', label: 'Azul' },
+    { value: '3', label: 'Verde' },
+]
 
 
 
@@ -57,6 +72,22 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div>
+
+            <div>
+                <MdSelect
+                    v-model="form.color"
+                    :options="form.colores"
+                    label="Selecciona un color"
+                    name="colores"
+                    id="colores"
+                    :required="true"
+                    iconClass="fa fa-user"
+                    helper="Select a color"
+                    :error="form.errors.color"
+                    :success="!form.errors.color"
+                />
+            </div>
+
                 <TextInput
                     v-model="form.nombre"
                     label="Nombre"

@@ -22,7 +22,7 @@
 }
 
 .dark {
-  --color-background: #101828;
+    --color-background: #101828;
 }
 
 @layer base {
@@ -46,28 +46,41 @@
     }
 
     /* ✅ Tus estilos globales */
-    html,
-    body {
+
+    html, body {
         touch-action: manipulation;
         overscroll-behavior: none;
     }
 
-    input,
-    textarea,
-    select {
+    input, textarea, select {
         font-size: 16px !important;
     }
 
-    input:focus,
-    input:focus-visible {
+    input:focus{
         outline: none;
         border-color: #000000;
-        box-shadow: none;
         --tw-ring-color: none;
+        box-shadow: none;
     }
 
-    [type='text']:focus,
-    [type='time']:focus {
+    input:focus{
+        outline: none;
+        border-color: #000000;
+        --tw-ring-color: none;
+        box-shadow: none;
+    }
+
+    input:focus-visible{
+        outline: none;
+        --tw-ring-color: none;
+        box-shadow: none;
+    }
+
+    [type="text"]:focus {
+        border-color: transparent;
+    }
+
+    [type="time"]:focus {
         border-color: transparent;
     }
 }
