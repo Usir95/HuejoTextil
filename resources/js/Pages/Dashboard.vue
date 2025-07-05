@@ -10,6 +10,7 @@ import PasswordInput from '@/Components/MaterialDesign/MdPasswordInput.vue'
 import EmailInput from '@/Components/MaterialDesign/MdEmailInput.vue'
 import TextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
+import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -24,6 +25,10 @@ const form = useForm({
     curp: '',
     password: '',
     descripcion: '',
+    rango: {
+        start: '',
+        end: ''
+    }
 });
 
 
@@ -80,6 +85,19 @@ function GuardaFormaulario() {
                     :disabledDates="['2025-07-07']"
                 />
 
+
+                <DateRangeInput
+                    v-model="form.rango"
+                    label="Rango de fechas"
+                    name="rango"
+                    id="rango"
+                    required
+                    iconClass="fa fa-calendar"
+                    helper="Formato: año-mes-día"
+                    :error="form.errors.rango"
+                    :success="!form.errors.rango"
+                    :modelRange="form.rango"
+                />
 
                 <EmailInput
                     v-model="form.correo"
