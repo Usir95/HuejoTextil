@@ -5,20 +5,17 @@
             v-if="label"
             class="absolute text-sm transition-all duration-300 ease-in-out px-1 pointer-events-none z-10 flex items-center gap-1 transform"
             :class="[
-                isFocused || modelValue
+                isFocused || modelValue?.length || modelValue
                     ? `text-[0.75rem] -top-2.5 scale-90 ${labelColor}`
                     : 'top-2.5 scale-100 text-gray-500',
                 iconLeft || iconClass ? 'left-10' : 'left-3'
             ]"
             :style="{ backgroundColor }"
         >
-            <!-- Asterisco si es requerido -->
             <span
-                v-if="required && !modelValue && !errorText"
+                v-if="required && (!modelValue || modelValue.length === 0) && !errorText"
                 class="text-red-500 font-bold text-base leading-none"
             >*</span>
-
-            <!-- Palomita si success -->
             <svg
                 v-else-if="success && !errorText"
                 xmlns="http://www.w3.org/2000/svg"
@@ -30,8 +27,6 @@
             >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
-
-            <!-- Equis si error -->
             <svg
                 v-else-if="errorText"
                 xmlns="http://www.w3.org/2000/svg"
@@ -43,11 +38,9 @@
             >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-
             {{ label }}
         </label>
 
-        <!-- Icono izquierdo -->
         <div
             v-if="iconLeft || iconClass"
             class="absolute left-3 h-10 flex items-center pointer-events-none"
@@ -60,7 +53,7 @@
         <!-- Input visual -->
         <div
             tabindex="0"
-            class="w-full h-10 rounded-xl text-sm flex items-center cursor-pointer transition-all duration-300 ease-in-out shadow-sm ring-1 ring-inset"
+            class="w-full min-h-10 rounded-xl text-sm flex flex-wrap items-center gap-1 cursor-pointer transition-all duration-300 ease-in-out shadow-sm ring-1 ring-inset"
             :class="{ 'pl-10 pr-4': iconLeft || iconClass, 'px-4': !iconLeft && !iconClass }"
             @click="toggleOpen"
             @focus="isFocused = true"
@@ -72,12 +65,19 @@
                 borderWidth: '1px'
             }"
         >
-            <span class="truncate select-none text-gray-800 dark:text-gray-100"
-                :class="{ 'opacity-50': !modelValue }">
-                {{
-                    props.options.find(opt => opt.value === props.modelValue)?.label || ''
-                }}
-            </span>
+            <template v-if="multiple">
+                <span v-for="(option, i) in selectedOptions" :key="i" class="bg-[var(--color-primary)] text-white px-3 py-1 rounded-full text-xs flex items-center gap-1">
+                    {{ option.label }}
+                    <button type="button" class="ml-1 text-xs px-1 cursor-pointer" @click.stop="removeOption(option)">×</button>
+                </span>
+                <span v-if="!selectedOptions.length" class="opacity-50">Selecciona opciones</span>
+            </template>
+            <template v-else>
+                <span class="truncate select-none text-gray-800 dark:text-gray-100"
+                    :class="{ 'opacity-50': !modelValue }">
+                    {{ options.find(opt => opt.value === modelValue)?.label || '' }}
+                </span>
+            </template>
         </div>
 
         <!-- Dropdown -->
@@ -85,8 +85,12 @@
             <ul v-if="isOpen && options.length"
                 class="absolute z-20 left-2 right-2 mt-1 max-h-60 overflow-auto rounded-xl border border-[var(--color-primary-light)] bg-[#f3f4f6] dark:bg-[#101828] shadow-lg text-sm text-gray-800 dark:text-gray-100"
             >
-                <li v-for="(option, index) in options" :key="index" @click="selectOption(option)"
+                <li
+                    v-for="(option, index) in options"
+                    :key="index"
+                    @click.stop="selectOption(option)"
                     class="px-4 py-2 hover:bg-[var(--color-primary-light)] cursor-pointer transition-colors"
+                    :class="{ 'bg-[var(--color-primary-light)]': isSelected(option) }"
                 >
                     {{ option.label }}
                 </li>
@@ -109,14 +113,15 @@
 import { ref, computed, watch, onMounted, useSlots } from 'vue'
 
 const props = defineProps({
-    modelValue: [String, Number, Object],
+    modelValue: [String, Number, Object, Array],
     options: { type: Array, default: () => [] },
     label: { type: String, default: 'Selecciona una opción' },
     iconClass: { type: String, default: '' },
     error: [Boolean, String, Array],
     success: Boolean,
     required: Boolean,
-    helper: String
+    helper: String,
+    multiple: Boolean
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -149,9 +154,33 @@ const errorText = computed(() => {
     return null
 })
 
+const selectedOptions = computed(() => {
+    if (!props.multiple) return []
+    return props.options.filter(opt => props.modelValue?.includes(opt.value))
+})
+
+function isSelected(option) {
+    if (props.multiple) return props.modelValue?.includes(option.value)
+    return props.modelValue === option.value
+}
+
 function selectOption(option) {
-    emit('update:modelValue', option.value)
-    isOpen.value = false
+    if (props.multiple) {
+        const newValue = [...(props.modelValue || [])]
+        const index = newValue.indexOf(option.value)
+        if (index >= 0) newValue.splice(index, 1)
+        else newValue.push(option.value)
+        emit('update:modelValue', newValue)
+    } else {
+        emit('update:modelValue', option.value)
+        isOpen.value = false
+    }
+}
+
+function removeOption(option) {
+    if (!props.multiple) return
+    const newValue = props.modelValue.filter(val => val !== option.value)
+    emit('update:modelValue', newValue)
 }
 
 function toggleOpen() {
@@ -166,11 +195,11 @@ function handleBlur() {
 }
 
 function validate() {
-    if (props.required && (props.modelValue === null || props.modelValue === '' || props.modelValue === undefined)) {
+    const isEmpty = props.multiple ? !props.modelValue?.length : (props.modelValue === null || props.modelValue === '' || props.modelValue === undefined)
+    if (props.required && isEmpty) {
         internalError.value = 'Este campo es obligatorio'
         return false
     }
-
     internalError.value = ''
     return true
 }
@@ -184,7 +213,8 @@ onMounted(() => {
 })
 
 watch(() => props.modelValue, (val) => {
-    if (props.required && (val === null || val === '' || val === undefined)) {
+    const isEmpty = props.multiple ? !val?.length : (val === null || val === '' || val === undefined)
+    if (props.required && isEmpty) {
         internalError.value = 'Este campo es obligatorio'
     } else {
         internalError.value = ''

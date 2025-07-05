@@ -12,7 +12,7 @@ import TextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
 import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
-import MdSelect from '@/Components/MaterialDesign/MdSelect.vue'
+import MdSelect from '@/Components/MaterialDesign/MdSelectInput.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -81,6 +81,7 @@ function GuardaFormaulario() {
                     name="colores"
                     id="colores"
                     :required="true"
+                    :multiple="true"
                     iconClass="fa fa-user"
                     helper="Select a color"
                     :error="form.errors.color"
