@@ -1,5 +1,5 @@
 <template>
-    <div class="relative w-full my-3 px-1" data-md-input="true">
+    <div ref="wrapperRef" class="relative w-full my-3 px-1" data-md-input="true">
         <!-- Label flotante -->
         <label
             v-if="label"
@@ -57,7 +57,6 @@
             :class="{ 'pl-10 pr-4': iconLeft || iconClass, 'px-4': !iconLeft && !iconClass }"
             @click="toggleOpen"
             @focus="isFocused = true"
-            @blur="handleBlur"
             :style="{
                 backgroundColor,
                 borderColor,
@@ -91,7 +90,7 @@
                 <li
                     v-for="(option, index) in options"
                     :key="index"
-                    @click.stop="selectOption(option)"
+                    @click.stop="(e) => selectOption(option, e)"
                     class="px-4 py-2 hover:bg-[var(--color-primary-light)] cursor-pointer transition-colors"
                     :class="{ 'bg-[var(--color-primary-light)]': isSelected(option) }"
                 >
@@ -114,6 +113,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, useSlots } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps({
     modelValue: [String, Number, Object, Array],
@@ -128,7 +128,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-
+const wrapperRef = ref(null)
 const isOpen = ref(false)
 const iconLeft = computed(() => !!useSlots().iconLeft)
 const isFocused = ref(false)
@@ -167,18 +167,25 @@ function isSelected(option) {
     return props.modelValue === option.value
 }
 
-function selectOption(option) {
+function selectOption(option, event) {
     if (props.multiple) {
         const newValue = [...(props.modelValue || [])]
         const index = newValue.indexOf(option.value)
         if (index >= 0) newValue.splice(index, 1)
         else newValue.push(option.value)
         emit('update:modelValue', newValue)
+
+        // ❗️Cerrar solo si NO está presionado Ctrl o Cmd
+        if (!(event.ctrlKey || event.metaKey)) {
+            isOpen.value = false
+        }
     } else {
         emit('update:modelValue', option.value)
         isOpen.value = false
     }
 }
+
+
 
 function removeOption(option) {
     if (!props.multiple) return
@@ -231,6 +238,11 @@ watch(() => props.modelValue, (val) => {
     } else {
         internalError.value = ''
     }
+})
+
+
+onClickOutside(wrapperRef, (event) => {
+    isOpen.value = false
 })
 
 defineExpose({

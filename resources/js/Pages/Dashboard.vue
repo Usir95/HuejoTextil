@@ -36,7 +36,17 @@ const form = useForm({
     colores: [
         { value: '1', label: 'Rojo' },
         { value: '2', label: 'Azul' },
-        { value: '3', label: 'Verde' }
+        { value: '3', label: 'Verde' },
+        { value: '4', label: 'Amarillo' },
+        { value: '5', label: 'Naranja' },
+        { value: '6', label: 'Morado' },
+        { value: '7', label: 'Rosa' },
+        { value: '8', label: 'Negro' },
+        { value: '9', label: 'Blanco' },
+        { value: '10', label: 'Gris' },
+        { value: '11', label: 'Marrón' },
+        { value: '12', label: 'Turquesa' },
+        { value: '13', label: 'Violeta' }
     ]
 });
 
@@ -81,7 +91,6 @@ function GuardaFormaulario() {
                     name="colores"
                     id="colores"
                     :required="true"
-                    :multiple="true"
                     iconClass="fa fa-user"
                     helper="Select a color"
                     :error="form.errors.color"
