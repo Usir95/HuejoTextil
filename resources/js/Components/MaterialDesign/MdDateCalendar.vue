@@ -25,8 +25,9 @@
                 :key="index"
                 class="py-1.5"
             >
+                <!-- Día válido y habilitado -->
                 <button
-                    v-if="d"
+                    v-if="d && !estaDeshabilitado(d)"
                     @click="seleccionarDia(d)"
                     :class="[
                         'w-8 h-8 rounded-full flex items-center justify-center transition duration-200',
@@ -35,10 +36,19 @@
                         !esSeleccionado(d) ? 'hover:bg-[var(--color-primary-light)]/20 dark:hover:bg-white/20' : ''
                     ]"
                     :style="esSeleccionado(d) ? { backgroundColor: 'var(--color-primary)' } : {}"
-
                 >
                     {{ d }}
                 </button>
+
+                <!-- Día deshabilitado -->
+                <span
+                    v-else-if="d"
+                    class="w-8 h-8 flex items-center justify-center text-gray-400 opacity-40 cursor-not-allowed"
+                >
+                    {{ d }}
+                </span>
+
+                <!-- Día vacío -->
                 <span v-else></span>
             </div>
         </div>
@@ -53,11 +63,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
 
 const props = defineProps({
-    modelValue: String
+    modelValue: String,
+    minDate: String,
+    maxDate: String,
+    disabledDates: Array,
+    disabledWeekdays: Array
 })
 
 const emit = defineEmits(['update:modelValue', 'close', 'clear'])
@@ -111,6 +125,17 @@ function seleccionarDia(d) {
     const fechaSeleccionada = dayjs().year(anio.value).month(mes.value).date(d).format('YYYY-MM-DD')
     emit('update:modelValue', fechaSeleccionada)
     emit('close')
+}
+
+function estaDeshabilitado(d) {
+    const fecha = dayjs().year(anio.value).month(mes.value).date(d)
+
+    if (props.minDate && fecha.isBefore(dayjs(props.minDate), 'day')) return true
+    if (props.maxDate && fecha.isAfter(dayjs(props.maxDate), 'day')) return true
+    if (Array.isArray(props.disabledDates) && props.disabledDates.some(fd => dayjs(fd).isSame(fecha, 'day'))) return true
+    if (Array.isArray(props.disabledWeekdays) && props.disabledWeekdays.includes(fecha.day())) return true
+
+    return false
 }
 
 function prevMonth() {

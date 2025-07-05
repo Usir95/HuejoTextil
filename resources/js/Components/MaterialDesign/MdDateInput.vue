@@ -88,26 +88,31 @@
             </div>
         </div>
 
-        <div
-            v-if="showCalendar"
-            ref="calendarRef"
-            class="absolute z-50 mt-2"
-            :style="{ top: '100%', left: '0' }"
-        >
-            <MdDateCalendar
-                v-model="internalValue"
-                @close="closeCalendar"
-                @clear="() => updateValue('')"
-            />
-        </div>
+        <transition name="calendar-fade">
+            <div
+                v-if="showCalendar"
+                ref="calendarRef"
+                class="absolute z-50 mt-2"
+                :style="{ top: '100%', left: '0' }"
+            >
+                <MdDateCalendar
+                    v-model="internalValue"
+                    @close="closeCalendar"
+                    @clear="() => updateValue('')"
+                    :minDate="props.minDate"
+                    :maxDate="props.maxDate"
+                    :disabledDates="props.disabledDates"
+                    :disabledWeekdays="props.disabledWeekdays"
+                />
+            </div>
+        </transition>
     </div>
 </template>
-
 
 <script setup>
 import { ref, watch, computed, useSlots, onMounted, onBeforeUnmount } from 'vue'
 import MdDateCalendar from './MdDateCalendar.vue'
-
+import dayjs from 'dayjs'
 /* ======================= Props ========================== */
 const props = defineProps({
     modelValue: String,
@@ -121,8 +126,13 @@ const props = defineProps({
     error: [Boolean, String, Array],
     success: { type: Boolean, default: false },
     iconClass: { type: String, default: '' },
-    helper: { type: String, default: '' }
+    helper: { type: String, default: '' },
+    minDate: String,
+    maxDate: String,
+    disabledDates: Array,
+    disabledWeekdays: Array
 })
+
 
 /* ======================= Emits ========================== */
 const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
@@ -202,11 +212,31 @@ function onUserInput(e) {
         const dd = raw.slice(0, 2)
         const mm = raw.slice(2, 4)
         const yyyy = raw.slice(4)
-        updateValue(`${yyyy}-${mm}-${dd}`)
+        const parsed = `${yyyy}-${mm}-${dd}`
+        const date = dayjs(parsed)
+
+        if (isDateDisabled(date)) {
+            internalError.value = 'Fecha no permitida'
+            updateValue('')
+        } else {
+            updateValue(parsed)
+        }
     } else {
         updateValue('')
     }
 }
+
+function isDateDisabled(date) {
+    if (!date.isValid()) return true
+
+    if (props.minDate && date.isBefore(dayjs(props.minDate), 'day')) return true
+    if (props.maxDate && date.isAfter(dayjs(props.maxDate), 'day')) return true
+    if (props.disabledDates?.some(fd => dayjs(fd).isSame(date, 'day'))) return true
+    if (props.disabledWeekdays?.includes(date.day())) return true
+
+    return false
+}
+
 
 function onKeydown(event) {
     if (event.key === 'Tab') {
@@ -279,3 +309,21 @@ onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
+<style scoped>
+.calendar-fade-enter-active,
+.calendar-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.calendar-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+.calendar-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+</style>

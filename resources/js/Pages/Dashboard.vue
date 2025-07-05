@@ -75,7 +75,11 @@ function GuardaFormaulario() {
                     helper="Formato: año-mes-día"
                     :error="form.errors.fecha_nacimiento"
                     :success="!form.errors.fecha_nacimiento"
+                    :minDate="'2025-07-01'"
+                    :maxDate="'2026-12-02'"
+                    :disabledDates="['2025-07-07']"
                 />
+
 
                 <EmailInput
                     v-model="form.correo"
