@@ -13,6 +13,7 @@ import DateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
 import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
 import MdSelect from '@/Components/MaterialDesign/MdSelectInput.vue'
+import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -33,6 +34,7 @@ const form = useForm({
         end: ''
     },
     color: '',
+    fruta: '',
     colores: [
         { value: '1', label: 'Rojo' },
         { value: '2', label: 'Azul' },
@@ -52,10 +54,20 @@ const form = useForm({
 
 const colorSeleccionado = ref(null)
 
-const colores = [
-    { value: '1', label: 'Rojo' },
-    { value: '2', label: 'Azul' },
-    { value: '3', label: 'Verde' },
+const frutas = [
+    { value: '1', label: 'Platano' },
+    { value: '2', label: 'Manzana' },
+    { value: '3', label: 'Fresa' },
+    { value: '4', label: 'Pera' },
+    { value: '5', label: 'Uva' },
+    { value: '6', label: 'Sandía' },
+    { value: '7', label: 'Melón' },
+    { value: '8', label: 'Piña' },
+    { value: '9', label: 'Cereza' },
+    { value: '10', label: 'Naranja' },
+    { value: '11', label: 'Mango' },
+    { value: '12', label: 'Limón' },
+    { value: '13', label: 'Coco' },
 ]
 
 
@@ -82,6 +94,19 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div>
+
+            <MdSelectSearchInput
+                v-model="form.fruta"
+                :options="frutas"
+                label="Selecciona una fruta"
+                name="fruta"
+                id="fruta"
+                :required="true"
+                iconClass="fa fa-user"
+                helper="Select a fruit"
+                :error="form.errors.color"
+                :success="!form.errors.color"
+            />
 
             <div>
                 <MdSelect
