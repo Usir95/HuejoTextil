@@ -17,6 +17,7 @@ import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput
 import FileUploader from '@/Components/MaterialDesign/FileUploader.vue'
 import Checkbox from '@/Components/MaterialDesign/MdCheckbox.vue'
 import RadioButton from '@/Components/MaterialDesign/MdRadioButton.vue'
+import Switch from '@/Components/MaterialDesign/MdSwitch.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -36,6 +37,7 @@ const form = useForm({
         start: '',
         end: ''
     },
+    extraterreste: false,
     sexo: null,
     terminos: false,
     archivo: [],
@@ -101,6 +103,15 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div class="h-[60vh] overflow-auto">
+
+                <Switch
+                    v-model="form.extraterreste"
+                    label="¿Es un extraterrestre?"
+                    icon="home-outline"
+                    id="extraterreste"
+                    name="extraterreste"
+                    :required="true"
+                />
 
                 <div class="flex flex-row justify-between items-center">
                     <RadioButton v-model="form.sexo" value="M" label="Masculino" required />
