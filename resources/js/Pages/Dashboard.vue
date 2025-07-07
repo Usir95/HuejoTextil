@@ -14,6 +14,7 @@ import DateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue'
 import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
 import MdSelect from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
+import FileUploader from '@/Components/MaterialDesign/FileUploader.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -33,6 +34,7 @@ const form = useForm({
         start: '',
         end: ''
     },
+    archivo: [],
     color: '',
     fruta: '',
     colores: [
@@ -74,6 +76,7 @@ const frutas = [
 
 function GuardaFormaulario() {
     if (!FormValidate || !FormValidate(FormSection)) return
+    console.log(form.archivo);
 
     form.post(route('example.store'), {
         preserveScroll: true,
@@ -94,6 +97,21 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div>
+
+            <FileUploader
+                name="file"
+                id="file"
+                label="Subir Imagen"
+                v-model="form.archivo"
+                accept=".png,.jpg,.jpeg,"
+                :required="true"
+                :multiple="false"
+                :error="form.errors.archivo"
+                :success="!form.errors.archivo"
+            />
+
+
+
 
             <MdSelectSearchInput
                 v-model="form.fruta"
