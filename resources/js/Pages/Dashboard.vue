@@ -16,6 +16,7 @@ import MdSelect from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 import FileUploader from '@/Components/MaterialDesign/FileUploader.vue'
 import Checkbox from '@/Components/MaterialDesign/MdCheckbox.vue'
+import RadioButton from '@/Components/MaterialDesign/MdRadioButton.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -35,6 +36,7 @@ const form = useForm({
         start: '',
         end: ''
     },
+    sexo: null,
     terminos: false,
     archivo: [],
     color: '',
@@ -97,41 +99,45 @@ function GuardaFormaulario() {
             </h2>
         </template>
 
-        <section  ref="FormSection" class="my-2 mx-4 h-[70vh] overflow-auto">
-            <div>
+        <section  ref="FormSection" class="my-2 mx-4">
+            <div class="h-[60vh] overflow-auto">
 
-            <Checkbox
-                v-model="form.terminos"
-                label="Acepto los términos"
-                required
-            />
+                <div class="flex flex-row justify-between items-center">
+                    <RadioButton v-model="form.sexo" value="M" label="Masculino" required />
+                    <RadioButton v-model="form.sexo" value="F" label="Femenino" required/>
+                </div>
 
-            <FileUploader
-                name="file"
-                id="file"
-                label="Subir Imagen"
-                v-model="form.archivo"
-                accept=".png,.jpg,.jpeg,"
-                :required="true"
-                :multiple="false"
-                :error="form.errors.archivo"
-                :success="!form.errors.archivo"
-            />
+                <Checkbox
+                    v-model="form.terminos"
+                    label="Acepto los términos"
+                    required
+                />
 
-            <MdSelectSearchInput
-                v-model="form.fruta"
-                :options="frutas"
-                label="Selecciona una fruta"
-                name="fruta"
-                id="fruta"
-                :required="true"
-                iconClass="fa fa-user"
-                helper="Select a fruit"
-                :error="form.errors.color"
-                :success="!form.errors.color"
-            />
+                <FileUploader
+                    name="file"
+                    id="file"
+                    label="Subir Imagen"
+                    v-model="form.archivo"
+                    accept=".png,.jpg,.jpeg,"
+                    :required="true"
+                    :multiple="false"
+                    :error="form.errors.archivo"
+                    :success="!form.errors.archivo"
+                />
 
-            <div>
+                <MdSelectSearchInput
+                    v-model="form.fruta"
+                    :options="frutas"
+                    label="Selecciona una fruta"
+                    name="fruta"
+                    id="fruta"
+                    :required="true"
+                    iconClass="fa fa-user"
+                    helper="Select a fruit"
+                    :error="form.errors.color"
+                    :success="!form.errors.color"
+                />
+
                 <MdSelect
                     v-model="form.color"
                     :options="form.colores"
@@ -144,7 +150,6 @@ function GuardaFormaulario() {
                     :error="form.errors.color"
                     :success="!form.errors.color"
                 />
-            </div>
 
                 <TextInput
                     v-model="form.nombre"
@@ -175,7 +180,6 @@ function GuardaFormaulario() {
                     :maxDate="'2026-12-02'"
                     :disabledDates="['2025-07-07']"
                 />
-
 
                 <DateRangeInput
                     v-model="form.rango"
@@ -300,12 +304,10 @@ function GuardaFormaulario() {
                     :success="!form.errors.descripcion"
                 />
 
+            </div>
 
-
-
-
+            <div class="flex justify-center">
                 <button @click="GuardaFormaulario()" class="px-4 py-1 rounded-lg bg-sky-400">Guardar formulario</button>
-
             </div>
         </section>
     </AppLayout>
