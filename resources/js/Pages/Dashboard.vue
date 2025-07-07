@@ -15,6 +15,7 @@ import TimeInput from '@/Components/MaterialDesign/MdTimeInput.vue'
 import MdSelect from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 import FileUploader from '@/Components/MaterialDesign/FileUploader.vue'
+import Checkbox from '@/Components/MaterialDesign/MdCheckbox.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -34,6 +35,7 @@ const form = useForm({
         start: '',
         end: ''
     },
+    terminos: false,
     archivo: [],
     color: '',
     fruta: '',
@@ -95,8 +97,14 @@ function GuardaFormaulario() {
             </h2>
         </template>
 
-        <section  ref="FormSection" class="my-2 mx-4">
+        <section  ref="FormSection" class="my-2 mx-4 h-[70vh] overflow-auto">
             <div>
+
+            <Checkbox
+                v-model="form.terminos"
+                label="Acepto los términos"
+                required
+            />
 
             <FileUploader
                 name="file"
@@ -109,9 +117,6 @@ function GuardaFormaulario() {
                 :error="form.errors.archivo"
                 :success="!form.errors.archivo"
             />
-
-
-
 
             <MdSelectSearchInput
                 v-model="form.fruta"
