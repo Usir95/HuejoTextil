@@ -18,6 +18,7 @@ import FileUploader from '@/Components/MaterialDesign/FileUploader.vue'
 import Checkbox from '@/Components/MaterialDesign/MdCheckbox.vue'
 import RadioButton from '@/Components/MaterialDesign/MdRadioButton.vue'
 import Switch from '@/Components/MaterialDesign/MdSwitch.vue'
+import ColorPicker  from '@/Components/MaterialDesign/MdColorPicker.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -57,7 +58,8 @@ const form = useForm({
         { value: '11', label: 'Marrón' },
         { value: '12', label: 'Turquesa' },
         { value: '13', label: 'Violeta' }
-    ]
+    ],
+    palette: '',
 });
 
 const colorSeleccionado = ref(null)
@@ -103,6 +105,16 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div class="h-[60vh] overflow-auto">
+
+                <ColorPicker
+                    v-model="form.palette"
+                    label="Color favorito"
+                    icon="palette"
+                    id="palette"
+                    name="palette"
+                    :required="true"
+                    :clearable="true"
+                />
 
                 <Switch
                     v-model="form.extraterreste"
