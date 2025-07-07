@@ -19,6 +19,7 @@ import Checkbox from '@/Components/MaterialDesign/MdCheckbox.vue'
 import RadioButton from '@/Components/MaterialDesign/MdRadioButton.vue'
 import Switch from '@/Components/MaterialDesign/MdSwitch.vue'
 import ColorPicker  from '@/Components/MaterialDesign/MdColorPicker.vue'
+import MdMoneyInput from '@/Components/MaterialDesign/MdMoneyInput.vue';
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -60,6 +61,7 @@ const form = useForm({
         { value: '13', label: 'Violeta' }
     ],
     palette: '',
+    dinero: '',
 });
 
 const colorSeleccionado = ref(null)
@@ -83,8 +85,8 @@ const frutas = [
 
 
 function GuardaFormaulario() {
+        console.log(form.dinero);
     if (!FormValidate || !FormValidate(FormSection)) return
-    console.log(form.archivo);
 
     form.post(route('example.store'), {
         preserveScroll: true,
@@ -105,6 +107,21 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div class="h-[60vh] overflow-auto">
+
+                <MdMoneyInput
+                    v-model="form.dinero"
+                    label="dinero"
+                    name="dinero"
+                    id="dinero"
+                    :required="true"
+                    :maxlength="10"
+                    :minlength="1"
+                    :inputRestrict="'decimal'"
+                    iconClass="fa fa-money-bill-alt"
+                    helper="Dinero"
+                    :error="form.errors.dinero"
+                    :success="!form.errors.dinero"
+                />
 
                 <ColorPicker
                     v-model="form.palette"
