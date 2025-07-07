@@ -20,6 +20,7 @@ import RadioButton from '@/Components/MaterialDesign/MdRadioButton.vue'
 import Switch from '@/Components/MaterialDesign/MdSwitch.vue'
 import ColorPicker  from '@/Components/MaterialDesign/MdColorPicker.vue'
 import MdMoneyInput from '@/Components/MaterialDesign/MdMoneyInput.vue';
+import MdStepper from '@/Components/MaterialDesign/MdStepper.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -107,6 +108,13 @@ function GuardaFormaulario() {
 
         <section  ref="FormSection" class="my-2 mx-4">
             <div class="h-[60vh] overflow-auto">
+
+                <div>
+                    <MdStepper
+                        :steps="['Información', 'Detalles', 'Confirmación']"
+                        :index="0"
+                    />
+                </div>
 
                 <MdMoneyInput
                     v-model="form.dinero"
