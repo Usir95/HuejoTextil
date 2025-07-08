@@ -3,70 +3,87 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class MakeModule extends Command {
     protected $signature = 'make:module {nombre}';
-    protected $description = 'Crea modelo, migración, controlador, factory, seeder y vista Inertia';
+    protected $description = 'Crea modelo, migración, controlador, seeder y vista Inertia';
 
     public function handle() {
-        $nombre = Str::studly($this->argument('nombre'));
-        $plural = Str::pluralStudly($nombre);
+        // 1. Normalizamos el input y separamos carpeta y archivo
+        $input = str_replace('\\', '/', trim($this->argument('nombre')));
+        $segments = explode('/', $input);
 
-        // Modelo con migración, factory y seeder
+        $baseName = array_pop($segments); // último segmento es el nombre base
+        $folderPath = implode('/', $segments); // carpeta de destino (puede estar vacía)
+
+        $modelName = Str::pluralStudly($baseName); // nombre del modelo y del archivo .vue
+
+        // 2. Generar modelo, migración y seeder
         $this->call('make:model', [
-            'name' => $nombre,
+            'name' => $modelName,
             '--migration' => true,
-            // '--factory' => true,
             '--seed' => true,
         ]);
 
-        // Controlador resource
+        // 3. Generar controlador
         $this->call('make:controller', [
-            'name' => "{$nombre}Controller",
+            'name' => "{$modelName}Controller",
             '--resource' => true,
         ]);
 
-        // Crear carpeta y vista Inertia
-        $rutaVista = resource_path("js/Pages/{$plural}");
-        File::ensureDirectoryExists($rutaVista);
+        // 4. Definir ruta final de la carpeta
+        $pagesPath = resource_path('js/Pages');
+        $fullFolderPath = $folderPath ? $pagesPath . '/' . $folderPath : $pagesPath;
 
-        $contenidoVue =
-            <<<VUE
-                <template>
-                    <AppLayout title="{$plural}">
-                        <template #options>
-                        </template>
-                    </AppLayout>
-                </template>
+        // 5. Asegurar que la carpeta existe
+        File::ensureDirectoryExists($fullFolderPath);
 
-                <script setup>
-                import { ref, defineProps, inject, computed, onMounted } from 'vue';
-                import AppLayout from '@/Layouts/AppLayout.vue';
+        // 6. Ruta final del archivo .vue
+        $vueFile = $fullFolderPath . '/' . $modelName . '.vue';
 
-                /* ============================================ Props ============================================ */
-                const props = defineProps({
+        // 7. Si ya existe, preguntar si sobrescribir
+        if (File::exists($vueFile)) {
+            $this->warn("⚠️ El archivo ya existe: {$vueFile}");
+            if (! $this->confirm('¿Deseas sobrescribirlo?')) {
+                $this->info('⏹ Operación cancelada.');
+                return;
+            }
+        }
 
-                });
+        // 8. Contenido del archivo
+        $contenidoVue = <<<VUE
+            <template>
+                <AppLayout title="{$modelName}">
+                    <template #options>
+                    </template>
+                </AppLayout>
+            </template>
 
-                /* ============================================ Variables ============================================ */
-                const toast = inject('\$toast');
-                const loading = inject('\$loading');
-                const items = ref([]);
+            <script setup>
+            import { ref, defineProps, inject, computed, onMounted } from 'vue';
+            import AppLayout from '@/Layouts/AppLayout.vue';
 
-                /* ============================================ Mounted ============================================ */
-                onMounted(() => {
-                    // Fetch or initialize data here
-                });
+            /* ============================================ Props ============================================ */
+            const props = defineProps({});
 
-                /* ============================================ Functions ============================================ */
+            /* ============================================ Variables ============================================ */
+            const toast = inject('\$toast');
+            const loading = inject('\$loading');
+            const items = ref([]);
 
-                </script>
+            /* ============================================ Mounted ============================================ */
+            onMounted(() => {
+                // Fetch or initialize data here
+            });
+
+            /* ============================================ Functions ============================================ */
+            </script>
             VUE;
 
-        File::put("{$rutaVista}/{$nombre}.vue", $contenidoVue);
-
-        $this->info("✅ Módulo {$nombre} creado con éxito con vista Inertia.");
+        // 9. Crear archivo
+        File::put($vueFile, $contenidoVue);
+        $this->info("✅ Módulo creado correctamente en: {$vueFile}");
     }
 }
