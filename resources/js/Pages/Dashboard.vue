@@ -23,9 +23,11 @@ import MdMoneyInput from '@/Components/MaterialDesign/MdMoneyInput.vue';
 import MdStepper from '@/Components/MaterialDesign/MdStepper.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdLoadingScreen from '@/Components/MaterialDesign/MdLoadingScreen.vue';
+import DialogModal from '@/Components/MaterialDesign/MdDialogModal.vue';
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
+const ShowModal = ref(false)
 
 const form = useForm({
     nombre: '',
@@ -85,8 +87,6 @@ const frutas = [
     { value: '13', label: 'Coco' },
 ]
 
-
-
 function GuardaFormaulario() {
         console.log(form.dinero);
     if (!FormValidate || !FormValidate(FormSection)) return
@@ -98,6 +98,11 @@ function GuardaFormaulario() {
         },
     })
 }
+
+const ChangeModal = () => {
+    ShowModal.value = !ShowModal.value
+}
+
 </script>
 
 <template>
@@ -109,6 +114,7 @@ function GuardaFormaulario() {
         </template>
 
         <section  ref="FormSection" class="my-2 mx-4">
+            <MdButton @click="ChangeModal()">Guardar formulario</MdButton>
             <div class="h-[60vh] overflow-auto">
 
                 <div>
@@ -356,10 +362,22 @@ function GuardaFormaulario() {
 
             </div>
 
-        <MdLoadingScreen :show="false" text="Guardando cambios..." />
+        <!-- <MdLoadingScreen :show="false" text="Guardando cambios..." /> -->
             <div class="flex justify-center">
                 <MdButton :loading="false">Guardar formulario</MdButton>
             </div>
         </section>
+
+        <DialogModal :show="ShowModal" @close="ChangeModal">
+            <template #title>
+            </template>
+
+            <template #content>
+                Lorem ipsum dolor sit amet.
+            </template>
+
+            <template #footer>
+            </template>
+        </DialogModal>
     </AppLayout>
 </template>
