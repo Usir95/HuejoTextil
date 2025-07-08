@@ -22,6 +22,7 @@ import ColorPicker  from '@/Components/MaterialDesign/MdColorPicker.vue'
 import MdMoneyInput from '@/Components/MaterialDesign/MdMoneyInput.vue';
 import MdStepper from '@/Components/MaterialDesign/MdStepper.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
+import MdLoadingScreen from '@/Components/MaterialDesign/MdLoadingScreen.vue';
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -355,7 +356,7 @@ function GuardaFormaulario() {
 
             </div>
 
-
+        <MdLoadingScreen :show="false" text="Guardando cambios..." />
             <div class="flex justify-center">
                 <MdButton :loading="false">Guardar formulario</MdButton>
             </div>
