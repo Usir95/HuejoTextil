@@ -21,6 +21,7 @@ import Switch from '@/Components/MaterialDesign/MdSwitch.vue'
 import ColorPicker  from '@/Components/MaterialDesign/MdColorPicker.vue'
 import MdMoneyInput from '@/Components/MaterialDesign/MdMoneyInput.vue';
 import MdStepper from '@/Components/MaterialDesign/MdStepper.vue'
+import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 
 const FormValidate = inject('FormValidate')
 const FormSection  = ref(null)
@@ -354,8 +355,9 @@ function GuardaFormaulario() {
 
             </div>
 
+
             <div class="flex justify-center">
-                <button @click="GuardaFormaulario()" class="px-4 py-1 rounded-lg bg-sky-400">Guardar formulario</button>
+                <MdButton :loading="false">Guardar formulario</MdButton>
             </div>
         </section>
     </AppLayout>

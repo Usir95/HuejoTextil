@@ -11,13 +11,13 @@
 }
 
 :root {
-    --color-primary: #3b82f6;         /* blue-500 */
-    --color-primary-hover: #2563eb;  /* blue-600 */
-    --color-primary-light: #60a5fa;  /* blue-400 */
-    --color-secondary: #9333ea;      /* purple-600 */
-    --color-tertiary: #06b6d4;       /* cyan-500 */
-    --color-complement-1: #facc15;   /* yellow-400 */
-    --color-complement-2: #ef4444;   /* red-500 */
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-primary-light: #60a5fa;
+    --color-secondary: #9333ea;
+    --color-tertiary: #06b6d4;
+    --color-complement-1: #facc15;
+    --color-complement-2: #ef4444;
     --color-background: #f3f4f6;
 }
 
