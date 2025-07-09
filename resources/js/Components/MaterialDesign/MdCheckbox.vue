@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-full my-3 px-1"
+    class="my-3 px-1"
     :data-md-input="true"
     ref="rootRef"
   >

@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->date('fecha_descubrimiento')->nullable(); // MdDateInput
             $table->date('rango_inicio')->nullable(); // MdDateRangeInput (inicio)
             $table->date('rango_fin')->nullable(); // MdDateRangeInput (fin)
-            $table->time('hora_avistamiento')->nullable(); // MdTimeInput
             $table->enum('nivel_peligro', ['bajo', 'medio', 'alto'])->default('medio'); // MdSelectInput
             $table->text('descripcion')->nullable(); // MdTextarea
             $table->boolean('es_invisible')->default(false); // MdCheckbox
