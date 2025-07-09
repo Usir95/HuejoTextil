@@ -1,0 +1,6 @@
+export * from './inputs'
+export * from './fechas'
+export * from './selects'
+export * from './booleanos'
+export * from './archivos'
+export * from './ui'
