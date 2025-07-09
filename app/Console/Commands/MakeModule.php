@@ -6,13 +6,11 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class MakeModule extends Command
-{
+class MakeModule extends Command {
     protected $signature = 'make:module {nombre}';
     protected $description = 'Crea modelo, migración, controlador, seeder y vista Inertia';
 
-    public function handle()
-    {
+    public function handle() {
         // 1. Normalizamos el input y separamos carpeta y archivo
         $input = str_replace('\\', '/', trim($this->argument('nombre')));
         $segments = explode('/', $input);
@@ -23,14 +21,18 @@ class MakeModule extends Command
         $modelName = Str::pluralStudly($baseName); // nombre del modelo y del archivo .vue
 
         // 2. Generar modelo, migración y seeder
+        // 2. Generar modelo, migración y seeder
         $this->call('make:model', [
+            'name' => $modelName,
             'name' => $modelName,
             '--migration' => true,
             '--seed' => true,
         ]);
 
         // 3. Generar controlador
+        // 3. Generar controlador
         $this->call('make:controller', [
+            'name' => "{$modelName}Controller",
             'name' => "{$modelName}Controller",
             '--resource' => true,
         ]);
@@ -66,10 +68,19 @@ class MakeModule extends Command
             <script setup>
             import { ref, defineProps, inject, computed, onMounted } from 'vue';
             import AppLayout from '@/Layouts/AppLayout.vue';
+            <script setup>
+            import { ref, defineProps, inject, computed, onMounted } from 'vue';
+            import AppLayout from '@/Layouts/AppLayout.vue';
 
             /* ============================================ Props ============================================ */
             const props = defineProps({});
+            /* ============================================ Props ============================================ */
+            const props = defineProps({});
 
+            /* ============================================ Variables ============================================ */
+            const toast = inject('\$toast');
+            const loading = inject('\$loading');
+            const items = ref([]);
             /* ============================================ Variables ============================================ */
             const toast = inject('\$toast');
             const loading = inject('\$loading');
@@ -79,11 +90,20 @@ class MakeModule extends Command
             onMounted(() => {
                 // Fetch or initialize data here
             });
+            /* ============================================ Mounted ============================================ */
+            onMounted(() => {
+                // Fetch or initialize data here
+            });
 
+            /* ============================================ Functions ============================================ */
+            </script>
             /* ============================================ Functions ============================================ */
             </script>
             VUE;
 
+        // 9. Crear archivo
+        File::put($vueFile, $contenidoVue);
+        $this->info("✅ Módulo creado correctamente en: {$vueFile}");
         // 9. Crear archivo
         File::put($vueFile, $contenidoVue);
         $this->info("✅ Módulo creado correctamente en: {$vueFile}");
