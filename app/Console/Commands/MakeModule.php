@@ -6,11 +6,13 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
-class MakeModule extends Command {
+class MakeModule extends Command
+{
     protected $signature = 'make:module {nombre}';
     protected $description = 'Crea modelo, migración, controlador, seeder y vista Inertia';
 
-    public function handle() {
+    public function handle()
+    {
         // 1. Normalizamos el input y separamos carpeta y archivo
         $input = str_replace('\\', '/', trim($this->argument('nombre')));
         $segments = explode('/', $input);
@@ -56,7 +58,7 @@ class MakeModule extends Command {
         $contenidoVue = <<<VUE
             <template>
                 <AppLayout title="{$modelName}">
-                    <template #options>
+                    <template #header>
                     </template>
                 </AppLayout>
             </template>
