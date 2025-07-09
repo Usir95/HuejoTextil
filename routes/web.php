@@ -24,5 +24,5 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::resource('example', ExampleController::class)->names('example');
+Route::resource('Example', ExampleController::class)->names('Example');
 
