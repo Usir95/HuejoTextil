@@ -12,7 +12,12 @@ class ExampleController extends Controller {
 
     public function index() {
         $Examples = Examples::get();
-        return Inertia::render('Example/Examples', compact('Examples'));
+
+        $NivelesPeligro = ['bajo', 'medio', 'alto'];
+        $Generos = ['macho', 'hembra', 'otro'];
+        $Estatus = ['activo', 'inactivo', 'pendiente'];
+
+        return Inertia::render('Example/Examples', compact('Examples', 'NivelesPeligro', 'Generos', 'Estatus'));
     }
 
     public function MyFunction(Request $request) {

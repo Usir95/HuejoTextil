@@ -1,53 +1,56 @@
 <template>
     <AppLayout title="Examples">
-        <template #header>
+        <template #header-right>
             <MdButton @click="ChangeModal()">Abrir modal</MdButton>
         </template>
 
-
-
-        <DialogModal :show="ShowModal" @close="ChangeModal">
+        <DialogModal v-if="ShowModal" :show="ShowModal" @close="ChangeModal">
             <template #title>
                 Crear Ejemplo
             </template>
 
             <template #content>
-                <div class="space-y-4">
-                    <MdTextInput v-model="form.nombre" label="Nombre" />
-                    <MdNumberInput v-model="form.edad_aproximada" label="Edad Aproximada" />
-                    <MdTextInput v-model="form.especie" label="Especie" />
-                    <MdColorPicker v-model="form.color_principal" label="Color Principal" />
-                    <MdDateInput v-model="form.fecha_descubrimiento" label="Fecha de Descubrimiento" />
+                <section ref="FormSection" class="space-y-4">
+                    <MdTextInput v-model="form.nombre" required label="Nombre" />
+                    <MdNumberInput v-model="form.edad_aproximada" required label="Edad Aproximada" />
+                    <MdTextInput v-model="form.especie" required label="Especie" />
+                    <MdColorPicker v-model="form.color_principal" required label="Color Principal" />
+                    <MdDateInput v-model="form.fecha_descubrimiento" required label="Fecha de Descubrimiento" />
                     <MdDateRangeInput
                         v-model:start="form.rango_inicio"
                         v-model:end="form.rango_fin"
+                        required
                         label="Rango de Fechas"
                     />
-                    <MdTimeInput v-model="form.hora_avistamiento" label="Hora de Avistamiento" />
-                    <MdSelectInput v-model="form.nivel_peligro" label="Nivel de Peligro" :options="['bajo', 'medio', 'alto']" />
-                    <MdTextarea v-model="form.descripcion" label="Descripción" />
-                    <div class="flex items-center gap-4">
-                        <MdCheckbox v-model="form.es_invisible" label="Es invisible" />
-                        <MdCheckbox v-model="form.tiene_alas" label="Tiene alas" />
+                    <MdSelectInput v-model="form.nivel_peligro" required label="Nivel de Peligro" :options="NivelesPeligro" />
+                    <MdTextarea v-model="form.descripcion" required label="Descripción" />
+                    <div class="flex items-center justify-center gap-4 mx-auto">
+                        <MdCheckbox v-model="form.es_invisible" required label="Es invisible" />
+                        <MdCheckbox v-model="form.tiene_alas" required label="Tiene alas" />
                     </div>
-                    <MdSelectInput v-model="form.genero" label="Género" :options="['macho', 'hembra', 'otro']" />
-                    <MdTextInput v-model="form.clave_identificacion" label="Clave de Identificación" />
-                    <MdTextInput v-model="form.correo_contacto" label="Correo de contacto" type="email" />
-                    <MdCheckbox v-model="form.confirmacion" label="Confirmación" />
-                    <MdSelectInput v-model="form.estatus" label="Estatus" :options="['activo', 'inactivo', 'pendiente']" />
-                </div>
+                    <MdSelectInput v-model="form.genero" required label="Género" :options="['macho', 'hembra', 'otro']" />
+                    <MdTextInput v-model="form.clave_identificacion" required label="Clave de Identificación" />
+                    <MdTextInput v-model="form.correo_contacto" required label="Correo de contacto" type="email" />
+                    <MdCheckbox v-model="form.confirmacion" required label="Confirmación" />
+                    <MdSelectInput v-model="form.estatus" required label="Estatus" :options="['activo', 'inactivo', 'pendiente']" />
+                </section>
             </template>
 
             <template #footer>
                 <MdButton @click="ChangeModal()">Cancelar</MdButton>
-                <MdButton class="ml-2" color="primary">Guardar</MdButton>
+                <MdButton class="ml-2" color="primary" @click="GuardarModificar()">Guardar</MdButton>
             </template>
         </DialogModal>
+
     </AppLayout>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+/* ========================== Imports ========================== */
+import { ref, inject, onMounted } from 'vue';
+import { router, useForm } from '@inertiajs/vue3';
+
+/* ========================== Layout y Componentes ========================== */
 import AppLayout from '@/Layouts/AppLayout.vue';
 import DialogModal from '@/Components/MaterialDesign/MdDialogModal.vue';
 import MdButton from '@/Components/MaterialDesign/MdButton.vue';
@@ -56,15 +59,32 @@ import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue';
 import MdColorPicker from '@/Components/MaterialDesign/MdColorPicker.vue';
 import MdDateInput from '@/Components/MaterialDesign/MdDateInput.vue';
 import MdDateRangeInput from '@/Components/MaterialDesign/MdDateRangeInput.vue';
-import MdTimeInput from '@/Components/MaterialDesign/MdTimeInput.vue';
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue';
 import MdTextarea from '@/Components/MaterialDesign/MdTextareaInput.vue';
 import MdCheckbox from '@/Components/MaterialDesign/MdCheckbox.vue';
 
-/* ============================================ Variables ============================================ */
-const ShowModal = ref(false);
+/* ========================== Props ========================== */
+defineProps({
+    Examples: Object,
+    NivelesPeligro: Object,
+    Generos: Object,
+    Estatus: Object
+});
 
-const form = ref({
+/* ========================== Refs y Variables ========================== */
+const ShowModal = ref(false);
+const FormSection = ref(null);
+const FormValidate = inject('FormValidate');
+const toast = inject('$toast')
+const editMode = ref(false);
+const loading = ref(false);
+const notify = inject('$notify');
+const confirm = inject('$confirm');
+const report = inject('$report');
+const block  = inject('$block');
+
+
+const form = useForm({
     nombre: '',
     edad_aproximada: null,
     especie: '',
@@ -74,7 +94,6 @@ const form = ref({
     fecha_descubrimiento: null,
     rango_inicio: null,
     rango_fin: null,
-    hora_avistamiento: null,
     nivel_peligro: 'medio',
     descripcion: '',
     es_invisible: false,
@@ -86,8 +105,19 @@ const form = ref({
     estatus: 'activo',
 });
 
-/* ============================================ Functions ============================================ */
+/* ========================== Funciones ========================== */
 const ChangeModal = () => {
     ShowModal.value = !ShowModal.value;
 };
+
+
+const GuardarModificar = () => {
+    if (!FormValidate(FormSection)) return
+
+};
+
+/* ========================== Lifecycle ========================== */
+onMounted(() => {
+
+});
 </script>
