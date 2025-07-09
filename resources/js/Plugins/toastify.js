@@ -13,7 +13,7 @@ export default function UseToastify(app) {
             draggable: true,
             pauseOnHover: true,
             theme: tema,
-            zIndex: 99999,
+            zIndex: 8000,
             style: { fontFamily: 'Patrick Hand' }
         });
     };
