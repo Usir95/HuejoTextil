@@ -28,8 +28,8 @@ Está diseñado para servir como plantilla inicial para sistemas administrativos
 
 ## 🧰 Instalación
 
-git clone https://github.com/Usir95/DarkPirate.git
-cd DarkPirate
+git clone https://github.com/Usir95/HuejoTextil.git
+cd HuejoTextil
 cp .env.example .env
 npx @tailwindcss/upgrade
 composer install
