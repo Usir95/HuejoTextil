@@ -6,7 +6,7 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
         <!-- Favicon -->
-        <link rel="icon" href="{{ asset('Img/DinoCraneo.ico') }}" type="image/x-icon">
+        <link rel="icon" href="{{ asset('Img/IconHuejo.ico') }}" type="image/x-icon">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Fredoka&family=Patrick+Hand&family=Pixelify+Sans&display=swap" rel="stylesheet">
 

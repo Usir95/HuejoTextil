@@ -3,13 +3,13 @@
 
     <div class="relative min-h-screen bg-black text-white overflow-hidden">
         <!-- Fondo animado con resplandor rojo -->
-<div class="absolute inset-0 z-0 overflow-hidden">
-    <!-- Círculo central que late -->
-    <div class="absolute top-1/2 left-1/2 h-[120vh] w-[120vh] bg-purple-600 opacity-20 blur-3xl rounded-full animate-ping-slow transform -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            <!-- Círculo central que late -->
+            <div class="absolute top-1/2 left-1/2 h-[120vh] w-[175vh] bg-blue-600 opacity-20 blur-3xl rounded-full animate-ping-slow transform -translate-x-1/2 -translate-y-1/2"></div>
 
-    <!-- Resplandor estático con gradiente más marcado -->
-    <div class="absolute inset-0 bg-gradient-radial from-indigo-700/40 via-indigo-900/20 to-black"></div>
-</div>
+            <!-- Resplandor estático con gradiente más marcado -->
+            <div class="absolute inset-0 bg-gradient-radial from-red-700/40 via-red-900/20 to-black"></div>
+        </div>
 
         <!-- Contenido -->
         <div
@@ -53,16 +53,7 @@
 
             <!-- Main -->
             <main class="text-center flex flex-col items-center justify-center flex-grow">
-                <div class="w-92 h-auto transition-transform duration-500 group-hover:rotate-3 group-hover:scale-110 cursor-pointer">
-                    <DinoPirata colorClass="text-sky-500" />
-                </div>
 
-                <h1 class="text-5xl md:text-7xl font-black tracking-tight text-white drop-shadow-lg">
-                    ¡Bienvenido a <span class="text-purple-400">DarkPirate</span>!
-                </h1>
-                <p class="mt-3 text-sm md:text-lg text-white/70 drop-shadow-sm">
-                    Navegando con Laravel + Inertia + Vue
-                </p>
             </main>
 
             <!-- Footer -->

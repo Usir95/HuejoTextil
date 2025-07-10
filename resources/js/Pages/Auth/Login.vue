@@ -32,7 +32,7 @@ const submit = () => {
         <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 space-y-6">
         <!-- Logo -->
         <div class="flex justify-center w-36 mx-auto">
-            <DinoPirata colorClass="text-sky-500" />
+            <img src="/Img/Logo.png" alt="Logo">
         </div>
 
         <!-- Título -->
