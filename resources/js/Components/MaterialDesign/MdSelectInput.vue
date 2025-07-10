@@ -74,7 +74,7 @@
             <template v-else>
                 <span class="truncate select-none text-gray-800 dark:text-gray-100"
                     :class="{ 'opacity-50': !modelValue }">
-                    {{ options.find(opt => opt.value === modelValue)?.label || '' }}
+                    {{ options.find(opt => String(opt.value) === String(modelValue))?.label || '' }}
                 </span>
             </template>
         </div>

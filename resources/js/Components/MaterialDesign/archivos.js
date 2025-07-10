@@ -1,2 +1,2 @@
-export { default as FileUploader } from './FileUploader.vue'
+export { default as MdFileUploader } from './FileUploader.vue'
 // Puedes añadir ImageUploader si después creas uno

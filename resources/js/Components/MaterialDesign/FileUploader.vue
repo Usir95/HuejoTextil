@@ -14,20 +14,27 @@
             @drop.prevent="handleDrop"
             @click="triggerInput"
         >
-            <div v-if="!fileNames">
+            <div v-if="!fileNames && typeof modelValue !== 'string'">
                 <i :class="iconClass" class="text-3xl" style="color: var(--color-primary)"></i>
             </div>
             <div v-else>
                 <i class="text-3xl fa-solid fa-file-arrow-down" :class="errorText ? 'text-red-500' : 'text-green-500'"></i>
             </div>
 
+
             <p class="text-sm font-medium text-center mt-1 text-gray-600 dark:text-gray-400">
                 {{ placeholderTitle }}
             </p>
 
             <p class="text-xs text-center text-gray-500 dark:text-gray-500 mt-1">
-                {{ fileNames || placeholderSub }}
+                <template v-if="typeof modelValue === 'string' && modelValue">
+                    {{ modelValue }}
+                </template>
+                <template v-else>
+                    {{ fileNames || placeholderSub }}
+                </template>
             </p>
+
 
             <input
                 ref="inputRef"
@@ -55,7 +62,7 @@
     import { ref, watch, computed, onMounted } from 'vue';
 
     const props = defineProps({
-        modelValue: [File, Array, null],
+        modelValue: [File, Array, String, null],
         helper: { type: String, default: '' },
         accept: { type: String, default: '.png,.jpg,.jpeg,.svg,.gif' },
         iconClass: { type: String, default: 'fa fa-upload' },

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->date('fecha_descubrimiento')->nullable(); // MdDateInput
             $table->date('rango_inicio')->nullable(); // MdDateRangeInput (inicio)
             $table->date('rango_fin')->nullable(); // MdDateRangeInput (fin)
-            $table->enum('nivel_peligro', ['bajo', 'medio', 'alto'])->default('medio'); // MdSelectInput
+            $table->string('nivel_peligro', 15)->nullable(); // MdSelectInput
             $table->text('descripcion')->nullable(); // MdTextarea
             $table->boolean('es_invisible')->default(false); // MdCheckbox
             $table->boolean('tiene_alas')->default(false); // MdCheckbox
@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->string('clave_identificacion', 15)->unique(); // MdTextInput
             $table->string('correo_contacto', 65)->nullable(); // MdTextInput con validación email
             $table->boolean('confirmacion')->default(false); // MdSwitch o MdCheckbox
-            $table->string('estatus', 25)->default('activo'); // MdSelectInput
+            $table->string('estatus', 25); // MdSelectInput
 
             $table->timestamps();
             $table->softDeletes();

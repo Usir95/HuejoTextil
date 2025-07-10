@@ -34,7 +34,7 @@ const close = () => {
             <!-- Botón cerrar -->
             <button
                 @click="close"
-                class="absolute top-4 right-4 z-20 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition"
+                class="absolute top-4 right-4 z-20 text-gray-500 cursor-pointer dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition"
                 aria-label="Cerrar"
                 role="button"
                 title="Cerrar"
@@ -50,7 +50,7 @@ const close = () => {
             </div>
 
             <!-- Contenido con scroll -->
-            <div class="overflow-y-auto px-6 py-4 text-sm text-gray-600 dark:text-gray-400 custom-scrollbar shadow-inner">
+            <div class="overflow-y-auto px-6 pt-4 pb-6 text-sm text-gray-600 dark:text-gray-400 custom-scrollbar shadow-inner">
                 <slot name="content" />
             </div>
 

@@ -274,7 +274,7 @@ const logout = () => {
             </nav>
 
             <!-- Page Heading -->
-            <header v-if="$slots.header || $slots['header-left'] || $slots['header-right']" class="bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
+            <header v-if="$slots.header || $slots['header-left'] || $slots['header-right']" class="bg-gray-100 mb-4 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
                 <div class="px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <!-- Filtros u opciones -->
                     <div class="flex flex-wrap items-center gap-2">
