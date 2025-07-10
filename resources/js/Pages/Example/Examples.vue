@@ -136,7 +136,7 @@ const FormSection = ref(null);
 const FormValidate = inject('FormValidate');
 const toast = inject('$toast')
 const editMode = ref(false);
-const loading = ref(false);
+const confirm = inject('$confirm');
 const notify = inject('$notify');
 const IsLoading = ref(false);
 
@@ -221,28 +221,28 @@ const GuardarModificar = () => {
     if (!FormValidate(FormSection)) return
 
     ChangeModal();
-    loading.value = true;
+    IsLoading.value = true;
     if (editMode.value) {
         form.put(route('Example.update', form.id), {
             onSuccess: () => {
                 form.reset();
-                loading.value = false;
+                IsLoading.value = false;
                 toast('Registro actualizado', 'success');
             },
             onError: () => {
                 toast('Ocurrió un error', 'danger');
-                loading.value = false;
+                IsLoading.value = false;
             }
         });
     } else {
         form.post(route('Example.store'), {
             onSuccess: () => {
                 form.reset();
-                loading.value = false
+                IsLoading.value = false
                 toast('Registro guardado correctamente', 'success');
             },
             onError: (e) => {
-                loading.value = false;
+                IsLoading.value = false;
                 console.error(e);
                 toast('Ocurrió un error', 'danger');
             }
@@ -258,7 +258,7 @@ const Editar = (locacion) => {
 };
 
 const Eliminar = (id) => {
-    confirm.show(
+    confirm(
         '¿Estás seguro?',
         'Esta acción no se puede deshacer.',
         'Sí, eliminar',
@@ -281,7 +281,6 @@ const Eliminar = (id) => {
 
 /* ========================== Ciclo de vida ========================== */
 onMounted(() => {
-    console.log(props.Examples);
 
 });
 </script>
