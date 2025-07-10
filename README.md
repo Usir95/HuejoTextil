@@ -2,9 +2,9 @@
   <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
 </p>
 
-# DarkPirate ⚓️
+# HuejoTextil ⚓️
 
-**DarkPirate** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 4 + Tailwind.
+**HuejoTextil** es un proyecto base reutilizable construido sobre Laravel 12 + Inertia + Vue 4 + Tailwind.
 Está diseñado para servir como plantilla inicial para sistemas administrativos y ERP, permitiendo clonar, escalar y extender con mínimos cambios.
 
 ## Características
