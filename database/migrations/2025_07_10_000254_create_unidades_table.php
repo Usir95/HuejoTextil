@@ -9,7 +9,9 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('unidades', function (Blueprint $table) {
             $table->id();
-
+            $table->string('nombre');
+            $table->string('abreviacion');
+            $table->foreignId('tipo_unidad_id')->nullable()->constrained('tipos_unidades')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

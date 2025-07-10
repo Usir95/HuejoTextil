@@ -9,7 +9,9 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-
+            $table->string('nombre');
+            $table->foreignId('tipo_producto_id')->nullable()->constrained('tipos_productos')->nullOnDelete();
+            $table->foreignId('unidad_medida_id')->nullable()->constrained('unidades')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
