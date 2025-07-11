@@ -77,19 +77,19 @@ const submit = () => {
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <label class="inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
+                    <!-- <label class="inline-flex items-center text-sm text-gray-700 dark:text-gray-300">
                         <input type="checkbox" v-model="form.remember" class="rounded border-gray-300 dark:border-gray-600" />
                         <span class="ml-2">Recordarme</span>
-                    </label>
+                    </label> -->
 
-                    <div v-if="canResetPassword">
+                    <!-- <div v-if="canResetPassword">
                         <Link
                             :href="route('password.request')"
                             class="text-sm text-pink-600 hover:underline"
                         >
                             ¿Olvidaste tu contraseña?
                         </Link>
-                    </div>
+                    </div> -->
                 </div>
 
                 <button

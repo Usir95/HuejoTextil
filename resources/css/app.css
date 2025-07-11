@@ -11,22 +11,27 @@
 }
 
 :root {
-  --color-primary: #3b82f6;           /* Azul marino del cono izquierdo */
-  --color-primary-hover: #2563eb;     /* Variante más clara para hover */
-  --color-primary-light: #60a5fa;     /* Azul medio de líneas entrecruzadas */
+    --color-primary: #3b82f6;           /* Azul marino del cono izquierdo */
+    --color-primary-hover: #2563eb;     /* Variante más clara para hover */
+    --color-primary-light: #60a5fa;     /* Azul medio de líneas entrecruzadas */
 
-  --color-secondary: #8aa8d6;         /* Azul claro del cono derecho */
-  --color-tertiary: #b3c7ea;          /* Azul muy claro (brillo y fondo) */
+    --color-secondary: #8aa8d6;         /* Azul claro del cono derecho */
+    --color-tertiary: #b3c7ea;          /* Azul muy claro (brillo y fondo) */
 
-  --color-complement-1: #facc15;      /* Amarillo cálido para contraste */
-  --color-complement-2: #ef4444;      /* Rojo para alertas o errores */
+    --color-complement-1: #facc15;      /* Amarillo cálido para contraste */
+    --color-complement-2: #ef4444;      /* Rojo para alertas o errores */
 
     --color-background: #f3f4f6;       /* Blanco azulado para fondo general */
+    --color-sidebar-text: #1e3a5f;     /* Texto azul oscuro */
+    --color-sidebar-border: #d1e0ef;
 }
 
 
 .dark {
     --color-background: #101828;
+    --color-sidebar-bg: #101828;        /* Sidebar oscuro */
+    --color-sidebar-text: #f1f5f9;      /* Texto claro */
+    --color-sidebar-border: #1b263b;
 }
 
 @layer base {
