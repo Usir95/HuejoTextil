@@ -2,13 +2,12 @@
 
 namespace App\Models\Almacenes;
 
+use App\Models\Catalogos\Clientes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
-
-
 class Pedidos extends Model implements AuditableContract {
     use HasFactory, SoftDeletes, Auditable;
 
@@ -17,7 +16,7 @@ class Pedidos extends Model implements AuditableContract {
     protected $dates = ['deleted_at'];
 
     public function cliente() {
-        return $this->belongsTo('App\Models\Entradas\Clientes', 'cliente_id');
+        return $this->belongsTo(Clientes::class, 'cliente_id');
     }
 
 }
