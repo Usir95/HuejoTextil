@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('movimientos', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad');
-            $table->string('fecha_movimiento');
+            $table->dateTime('fecha_movimiento');
             $table->foreignId('tipo_producto_id')->nullable()->constrained('tipos_productos')->nullOnDelete();
             $table->foreignId('tipo_unidad_id')->nullable()->constrained('tipos_unidades')->nullOnDelete();
             $table->foreignId('unidad_medida_id')->nullable()->constrained('unidades')->nullOnDelete();

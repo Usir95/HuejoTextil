@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Almacenes\Movimientos;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+// Importar los nuevos Form Request
+use App\Http\Requests\Movimientos\StoreMovimientoRequest;
+use App\Http\Requests\Movimientos\UpdateMovimientoRequest;
 
 class MovimientosController extends Controller {
     /**
@@ -24,15 +27,17 @@ class MovimientosController extends Controller {
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\Movimientos\StoreMovimientoRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request) {
+    public function store(StoreMovimientoRequest $request) {
+        // La validación se maneja automáticamente por StoreMovimientoRequest
+        // Si el request llega aquí, significa que la validación ha pasado.
 
-        //$validator = Validator::make($request->all(), [
-        //    'field1' => 'required|string|max:255',
-        //    'field2' => 'required|email|unique:table,column',
-        //]);
+        Movimientos::create($request->validated()); // Usa validated() para obtener solo los datos validados
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Movimiento creado exitosamente.');
     }
 
     /**
@@ -51,17 +56,25 @@ class MovimientosController extends Controller {
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\Movimientos\UpdateMovimientoRequest  $request
+     * @param  \App\Models\Almacenes\Movimientos  $movimientos
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, Movimientos $movimientos){
+    public function update(UpdateMovimientoRequest $request, Movimientos $movimientos){
+        // La validación se maneja automáticamente por UpdateMovimientoRequest
+        // Si el request llega aquí, significa que la validación ha pasado.
 
-        return redirect()->back();
+        $movimientos->update($request->validated()); // Usa validated() para obtener solo los datos validados
+
+        return redirect()->back()->with('success', 'Movimiento actualizado exitosamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Movimientos $movimientos){
-
-        return redirect()->back();
+        $movimientos->delete();
+        return redirect()->back()->with('success', 'Movimiento eliminado exitosamente.');
     }
 }
