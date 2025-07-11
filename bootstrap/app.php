@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('Administrador')
                 ->group(base_path('routes/Administrador.php'));
 
+            Route::middleware(['web', 'auth'])
+                ->prefix('Almacen')
+                ->group(base_path('routes/Almacen.php'));
+
             Route::middleware(['web'])
                 ->prefix('Publico')
                 ->group(base_path('routes/Public.php'));

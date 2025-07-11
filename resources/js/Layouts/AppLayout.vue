@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted  } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
@@ -13,6 +13,13 @@ defineProps({
 });
 
 const showingNavigationDropdown = ref(false);
+const tema = ref('light')
+
+onMounted(() => {
+    tema.value = 'light'
+    localStorage.setItem('tema', 'light')
+    document.documentElement.classList.remove('dark')
+})
 
 const switchToTeam = (team) => {
     router.put(route('current-team.update'), {
@@ -21,6 +28,17 @@ const switchToTeam = (team) => {
         preserveState: false,
     });
 };
+
+const AlternarTema = () => {
+    tema.value = tema.value === 'dark' ? 'light' : 'dark'
+    localStorage.setItem('tema', tema.value)
+
+    if (tema.value === 'dark') {
+        document.documentElement.classList.add('dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+}
 
 const logout = () => {
     router.post(route('logout'));
@@ -135,15 +153,22 @@ const logout = () => {
                                     <template #content>
                                         <!-- Account Management -->
                                         <div class="block px-4 py-2 text-xs text-gray-400">
-                                            Manage Account
+                                            Configuracion de cuenta
                                         </div>
 
                                         <DropdownLink :href="route('profile.show')">
-                                            Profile
+                                            Perfil
+                                        </DropdownLink>
+
+                                        <DropdownLink as="button" @click="AlternarTema">
+                                            <i :class="tema === 'dark' ? 'fa-sun' : 'fa-moon'"></i>
+                                            <span class="ml-2">
+                                                {{ tema === 'dark' ? 'Tema claro' : 'Tema oscuro' }}
+                                            </span>
                                         </DropdownLink>
 
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
-                                            API Tokens
+                                            Api Tokens
                                         </DropdownLink>
 
                                         <div class="border-t border-gray-200 dark:border-gray-600" />
@@ -151,7 +176,7 @@ const logout = () => {
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
-                                                Log Out
+                                                Cerrar Sesión
                                             </DropdownLink>
                                         </form>
                                     </template>
