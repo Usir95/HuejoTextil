@@ -14,7 +14,10 @@ return new class extends Migration {
             $table->string('plazo_pago');
             $table->string('condiciones');
             $table->string('observaciones');
-            $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
+
+            // $table->unsignedBigInteger('cliente_id')->nullable()->index();
+            // $table->foreign('cliente_id')->references('id')->on('clientes');
+
             $table->timestamps();
             $table->softDeletes();
         });
