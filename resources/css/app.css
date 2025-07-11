@@ -11,15 +11,19 @@
 }
 
 :root {
-    --color-primary: #3b82f6;
-    --color-primary-hover: #2563eb;
-    --color-primary-light: #60a5fa;
-    --color-secondary: #9333ea;
-    --color-tertiary: #06b6d4;
-    --color-complement-1: #facc15;
-    --color-complement-2: #ef4444;
-    --color-background: #f3f4f6;
+  --color-primary: #1c2c60;           /* Azul marino del cono izquierdo */
+  --color-primary-hover: #2d3d8f;     /* Variante más clara para hover */
+  --color-primary-light: #3d5db0;     /* Azul medio de líneas entrecruzadas */
+
+  --color-secondary: #8aa8d6;         /* Azul claro del cono derecho */
+  --color-tertiary: #b3c7ea;          /* Azul muy claro (brillo y fondo) */
+
+  --color-complement-1: #facc15;      /* Amarillo cálido para contraste */
+  --color-complement-2: #ef4444;      /* Rojo para alertas o errores */
+
+  --color-background: #f7f9fc;        /* Blanco azulado para fondo general */
 }
+
 
 .dark {
     --color-background: #101828;
