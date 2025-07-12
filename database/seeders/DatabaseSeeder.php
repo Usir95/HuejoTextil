@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void {
         $this->call([
             CategoriasModulosSeeder::class,
-            EmpleadosSeeder::class
+            EmpleadosSeeder::class,
+            ModulosSeeder::class,
         ]);
     }
 }
