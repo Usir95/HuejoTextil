@@ -1,12 +1,14 @@
 <script setup>
-    import { ref, onMounted, onBeforeUnmount } from 'vue';
+    import { inject,ref, onMounted, onBeforeUnmount } from 'vue';
     import { Head, usePage } from '@inertiajs/vue3';
 
     import Sidebar from '@/Components/Layout/Sidebar.vue';
     import TopBar from '@/Components/Layout/TopBar.vue';
+    import MdLoadingScreen from '@/Components/MaterialDesign/MdLoadingScreen.vue'
 
     defineProps({ title: String });
 
+    const IsLoading = inject('IsLoading')
     const tema = ref('light');
     const isMobile = ref(false);
     const mobileOpen = ref(false);
@@ -89,5 +91,6 @@
                 <slot />
             </main>
         </div>
+        <MdLoadingScreen :show="IsLoading" text="Cargando un momento por favor..." />
     </div>
 </template>
