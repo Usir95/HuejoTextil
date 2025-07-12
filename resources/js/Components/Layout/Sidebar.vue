@@ -26,7 +26,7 @@
             />
 
             <!-- ============================================ Navegación ============================================ -->
-            <nav class="flex-1 overflow-y-auto no-scrollbar px-1 py-3">
+            <nav class="flex-1 overflow-y-auto no-scrollbar py-3">
                 <SubMenu
                     v-for="categoria in CategoriasModulos"
                     :key="categoria.id"

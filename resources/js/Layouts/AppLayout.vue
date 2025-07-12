@@ -13,7 +13,8 @@
     const sidebarCollapsed = ref(false);
     const page = usePage();
 
-    const categoriasModulos = ref(page.props.PermisosModulos || []);
+    const CategoriasModulos  = ref(page.props.PermisosModulos || []);
+    const PermisosGranulares = ref(page.props.PermisosGranulares || []);
 
     const checkMobile = () => {
         isMobile.value = window.innerWidth <= 768;
@@ -48,7 +49,7 @@
             :isMobile="isMobile"
             :mobileOpen="mobileOpen"
             :sidebarCollapsed="sidebarCollapsed"
-            :CategoriasModulos="categoriasModulos"
+            :CategoriasModulos="CategoriasModulos"
             @close-mobile="mobileOpen = false"
             @update-collapsed="sidebarCollapsed = $event"
         />
