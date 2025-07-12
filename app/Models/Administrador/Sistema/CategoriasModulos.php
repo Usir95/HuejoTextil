@@ -16,4 +16,8 @@ class CategoriasModulos extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
+    public function Modulos() {
+        return $this->hasMany(Modulos::class, 'categoria_modulo_id');
+    }
+
 }
