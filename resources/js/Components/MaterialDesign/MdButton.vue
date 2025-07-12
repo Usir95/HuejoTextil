@@ -21,7 +21,7 @@
                 'text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] dark:bg-[var(--color-primary-light)]',
             variant === 'secondary' &&
                 'text-white bg-[var(--color-secondary)] hover:brightness-110',
-            variant === 'dark' && 'text-white bg-neutral-800 hover:bg-neutral-900',
+    variant === 'dark' && 'text-[#1e3a5f] dark:text-[#f1f5f9] hover:shadow-none',
             variant === 'light' && 'text-gray-800 bg-white hover:bg-gray-100 border',
         ]"
     >
