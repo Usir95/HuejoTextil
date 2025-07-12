@@ -11,43 +11,36 @@ class MakeModule extends Command {
     protected $description = 'Crea modelo, migración, controlador, seeder y vista Inertia';
 
     public function handle() {
-        // 1. Normalizamos el input y separamos carpeta y archivo
         $input = str_replace('\\', '/', trim($this->argument('nombre')));
         $segments = explode('/', $input);
 
-        $baseName = array_pop($segments); // último segmento es el nombre base
-        $folderPath = implode('/', $segments); // carpeta de destino (puede estar vacía)
+        $baseName = array_pop($segments); // Ejemplo
+        $folderPath = implode('/', $segments);
 
-        $modelName = Str::pluralStudly($baseName); // nombre del modelo y del archivo .vue
+        $modelName = Str::studly($baseName);            // Ejemplo
+        $modelPlural = Str::pluralStudly($modelName);   // Ejemplos
 
-        // 2. Generar modelo, migración y seeder
-        // 2. Generar modelo, migración y seeder
+        // 1. Crear modelo + migración + seeder
         $this->call('make:model', [
-            'name' => $modelName,
             'name' => $modelName,
             '--migration' => true,
             '--seed' => true,
         ]);
 
-        // 3. Generar controlador
-        // 3. Generar controlador
+        // 2. Crear controlador
         $this->call('make:controller', [
-            'name' => "{$modelName}Controller",
-            'name' => "{$modelName}Controller",
+            'name' => "{$modelPlural}Controller",
             '--resource' => true,
         ]);
 
-        // 4. Definir ruta final de la carpeta
+        // 3. Crear carpeta
         $pagesPath = resource_path('js/Pages');
         $fullFolderPath = $folderPath ? $pagesPath . '/' . $folderPath : $pagesPath;
-
-        // 5. Asegurar que la carpeta existe
         File::ensureDirectoryExists($fullFolderPath);
 
-        // 6. Ruta final del archivo .vue
-        $vueFile = $fullFolderPath . '/' . $modelName . '.vue';
+        // 4. Ruta final del archivo .vue
+        $vueFile = "{$fullFolderPath}/{$modelPlural}.vue";
 
-        // 7. Si ya existe, preguntar si sobrescribir
         if (File::exists($vueFile)) {
             $this->warn("⚠️ El archivo ya existe: {$vueFile}");
             if (! $this->confirm('¿Deseas sobrescribirlo?')) {
@@ -56,55 +49,157 @@ class MakeModule extends Command {
             }
         }
 
-        // 8. Contenido del archivo
-        $contenidoVue = <<<VUE
+        // 5. Contenido del .vue
+        $contenidoVue =
+        <<<VUE
             <template>
-                <AppLayout title="{$modelName}">
-                    <template #header>
+                <AppLayout title="{$modelPlural}">
+                    <template #header-right>
+                        <MdButton @click="ToggleModal()">Nuevo</MdButton>
                     </template>
+
+                    <AgGrid
+                        :initial-row-data="items"
+                        :initial-column-defs="columnas"
+                        :pagination="true"
+                        height="70vh"
+                    />
+
+                    <MdDialogModal v-if="modal" :show="modal" @close="ToggleModal">
+                        <template #title>
+                            Crear {$modelName}
+                        </template>
+
+                        <template #content>
+                            <section class="space-y-4">
+                                <MdTextInput v-model="form.nombre" label="Nombre" required />
+                            </section>
+                        </template>
+
+                        <template #footer>
+                            <div class="space-x-2">
+                                <MdButton variant="primary" :loading="IsLoading" @click="Upsert()">
+                                    {{ IsEditMode ? 'Actualizar' : 'Registrar' }}
+                                </MdButton>
+                                <MdButton variant="dark" @click="ToggleModal()">Cancelar</MdButton>
+                            </div>
+                        </template>
+                    </MdDialogModal>
                 </AppLayout>
             </template>
 
             <script setup>
-            import { ref, defineProps, inject, computed, onMounted } from 'vue';
-            import AppLayout from '@/Layouts/AppLayout.vue';
-            <script setup>
-            import { ref, defineProps, inject, computed, onMounted } from 'vue';
-            import AppLayout from '@/Layouts/AppLayout.vue';
+            import { ref, inject, defineProps } from 'vue'
+            import { useForm } from '@inertiajs/vue3'
+            import AppLayout from '@/Layouts/AppLayout.vue'
+            import AgGrid from '@/Components/Dependencies/AgGrid.vue'
+            import {
+                MdButton,
+                MdDialogModal,
+                MdTextInput
+            } from '@/Components/MaterialDesign'
 
-            /* ============================================ Props ============================================ */
-            const props = defineProps({});
-            /* ============================================ Props ============================================ */
-            const props = defineProps({});
+            /* ========================== Props ========================== */
+            const props = defineProps({
+                {$modelPlural}: Object
+            })
 
-            /* ============================================ Variables ============================================ */
-            const toast = inject('\$toast');
-            const loading = inject('\$loading');
-            const items = ref([]);
-            /* ============================================ Variables ============================================ */
-            const toast = inject('\$toast');
-            const loading = inject('\$loading');
-            const items = ref([]);
+            /* ========================== Refs ========================== */
+            const toast = inject('\$toast')
+            const FormValidate = inject('FormValidate')
+            const IsLoading = ref(false);
+            const IsEditMode = ref(false)
+            const modal = ref(false)
+            const FormSection  = ref(null)
 
-            /* ============================================ Mounted ============================================ */
-            onMounted(() => {
-                // Fetch or initialize data here
-            });
-            /* ============================================ Mounted ============================================ */
-            onMounted(() => {
-                // Fetch or initialize data here
-            });
+            const form = useForm({
+                id: '',
+                nombre: ''
+            })
 
-            /* ============================================ Functions ============================================ */
+            const columnas = [
+                { headerName: 'Nombre', field: 'nombre' },
+            ]
+
+            const items = ref(props.{$modelPlural})
+
+            /* ========================== Funciones ========================== */
+            const ToggleModal = () => {
+                modal.value = !modal.value
+            }
+
+            const Upsert = () => {
+                if (!FormValidate(FormSection)) {
+                    console.log('[Upsert] Validación fallida');
+                    return;
+                }
+                ToggleModal();
+                IsLoading.value = true;
+                IsEditMode.value ? Update() : Insert();
+            };
+
+            const Insert = (startTime) => {
+                form.post(route('Modulos.store'), {
+                    onStart: () => {
+                        console.log('[Insert] Inertia empezó la petición');
+                    },
+                    onSuccess: () => {
+                        form.reset();
+                        IsLoading.value = false;
+                        toast('Registro guardado correctamente', 'success');
+                    },
+                    onError: (e) => {
+                        IsLoading.value = false;
+                        toast('Ocurrió un error', 'danger');
+                    }
+                });
+            };
+
+            const Update = () => {
+                form.put(route('Modulos.update', form.id), {
+                    onSuccess: () => {
+                        form.reset();
+                        IsLoading.value = false;
+                        toast('Registro actualizado', 'success');
+                    },
+                    onError: () => {
+                        IsLoading.value = false;
+                        toast('Ocurrió un error', 'danger');
+                    }
+                });
+            };
+
+            const Edit = (locacion) => {
+                form.reset();
+                Object.assign(form, locacion);
+                IsEditMode.value = true;
+                ShowModal.value = true;
+            };
+
+            const Delete = (id) => {
+                confirm(
+                    '¿Estás seguro?',
+                    'Esta acción no se puede deshacer.',
+                    'Sí, eliminar',
+                    'Cancelar',
+                    () => {
+                        form.delete(route('Modulos.destroy', id), {
+                            onSuccess: () => {
+                                toast('Registro eliminado', 'success');
+                            },
+                            onError: (e) => {
+                                console.log('Ocurrió un error', e);
+                            }
+                        });
+                    },
+                    () => {
+                        console.log('Acción cancelada');
+                    }
+                );
+            };
             </script>
-            /* ============================================ Functions ============================================ */
-            </script>
-            VUE;
+        VUE;
 
-        // 9. Crear archivo
-        File::put($vueFile, $contenidoVue);
-        $this->info("✅ Módulo creado correctamente en: {$vueFile}");
-        // 9. Crear archivo
         File::put($vueFile, $contenidoVue);
         $this->info("✅ Módulo creado correctamente en: {$vueFile}");
     }
