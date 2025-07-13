@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\RecursosHumanos\Empleados;
+use App\Models\Scopes\ActivoScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -69,5 +72,14 @@ class User extends Authenticatable implements AuditableContract {
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /* ========================== SCOPE PERSONLIAZADOS ========================== */
+    protected static function booted() {
+        static::addGlobalScope(new ActivoScope);
+    }
+
+    public function Empleado() {
+        return $this->hasOne(Empleados::class, 'usuario_id');
     }
 }

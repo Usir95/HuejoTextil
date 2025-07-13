@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('telefono', 15)->nullable();
             $table->string('correo', 100)->nullable()->index();
 
+            $table->boolean('activo')->default(true);
+
             $table->unsignedBigInteger('usuario_id')->nullable()->index();
             $table->foreign('usuario_id')->references('id')->on('usuarios');
 

@@ -17,7 +17,7 @@ class ModulosSeeder extends Seeder
         $rolInicio = Role::findByName('Inicio');
         $rolAdministrador = Role::findByName('Administrador');
 
-        $moduloDashboard = Modulos::create([
+        Modulos::create([
             'nombre' => 'Dashboards',
             'ruta' => 'dashboard',
             'descripcion' => 'Panel principal de la aplicación',
@@ -28,7 +28,18 @@ class ModulosSeeder extends Seeder
 
         Permission::create(['name' => 'Dashboards'])->assignRole($rolAdministrador);
 
-        $moduloModulos = Modulos::create([
+        Modulos::create([
+            'nombre' => 'Modulos',
+            'ruta' => 'Modulos.index',
+            'descripcion' => 'Gestión de los módulos del sistema',
+            'icono' => 'fa-solid fa-box',
+            'categoria_modulo_id' => $rolAdministrador->id,
+            'modulo_padre_id' => null,
+        ]);
+
+        Permission::create(['name' => 'Modulos'])->assignRole($rolAdministrador);
+
+        Modulos::create([
             'nombre' => 'Bitacora',
             'ruta' => 'Bitacora.index',
             'descripcion' => 'Bitacora del sistema',
@@ -39,7 +50,7 @@ class ModulosSeeder extends Seeder
 
         Permission::create(['name' => 'Bitacora'])->assignRole($rolAdministrador);
 
-        $moduloRolesPermisos = Modulos::create([
+        Modulos::create([
             'nombre' => 'Roles y permisos',
             'ruta' => 'RolesPermisos.index',
             'descripcion' => 'Gestión de roles y permisos del sistema',
@@ -50,7 +61,7 @@ class ModulosSeeder extends Seeder
 
         Permission::create(['name' => 'Roles y permisos'])->assignRole($rolAdministrador);
 
-        $moduloUsuarios = Modulos::create([
+        Modulos::create([
             'nombre' => 'Usuarios',
             'ruta' => 'Usuarios.index',
             'descripcion' => 'Gestión de usuarios del sistema',
@@ -60,5 +71,6 @@ class ModulosSeeder extends Seeder
         ]);
 
         Permission::create(['name' => 'Usuarios'])->assignRole($rolAdministrador);
+
     }
 }

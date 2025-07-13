@@ -44,12 +44,11 @@
             </template>
         </MdDialogModal>
 
-        <MdLoadingScreen :show="IsLoading" text="Guardando..." />
     </AppLayout>
 </template>
 
 <script setup>
-    import { ref, inject, defineProps } from 'vue'
+    import { ref, inject, defineProps,onMounted } from 'vue'
     import { useForm } from '@inertiajs/vue3'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import AgGrid from '@/Components/Dependencies/AgGrid.vue'
@@ -70,8 +69,8 @@
 
     /* ========================== Refs ========================== */
     const FormValidate = inject('FormValidate')
+    const IsLoading = inject('IsLoading')
     const toast = inject('$toast')
-    const IsLoading = ref(false);
     const IsEditMode = ref(false)
     const modal = ref(false)
     const FormSection  = ref(null)
@@ -82,7 +81,7 @@
         nombre: '',
         ruta: '',
         descripcion: '',
-        icono: 'xxx',
+        icono: '',
     })
 
     const columnas = [
@@ -92,10 +91,14 @@
         { headerName: 'Descripción', field: 'descripcion' },
     ]
 
+    /* ========================== Mounted ========================== */
+    onMounted(() => {
+    })
+
     /* ========================== Funciones ========================== */
-    const ToggleModal = () => {
-        modal.value = !modal.value
-    }
+    function ToggleModal() {
+  modal.value=!modal.value
+}
 
     const Upsert = () => {
         const t0 = performance.now();

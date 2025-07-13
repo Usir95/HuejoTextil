@@ -146,7 +146,7 @@ watch(internalValue, (val) => {
 
     if (props.required && !val) {
         internalError.value = 'Este campo es obligatorio'
-    } else if (!isEmail(val)) {
+    } else if (val && !isEmail(val)) {
         internalError.value = 'Correo no válido'
     }
 })
@@ -235,13 +235,14 @@ function validate() {
 
     if (props.required && !internalValue.value) {
         message = 'Este campo es obligatorio'
-    } else if (!isEmail(internalValue.value)) {
+    } else if (internalValue.value && !isEmail(internalValue.value)) {
         message = 'Correo no válido'
     }
 
     internalError.value = message
     return message === ''
 }
+
 
 /* ======================= Dark Mode ========================== */
 onMounted(() => {

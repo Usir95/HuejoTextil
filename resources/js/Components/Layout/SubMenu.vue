@@ -1,84 +1,90 @@
 <template>
-  <div :data-submenu="title" class="overflow-hidden text-sm font-medium border-b border-white/10 dark:border-white/20">
     <div
-      @click="toggle"
-      class="flex items-center px-2 py-3 cursor-pointer transition-colors hover:bg-[var(--color-primary-light)] hover:text-white"
+        :data-submenu="title"
+        :style="{ backgroundColor: backgroundColor, color: textColor }"
+        class="overflow-auto text-sm font-bold border-b transition-colors"
     >
-      <!-- Icono -->
-      <div class="flex justify-center w-10 text-[var(--color-complement-1)]">
-        <i :class="icon" class="text-lg" />
-      </div>
+        <div
+            @click="toggle"
+            class="flex items-center px-2 py-3 cursor-pointer hover:bg-[var(--color-sidebar-bg)] transition-colors"
+        >
+            <!-- Columna 1 -->
+            <div class="flex justify-center w-10" :style="{ color: textColor }">
+                <i :class="icon"></i>
+            </div>
+            <!-- Columna 2 -->
+            <div
+                class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis max-w-[140px]"
+                :class="{ hidden: collapsed }"
+                :style="{ color: textColor }"
+            >
+                {{ title }}
+            </div>
+            <!-- Columna 3 -->
+            <div class="flex justify-center w-4 text-xl" :class="{ hidden: collapsed }" :style="{ color: textColor }">
+                <i :class="isOpen ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'"></i>
+            </div>
+        </div>
 
-      <!-- Título -->
-      <div
-        class="flex-1 overflow-hidden whitespace-nowrap text-ellipsis transition-all duration-200 max-w-[140px]"
-        :class="{ hidden: collapsed }"
-      >
-        {{ title }}
-      </div>
-
-      <!-- Flecha -->
-      <div
-        class="flex justify-center w-4 text-xs text-white/80"
-        :class="{ hidden: collapsed }"
-      >
-        <i :class="isOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" />
-      </div>
+        <!-- Contenido del SubMenú -->
+        <transition name="slide-fade">
+            <div v-show="isOpen && !collapsed" class="py-2" :style="{ color: textColor }">
+                <slot></slot>
+            </div>
+        </transition>
     </div>
-
-    <!-- Submenú desplegable -->
-    <transition name="slide-fade">
-      <div v-show="isOpen && !collapsed" class="py-1 px-4 space-y-1 text-sm overflow-y-auto max-h-60">
-        <slot />
-      </div>
-    </transition>
-  </div>
 </template>
 
 <script setup>
-import { ref, inject, watch, onMounted } from 'vue'
+import { ref, inject, watch, onMounted, computed } from "vue";
 
 const props = defineProps({
-  title: { type: String, required: true },
-  icon: { type: String, required: true },
-  collapsed: { type: Boolean, required: true }
-})
+    title: { type: String, required: true },
+    icon: { type: String, required: true },
+    collapsed: { type: Boolean, required: true },
+});
 
-const isOpen = ref(false)
-const activeSubmenu = inject('activeSubmenu')
+const activeSubmenu = inject("activeSubmenu");
+const isOpen = ref(false);
+const isDark = ref(false);
+
+const backgroundColor = computed(() =>
+    isDark.value ? '#101828' : '#f3f4f6'
+);
+
+const textColor = computed(() =>
+    isDark.value ? '#f1f5f9' : '#1e3a5f'
+);
 
 const toggle = () => {
-  if (activeSubmenu.value !== props.title) {
-    activeSubmenu.value = props.title
-    isOpen.value = true
-  } else {
-    isOpen.value = !isOpen.value
-    if (!isOpen.value) activeSubmenu.value = null
-  }
-  localStorage.setItem('submenu-open', activeSubmenu.value || '')
-}
+    if (activeSubmenu.value !== props.title) {
+        activeSubmenu.value = props.title;
+        isOpen.value = true;
+    } else {
+        isOpen.value = !isOpen.value;
+        if (!isOpen.value) activeSubmenu.value = null;
+    }
+    localStorage.setItem("submenu-open", activeSubmenu.value || "");
+};
 
 onMounted(() => {
-  const saved = localStorage.getItem('submenu-open')
-  if (saved === props.title) {
-    isOpen.value = true
-    activeSubmenu.value = props.title
-  }
-})
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    isDark.value = prefersDark.matches;
 
-watch(activeSubmenu, (val) => {
-  if (val !== props.title) isOpen.value = false
-})
+    prefersDark.addEventListener('change', (e) => {
+        isDark.value = e.matches;
+    });
+
+    const savedState = localStorage.getItem("submenu-open");
+    if (savedState === props.title) {
+        isOpen.value = true;
+        activeSubmenu.value = props.title;
+    }
+});
+
+watch(activeSubmenu, (newVal) => {
+    if (newVal !== props.title) {
+        isOpen.value = false;
+    }
+});
 </script>
-
-<style scoped>
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.2s ease;
-}
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(-4px);
-  opacity: 0;
-}
-</style>

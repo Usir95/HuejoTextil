@@ -9,6 +9,7 @@ import UseToastify from './Plugins/toastify';
 import UseNotiflix from './Plugins/notiflix';
 import UseFilePond from './Plugins/filepond';
 import UseTippy from './Plugins/tippy';
+import UseLoading from './Plugins/loading';
 import '@fortawesome/fontawesome-free/css/all.min.css'
 
 import FormValidatePlugin from './Plugins/validacion'
@@ -26,6 +27,7 @@ createInertiaApp({
 
         app.use(plugin);
         app.use(ZiggyVue);
+        app.use(UseLoading);
         app.use(FormValidatePlugin);
 
         UseToastify(app);
@@ -36,7 +38,7 @@ createInertiaApp({
         app.mount(el);
     },
     progress: {
-        color: '#4B5563',
-        height: '3px',
+        color: '#3b82f6',
+        height: '5px',
     },
 });

@@ -11,19 +11,22 @@ return new class extends Migration {
             $table->id();
             $table->string('nombre');
             $table->string('usuario')->unique();
-            $table->string('correo')->unique();
+            $table->string('correo')->nullable();
             $table->timestamp('correo_verificado_en')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->boolean('activo')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
+            $table->softDeletes();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
