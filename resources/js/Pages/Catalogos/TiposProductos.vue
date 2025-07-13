@@ -1,13 +1,11 @@
     <template>
-        <AppLayout title="Clientes">
+        <AppLayout title="Catálogo de Productos">
             <template #header-right>
-                <MdButton @click="ToggleModal()">
-                    <i class="fa fa-user-plus mr-2"></i> Nuevo cliente
-                </MdButton>
+                <MdButton @click="ToggleModal()">Nuevo Productos</MdButton>
             </template>
 
             <AgGrid
-                :initial-row-data="Clientes"
+                :initial-row-data="Productos"
                 :initial-column-defs="columnas"
                 @cell-clicked="onCellClicked"
                 height="80vh"
@@ -15,11 +13,11 @@
 
             <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal">
                 <template #title>
-                    Crear Clientes
+                    Crear Productos
                 </template>
 
                 <template #content>
-                    <section ref="FormSection"  class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <section class="space-y-4">
                         <MdTextInput
                             id="nombre"
                             name="nombre"
@@ -28,23 +26,10 @@
                             v-model="form.nombre"
                             :uppercase="true"
                             required
-                            :maxlength="125"
-                            helper="Nombre del cliente"
+                            :maxlength="85"
+                            helper="Nombre del producto"
                             :error="form.errors.nombre"
                             :success="!form.errors.nombre"
-                        />
-
-                        <MdTextInput
-                            id="clave"
-                            name="clave"
-                            label="clave"
-                            class="col-span-2"
-                            v-model="form.clave"
-                            :uppercase="true"
-                            required
-                            helper="Clave del cliente"
-                            :error="form.errors.clave"
-                            :success="!form.errors.clave"
                         />
                     </section>
                 </template>
@@ -61,44 +46,41 @@
         </AppLayout>
     </template>
 
-<script setup>
+    <script setup>
     import { ref, inject, defineProps } from 'vue'
     import { useForm } from '@inertiajs/vue3'
     import AppLayout from '@/Layouts/AppLayout.vue'
     import AgGrid from '@/Components/Dependencies/AgGrid.vue'
-    import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
-    import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
-    import MdButton from '@/Components/MaterialDesign/MdButton.vue'
-
+import MdButton from '@/Components/MaterialDesign/MdButton.vue'
+import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
+import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 
     /* ========================== Props ========================== */
     const props = defineProps({
-        Clientes: Object
+        Productos: Object
     })
 
     /* ========================== Refs ========================== */
     const toast = inject('$toast');
     const confirm = inject('$confirm');
-    const FormValidate = inject('FormValidate')
+    const FormValidate = inject('FormValidate');
     const IsLoading = ref(false);
-    const IsEditMode = ref(false)
-    const ShowModal  = ref(false)
-    const FormSection  = ref(null)
+    const IsEditMode = ref(false);
+    const ShowModal = ref(false);
+    const FormSection = ref(null);
 
     const form = useForm({
         id: '',
-        nombre: '',
-        clave: ''
+        nombre: ''
     })
 
     const columnas = [
         { headerName: 'Nombre', field: 'nombre' },
-        { headerName: 'Clave', field: 'clave' },
         {
             headerName: 'Acciones',
             field: 'acciones',
             pinned: 'right',
-            minWidth: 150,
+            maxWidth: 200,
             cellRenderer: (params) => {
                 return `
                 <div>
@@ -145,7 +127,7 @@
         if (!FormValidate(FormSection)) return
         IsLoading.value = true;
         if (IsEditMode.value) {
-            form.put(route('Clientes.update', form.id), {
+            form.put(route('Productos.update', form.id), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -158,7 +140,7 @@
                 }
             });
         } else {
-            form.post(route('Clientes.store'), {
+            form.post(route('Productos.store'), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -188,7 +170,7 @@
             'Sí, eliminar',
             'Cancelar',
             () => {
-            form.delete(route('Clientes.destroy', id), {
+            form.delete(route('Productos.destroy', id), {
                 onSuccess: () => {
                     toast('Registro eliminado', 'success');
                 },

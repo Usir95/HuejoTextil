@@ -39,5 +39,14 @@ class CategoriasModulosSeeder extends Seeder {
 
         // Crear la categoría como un rol
         Role::create(['name' => $CatAlmacen->nombre]);
+
+        $CatConfAlmacen = CategoriasModulos::create([
+            'nombre' => 'Configuracion Almacen',
+            'icono' => 'fa-solid fa-gears',
+            'descripcion' => strtoupper('Seccion para la configuración de almacenes'),
+        ]);
+
+        // Crear la categoría como un rol
+        Role::create(['name' => $CatConfAlmacen->nombre]);
     }
 }

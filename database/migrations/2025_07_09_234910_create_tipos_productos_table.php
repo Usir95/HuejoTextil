@@ -9,7 +9,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('tipos_productos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->string('nombre', 85);
             $table->timestamps();
             $table->softDeletes();
         });

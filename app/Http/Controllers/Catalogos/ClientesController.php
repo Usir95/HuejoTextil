@@ -19,7 +19,7 @@ class ClientesController extends Controller {
     public function store(Request $request) {
         $validate = $request->validate([
             'nombre' => 'required|string|max:125',
-            'clave' => 'required|integer',
+            'clave' => 'required|string|max:125',
         ]);
 
         Clientes::create([
@@ -33,7 +33,7 @@ class ClientesController extends Controller {
     public function update(Request $request, $id) {
         $validate = $request->validate([
             'nombre' => 'required|string|max:125',
-            'clave' => 'required|integer',
+            'clave' => 'required|string|max:125',
         ]);
 
         $cliente = Clientes::findOrFail($id);

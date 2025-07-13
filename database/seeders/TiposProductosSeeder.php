@@ -14,8 +14,8 @@ class TiposProductosSeeder extends Seeder
     public function run(): void
     {
         $catalogo = [
-            'Tela',
-            'Hilo',
+            'TELA',
+            'HILO',
         ];
         foreach ($catalogo as $nombre) {
             TiposProductos::firstOrCreate(

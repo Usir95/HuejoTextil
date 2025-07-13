@@ -16,6 +16,7 @@ class ModulosSeeder extends Seeder
     public function run(): void {
         $rolInicio = Role::findByName('Inicio');
         $rolAdministrador = Role::findByName('Administrador');
+        $rolConfAlmacen = Role::findByName('Configuracion Almacen');
 
         Modulos::create([
             'nombre' => 'Dashboards',
@@ -71,6 +72,28 @@ class ModulosSeeder extends Seeder
         ]);
 
         Permission::create(['name' => 'Usuarios'])->assignRole($rolAdministrador);
+
+        Modulos::create([
+            'nombre' => 'Clientes',
+            'ruta' => 'Clientes.index',
+            'descripcion' => 'Catalogo de clientes',
+            'icono' => 'fa-solid fa-users',
+            'categoria_modulo_id' => $rolConfAlmacen->id,
+            'modulo_padre_id' => null,
+        ]);
+
+        Permission::create(['name' => 'Usuarios'])->assignRole($rolConfAlmacen);
+
+        Modulos::create([
+            'nombre' => 'Productos',
+            'ruta' => 'Productos.index',
+            'descripcion' => 'Catalogo de tipos productos',
+            'icono' => 'fa-solid fa-boxes-stacked',
+            'categoria_modulo_id' => $rolConfAlmacen->id,
+            'modulo_padre_id' => null,
+        ]);
+
+        Permission::create(['name' => 'Usuarios'])->assignRole($rolConfAlmacen);
 
     }
 }
