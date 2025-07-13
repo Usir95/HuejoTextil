@@ -16,4 +16,9 @@ class Colores extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
+    protected $fillable = [
+        'nombre',
+    ];
+
+
 }

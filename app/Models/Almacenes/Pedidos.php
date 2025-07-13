@@ -19,4 +19,8 @@ class Pedidos extends Model implements AuditableContract {
         return $this->belongsTo(Clientes::class, 'cliente_id');
     }
 
+    public function movimientos() {
+        return $this->hasMany(Movimientos::class, 'pedido_id');
+    }
+
 }

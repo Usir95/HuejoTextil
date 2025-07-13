@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Catalogos\TiposProductos;
+use App\Models\Catalogos\TiposPedidos;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class TiposProductosSeeder extends Seeder
+class TiposPedidosSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,11 +14,11 @@ class TiposProductosSeeder extends Seeder
     public function run(): void
     {
         $catalogo = [
-            'Tela',
-            'Hilo',
+            'Normal',
+            'Reproceso'
         ];
         foreach ($catalogo as $nombre) {
-            TiposProductos::firstOrCreate(
+            TiposPedidos::firstOrCreate(
                 ['nombre' => $nombre]
             );
         }

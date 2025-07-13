@@ -25,7 +25,7 @@ class Productos extends Model implements AuditableContract {
 
     public function unidadMedida()
     {
-        return $this->belongsTo(Unidades::class, 'unidad_medida_id');
+        return $this->belongsTo(Unidades::class, 'unidad_id');
     }
 
 }

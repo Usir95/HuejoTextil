@@ -22,4 +22,9 @@ class Unidades extends Model implements AuditableContract {
         return $this->belongsTo(TiposUnidades::class, 'tipo_unidad_id');
     }
 
+    public function productos()
+    {
+        return $this->hasMany(Productos::class, 'unidad_id');
+    }
+
 }

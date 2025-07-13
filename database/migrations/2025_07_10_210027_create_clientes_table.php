@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->integer('clave');
+            $table->string('clave');
             $table->timestamps();
             $table->softDeletes();
         });

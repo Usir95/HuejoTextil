@@ -35,7 +35,7 @@ class UpdateMovimientoRequest extends FormRequest
                 'nullable',
                 Rule::exists('tipos_unidades', 'id')
             ],
-            'unidad_medida_id' => [
+            'unidad_id' => [
                 'nullable',
                 Rule::exists('unidades', 'id')
             ],
@@ -74,7 +74,7 @@ class UpdateMovimientoRequest extends FormRequest
             'fecha_movimiento.date' => 'La fecha del movimiento no tiene un formato válido.',
             'tipo_producto_id.exists' => 'El tipo de producto seleccionado no es válido.',
             'tipo_unidad_id.exists' => 'El tipo de unidad seleccionado no es válido.',
-            'unidad_medida_id.exists' => 'La unidad de medida seleccionada no es válida.',
+            'unidad_id.exists' => 'La unidad de medida seleccionada no es válida.',
             'cliente_id.exists' => 'El cliente seleccionado no es válido.',
             'tipo_movimiento_id.exists' => 'El tipo de movimiento seleccionado no es válido.',
             'pedido_id.exists' => 'El pedido seleccionado no es válido.',
