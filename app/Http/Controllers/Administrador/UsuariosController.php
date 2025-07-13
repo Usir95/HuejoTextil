@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Administrador;
 use App\Actions\Fortify\PasswordValidationRules;
 use App\Http\Controllers\Controller;
 use App\Models\RecursosHumanos\Empleados;
+use App\Models\Scopes\ActivoScope;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -115,7 +116,8 @@ class UsuariosController extends Controller {
 
     private function GeneraUsuario() {
         // Obtener el último empleado real
-        $Empleado = Empleados::with('usuario')
+        $Empleado = Empleados::withoutGlobalScope(ActivoScope::class)
+            ->with('usuario')
             ->where('id', '>', 10)
             ->orderByDesc('id')
             ->first();

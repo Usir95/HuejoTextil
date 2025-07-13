@@ -1,87 +1,160 @@
 <template>
     <AppLayout title="Roles y permisos del sistema">
-        <template #options>
-            <!-- Opciones si las necesitas -->
-        </template>
-
-        <section>
+        <section class="mt-4">
             <AgGrid
-                :initialRowData="Usuarios"
-                :initialColumnDefs="columnDefs"
-                :pagination="true"
-                :paginationPageSize="50"
-                :height="'70vh'"
+                :initial-row-data="roles"
+                :initial-column-defs="columnas"
                 @cell-clicked="onCellClicked"
+                :pagination="true"
+                height="80vh"
             />
         </section>
+
+        <MdDialogModal :show="showModalRol" @close="showModalRol = false">
+            <template #title> Configurar permisos del rol </template>
+
+            <template #content>
+                <div v-if="rolSeleccionado">
+                    <h2 class="text-xl font-semibold mb-4">Permisos para: {{ rolSeleccionado.name }}</h2>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+                        <div v-for="(grupo, modulo) in PermisosPorModulo" :key="modulo" class="border rounded-xl p-3 bg-[var(--color-text)] text-white">
+                            <h3 class="font-extrabold text-xl text-center mb-2">{{ modulo }}</h3>
+                            <div class="space-y-2">
+                                <label v-for="permiso in grupo" :key="permiso.id" class="flex items-center justify-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        :value="permiso.name"
+                                        v-model="permisosSeleccionados"
+                                    />
+                                    <span>{{ permiso.name.replace(modulo + '.', '') }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="text-gray-500">Selecciona un rol para ver sus permisos.</div>
+            </template>
+
+            <template #footer>
+                <MdButton variant="primary" :loading="isLoading" @click="AsignarPermisos()">
+                    Guardar cambios
+                </MdButton>
+                <MdButton variant="dark" @click="showModalRol = false">
+                    Cancelar
+                </MdButton>
+            </template>
+        </MdDialogModal>
     </AppLayout>
 </template>
 
 <script setup>
-import { ref, defineProps, inject, onMounted } from 'vue'
+import { ref, defineProps, inject, computed, watch } from 'vue'
+import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import AgGrid from '@/Components/Dependencies/AgGrid.vue'
+import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue';
+import MdButton from '@/Components/MaterialDesign/MdButton.vue';
 
 /* ============================================ Props ============================================ */
 const props = defineProps({
     Roles: Object,
     Permisos: Object,
-    Usuarios: Object,
 })
 
-/* ============================================ Columnas AG Grid ============================================ */
-const columnDefs = [
-    { headerName: 'ID', field: 'id', filter: 'agNumberColumnFilter', minWidth: 100 },
-    { headerName: 'Usuario', field: 'usuario', filter: 'agTextColumnFilter', minWidth: 150 },
-    { headerName: 'Nombre', field: 'nombre', filter: 'agTextColumnFilter', minWidth: 150 },
-    { headerName: 'Email', field: 'correo', filter: 'agTextColumnFilter', minWidth: 150 },
+/* ============================================ Refs y states ============================================ */
+const toast = inject('$toast');
+const FormSection = ref(null);
+const isLoading = ref(false);
+const rolSeleccionado = ref(null);
+const permisosSeleccionados = ref([]);
+const showModalRol = ref(false);
+
+const roles = ref([...props.Roles]);
+
+/* ============================================ Watchers ============================================ */
+watch(() => props.Roles, (nuevosRoles) => {
+    roles.value = [...nuevosRoles];
+});
+
+/* ============================================ Columnas AgGrid ============================================ */
+
+const columnas = [
+    {
+        headerName: 'ID',
+        field: 'id',
+        filter: 'agTextColumnFilter',
+        minWidth: 100,
+        flex: 1,
+    },
+    {
+        headerName: 'Rol',
+        field: 'name',
+        filter: 'agTextColumnFilter',
+        minWidth: 150,
+        flex: 1,
+    },
     {
         headerName: 'Acciones',
-        field: 'actions',
+        field: 'acciones',
         pinned: 'right',
-        maxWidth: 130,
+        minWidth: 180,
         cellRenderer: (params) => {
-            const row = encodeURIComponent(JSON.stringify(params.data))
             return `
-                <div>
-                    <button data-action="Editar" data-row="${row}" class="text-indigo-500 hover:text-indigo-900" title="Editar registro">
-                        Editar
-                    </button>
-                    <button data-action="Eliminar" data-row="${row}" class="text-red-600 hover:text-red-900 ms-4" title="Eliminar registro">
-                        Eliminar
-                    </button>
-                </div>
-            `
+                <button data-action="SeleccionarRol" data-id="${params.data.id}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    <i class="fas fa-cogs mr-1"></i> Configurar permisos
+                </button>
+            `;
         },
-        filter: false,
         sortable: false,
-        resizable: false
+        filter: false,
+    },
+];
+
+/* ============================================ Eventos AgGrid ============================================ */
+const onCellClicked = (event) => {
+    const target = event.event.target.closest('button');
+    const action = target?.dataset.action;
+
+    if (action === 'SeleccionarRol') {
+        seleccionarRol(event.data);
     }
-]
+};
 
-// Acción al dar clic
-const onCellClicked = ({event}) => {
-    const action = event.target.dataset.action
-    const rowData = event.target.dataset.row
+/* ============================================ Lógica permisos por módulo ============================================ */
+const PermisosPorModulo = computed(() => {
+    const agrupado = {};
+    props.Permisos.forEach(p => {
+        const [modulo, permiso] = p.name.split('.');
+        if (!agrupado[modulo]) agrupado[modulo] = [];
+        agrupado[modulo].push(p);
+    });
+    return agrupado;
+});
 
-    if (!action || !rowData) return
+/* ============================================ Funciones principales ============================================ */
+const seleccionarRol = (data) => {
+    rolSeleccionado.value = data;
+    permisosSeleccionados.value = data.permissions?.map(p => p.name) ?? [];
+    showModalRol.value = true;
+};
 
-    const row = JSON.parse(decodeURIComponent(rowData))
+const AsignarPermisos = async () => {
+    try {
+        isLoading.value = true;
+        await router.post('RolesPermisos/AsignarPermisos', {
+            rol_id: rolSeleccionado.value.id,
+            permisos: permisosSeleccionados.value,
+        });
+        toast('Permisos actualizados correctamente', 'success');
+        showModalRol.value = false;
 
-    if (action === 'Editar') {
-        console.log('Editar', row)
-    } else if (action === 'Eliminar') {
-        console.log('Eliminar', row)
+        router.reload({ only: ['Roles'] });
+    } catch (error) {
+        toast('Error al actualizar permisos', 'error');
+    } finally {
+        isLoading.value = false;
     }
-}
-
-
-/* ============================================ Utilidades ============================================ */
-const toast = inject('$toast')
-const confirm = inject('$confirm')
-const notify = inject('$notify')
-
-onMounted(() => {
-    notify('Lista de usuarios cargada correctamente', 'success')
-})
+};
 </script>
+

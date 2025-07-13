@@ -12,6 +12,7 @@ use Inertia\Inertia;
 
 
 Route::resource('/RolesPermisos', RolesPermisosController::class)->names('RolesPermisos');
+Route::post('/RolesPermisos/AsignarPermisos', [RolesPermisosController::class, 'AsignarPermisos'])->name('RolesPermisos.AsignarPermisos');
 
 Route::resource('/Modulos', ModulosController::class)->names('Modulos');
 Route::post('/Modulos/ObtenCategoriasModulos', [ModulosController::class, 'ObtenCategoriasModulos'])->name('Modulos.ObtenCategoriasModulos');
