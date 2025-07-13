@@ -96,7 +96,7 @@
     })
 
     const columnas = [
-        { headerName: 'Usuario', field: 'user.name', filter: 'agTextColumnFilter', minWidth: 150, flex: 1 },
+        { headerName: 'Usuario', field: 'user.nombre', filter: 'agTextColumnFilter', minWidth: 150, flex: 1 },
         { headerName: 'Acción', field: 'event', filter: 'agTextColumnFilter',
             cellRenderer: (params) => {
                 return `
