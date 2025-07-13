@@ -18,8 +18,17 @@ class UsuariosController extends Controller {
     use PasswordValidationRules;
 
     public function index() {
-        $Usuarios = User::with('roles', 'Empleado')->get();
-        return Inertia::render('Administrador/Usuarios', compact('Usuarios'));
+        $Usuarios = User::with('roles', 'Empleado')
+        ->orderBy('id', 'desc')
+        ->get();
+
+        $Roles = $this->Roles();
+
+        return Inertia::render('Administrador/Usuarios', compact('Usuarios', 'Roles'));
+    }
+
+    public function Roles() {
+        return Role::with('permissions')->get();
     }
 
     public function store(Request $request) {
@@ -99,9 +108,8 @@ class UsuariosController extends Controller {
         return redirect()->back()->with('success', 'Empleado y usuario desactivados');
     }
 
-
     private function ContraseñaDefault($Password = null) {
-        $Key = $Password ?? '1234';
+        $Key = $Password ?? '12345';
         return Hash::make($Key);
     }
 
@@ -139,10 +147,10 @@ class UsuariosController extends Controller {
         return $NuevoUsuario;
     }
 
-    public function resetPassword(User $usuario) {
+    public function RestartPassword(User $usuario) {
         try {
             User::where('id', $usuario->id)->update([
-                'password' => Hash::make('12345')
+                'password' => $this->ContraseñaDefault(),
             ]);
 
             return redirect()->back()->with('success', 'Contraseña restablecida con éxito');
@@ -156,11 +164,10 @@ class UsuariosController extends Controller {
             'id' => 'required',
             'rol' => ['required']
         ]);
-        // return $request;
         $user = User::findOrFail($validated['id']);
         $role = Role::findById($validated['rol']);
         $user->syncRoles($role);
 
-        return redirect()->back()->with('success', 'Dato asignado correctamente');
+        return redirect()->back();
     }
 }

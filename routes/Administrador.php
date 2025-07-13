@@ -18,4 +18,7 @@ Route::post('/Modulos/ObtenCategoriasModulos', [ModulosController::class, 'Obten
 Route::post('/Modulos/IconosFontAwesome', [ModulosController::class, 'IconosFontAwesome'])->name('Modulos.IconosFontAwesome');
 
 Route::resource('/Bitacora', BitacoraController::class)->names('Bitacora');
+
 Route::resource('/Usuarios', UsuariosController::class)->names('Usuarios');
+Route::post('/Usuarios/RestartPassword/{usuario}', [UsuariosController::class, 'RestartPassword'])->name('Usuarios.RestartPassword');
+Route::post('/Usuarios/AsignarRolUsuario', [UsuariosController::class, 'AsignarRolUsuario'])->name('Usuarios.AsignarRolUsuario');
