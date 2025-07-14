@@ -9,14 +9,14 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha_pedido');
-            $table->string('estado_pedido');
-            $table->string('plazo_pago');
+            $table->date('fecha_pedido');
+            $table->string('estado_pedido', 15);
+            $table->string('plazo_pago', 30);
             $table->string('condiciones');
-            $table->string('observaciones');
+            $table->text('observaciones');
 
-            // $table->unsignedBigInteger('cliente_id')->nullable()->index();
-            // $table->foreign('cliente_id')->references('id')->on('clientes');
+            $table->unsignedBigInteger('cliente_id')->nullable()->index();
+            $table->foreign('cliente_id')->references('id')->on('clientes');
 
             $table->timestamps();
             $table->softDeletes();

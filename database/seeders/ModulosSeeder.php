@@ -19,6 +19,7 @@ class ModulosSeeder extends Seeder {
         // Obtener categorías por nombre
         $categoriaAdministrador = CategoriasModulos::where('nombre', 'Administrador')->first();
         $categoriaConfAlmacen = CategoriasModulos::where('nombre', 'Configuracion Almacen')->first();
+        $categoriaAlmacen = CategoriasModulos::where('nombre', 'Almacenes')->first();
 
         $modulos = [
             [
@@ -92,6 +93,15 @@ class ModulosSeeder extends Seeder {
                 'descripcion' => 'Catalogo de Colores',
                 'icono' => 'fa-solid fa-palette',
                 'categoria_id' => $categoriaConfAlmacen->id,
+                'roles' => ['Configuracion Almacen']
+            ],
+
+            [
+                'nombre' => 'Pedidos',
+                'ruta' => 'Pedidos.index',
+                'descripcion' => 'Pedidos de clientes',
+                'icono' => 'fa-solid fa-store',
+                'categoria_id' => $categoriaAlmacen->id,
                 'roles' => ['Configuracion Almacen']
             ],
         ];

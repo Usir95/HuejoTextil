@@ -1,13 +1,13 @@
     <template>
-        <AppLayout title="Catálogo de Colores">
+        <AppLayout title="PedidosClientes">
             <template #header-right>
                 <MdButton @click="ToggleModal()">
-                    <i class="fa fa-palette mr-2"></i>Nuevo Color
+                    <i class="fa fa-user-plus mr-2"></i>Nuevo pedido
                 </MdButton>
             </template>
 
             <AgGrid
-                :initial-row-data="Colores"
+                :initial-row-data="PedidosClientes"
                 :initial-column-defs="columnas"
                 @cell-clicked="onCellClicked"
                 height="80vh"
@@ -15,23 +15,65 @@
 
             <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal">
                 <template #title>
-                    Crear Productos
+                    Crear Pedidos
                 </template>
 
                 <template #content>
-                    <section class="space-y-4">
-                        <MdTextInput
-                            id="nombre"
-                            name="nombre"
-                            label="Nombre"
-                            class="col-span-2"
-                            v-model="form.nombre"
-                            :uppercase="true"
+                    <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-32">
+                        <MdDateInput
+                            id="fecha_pedido"
+                            name="fecha_pedido"
+                            label="fecha_pedido"
+                            v-model="form.fecha_pedido"
                             required
-                            :maxlength="85"
-                            helper="Nombre del color"
-                            :error="form.errors.nombre"
-                            :success="!form.errors.nombre"
+                            helper="Fecha del pedido"
+                            :error="form.errors.fecha_pedido"
+                            :success="!form.errors.fecha_pedido"
+                        />
+                        <MdSelectInput
+                            id="estado_pedido"
+                            name="estado_pedido"
+                            v-model="form.estado_pedido"
+                            required
+                            label="Selecciona un estatus"
+                            helper="Estatus del pedido"
+                            :error="form.errors.estado_pedido"
+                            :success="!form.errors.estado_pedido"
+                            :options="Estatus"
+                        />
+                        <MdSelectInput
+                            id="plazo_pago"
+                            name="plazo_pago"
+                            class="col-span-2"
+                            v-model="form.plazo_pago"
+                            required
+                            label="Plazo de pago"
+                            helper="Selecciona una forma de pago"
+                            :error="form.errors.plazo_pago"
+                            :success="!form.errors.plazo_pago"
+                            :options="FormasPagos"
+                        />
+                        <MdTextInput
+                            id="condiciones"
+                            name="condiciones"
+                            class="col-span-2"
+                            v-model="form.condiciones"
+                            required
+                            label="Condiciones"
+                            helper="Condiciones del pedido"
+                            :error="form.errors.condiciones"
+                            :success="!form.errors.condiciones"
+                        />
+                        <MdTextareaInput
+                            id="observaciones"
+                            name="observaciones"
+                            class="col-span-2"
+                            v-model="form.observaciones"
+                            required
+                            label="Observaciones"
+                            helper="Observaciones del pedido"
+                            :error="form.errors.observaciones"
+                            :success="!form.errors.observaciones"
                         />
                     </section>
                 </template>
@@ -39,7 +81,7 @@
                 <template #footer>
                     <div class="space-x-2">
                         <MdButton variant="primary" :loading="IsLoading" @click="Upsert()">
-                            {{ IsEditMode ? 'Actualizar Color' : 'Registrar Color' }}
+                            {{ IsEditMode ? 'Actualizar' : 'Registrar' }}
                         </MdButton>
                         <MdButton variant="dark" @click="ToggleModal()">Cancelar</MdButton>
                     </div>
@@ -53,13 +95,18 @@ import { ref, inject, defineProps } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import AgGrid from '@/Components/Dependencies/AgGrid.vue'
+import MdDateInput from '@/Components/MaterialDesign/MdDateInput.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
+import MdTextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
+import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 
     /* ========================== Props ========================== */
     const props = defineProps({
-        Colores: Object
+        PedidosClientes: Object,
+        Estatus: Array,
+        FormasPagos: Array
     })
 
     /* ========================== Refs ========================== */
@@ -71,13 +118,23 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
     const ShowModal = ref(false);
     const FormSection = ref(null);
 
+
     const form = useForm({
         id: '',
-        nombre: ''
+        fecha_pedido: '',
+        estado_pedido: '',
+        plazo_pago: '',
+        condiciones: '',
+        observaciones: '',
+        cliente_id: '',
     })
 
     const columnas = [
-        { headerName: 'Nombre', field: 'nombre' },
+        { headerName: 'Fecha de Pedido', field: 'fecha_pedido' },
+        { headerName: 'Estatus', field: 'estado_pedido' },
+        { headerName: 'Plazo de Pago', field: 'plazo_pago' },
+        { headerName: 'Condiciones', field: 'condiciones' },
+        { headerName: 'Observaciones', field: 'observaciones' },
         {
             headerName: 'Acciones',
             field: 'acciones',
@@ -129,7 +186,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
         if (!FormValidate(FormSection)) return
         IsLoading.value = true;
         if (IsEditMode.value) {
-            form.put(route('Colores.update', form.id), {
+            form.put(route('Pedidos.update', form.id), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -142,7 +199,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
                 }
             });
         } else {
-            form.post(route('Colores.store'), {
+            form.post(route('Pedidos.store'), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -172,7 +229,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
             'Sí, eliminar',
             'Cancelar',
             () => {
-            form.delete(route('Colores.destroy', id), {
+            form.delete(route('Pedidos.destroy', id), {
                 onSuccess: () => {
                     toast('Registro eliminado', 'success');
                 },
