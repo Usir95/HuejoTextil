@@ -85,6 +85,15 @@ class ModulosSeeder extends Seeder {
                 'categoria_id' => $categoriaConfAlmacen->id,
                 'roles' => ['Configuracion Almacen']
             ],
+
+            [
+                'nombre' => 'Colores',
+                'ruta' => 'Colores.index',
+                'descripcion' => 'Catalogo de Colores',
+                'icono' => 'fa-solid fa-palette',
+                'categoria_id' => $categoriaConfAlmacen->id,
+                'roles' => ['Configuracion Almacen']
+            ],
         ];
 
         foreach ($modulos as $modulo) {
