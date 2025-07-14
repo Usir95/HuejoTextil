@@ -1,28 +1,42 @@
     <template>
         <AppLayout title="Catálogo de Productos">
             <template #header-right>
-                <MdButton @click="ToggleModal()">Nuevo Tipo</MdButton>
+                <MdButton @click="ToggleModal()">
+                    <i class="fa fa-user-plus mr-2"></i> Nuevo producto
+                </MdButton>
             </template>
 
             <AgGrid
-                :initial-row-data="TipoProductos"
+                :initial-row-data="Productos"
                 :initial-column-defs="columnas"
                 @cell-clicked="onCellClicked"
                 height="80vh"
             />
 
-            <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal">
+            <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal" maxWidth="3xl">
                 <template #title>
                     Crear Productos
                 </template>
 
                 <template #content>
-                    <section class="space-y-4">
+                    <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-32">
+                        <MdTextInput
+                            id="codigo"
+                            name="codigo"
+                            label="codigo"
+                            v-model="form.codigo"
+                            :uppercase="true"
+                            required
+                            :maxlength="85"
+                            helper="Codigo del producto"
+                            :error="form.errors.codigo"
+                            :success="!form.errors.codigo"
+                        />
+
                         <MdTextInput
                             id="nombre"
                             name="nombre"
                             label="Nombre"
-                            class="col-span-2"
                             v-model="form.nombre"
                             :uppercase="true"
                             required
@@ -30,6 +44,26 @@
                             helper="Nombre del producto"
                             :error="form.errors.nombre"
                             :success="!form.errors.nombre"
+                        />
+
+                        <MdSelectInput
+                            id="tipo_producto_id"
+                            name="tipo_producto_id"
+                            v-model="form.tipo_producto_id"
+                            :options="TiposProductos"
+                            label="Selecciona un tipo de producto"
+                            :error="form.errors.tipo_producto_id"
+                            :success="!form.errors.tipo_producto_id"
+                        />
+
+                        <MdSelectInput
+                            id="unidad_id"
+                            name="unidad_id"
+                            v-model="form.unidad_id"
+                            :options="Unidades"
+                            label="Selecciona una unidad"
+                            :error="form.errors.unidad_id"
+                            :success="!form.errors.unidad_id"
                         />
                     </section>
                 </template>
@@ -46,18 +80,21 @@
         </AppLayout>
     </template>
 
-    <script setup>
-    import { ref, inject, defineProps } from 'vue'
-    import { useForm } from '@inertiajs/vue3'
-    import AppLayout from '@/Layouts/AppLayout.vue'
-    import AgGrid from '@/Components/Dependencies/AgGrid.vue'
+<script setup>
+import { ref, inject, defineProps } from 'vue'
+import { useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
+import AgGrid from '@/Components/Dependencies/AgGrid.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
+import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 
     /* ========================== Props ========================== */
     const props = defineProps({
-        TipoProductos: Object
+        TiposProductos: Object,
+        Unidades: Object,
+        Productos: Object
     })
 
     /* ========================== Refs ========================== */
@@ -71,11 +108,17 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 
     const form = useForm({
         id: '',
-        nombre: ''
+        codigo: '',
+        nombre: '',
+        tipo_producto_id: '',
+        unidad_id: ''
     })
 
     const columnas = [
         { headerName: 'Nombre', field: 'nombre' },
+        { headerName: 'Codigo', field: 'codigo' },
+        { headerName: 'Tipo Producto', field: 'tipo_producto.nombre' },
+        { headerName: 'Unidad', field: 'unidad_medida.nombre' },
         {
             headerName: 'Acciones',
             field: 'acciones',
@@ -127,7 +170,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
         if (!FormValidate(FormSection)) return
         IsLoading.value = true;
         if (IsEditMode.value) {
-            form.put(route('TipoProductos.update', form.id), {
+            form.put(route('Productos.update', form.id), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -140,7 +183,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
                 }
             });
         } else {
-            form.post(route('TipoProductos.store'), {
+            form.post(route('Productos.store'), {
                 onSuccess: () => {
                     ToggleModal();
                     form.reset();
@@ -170,7 +213,7 @@ import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
             'Sí, eliminar',
             'Cancelar',
             () => {
-            form.delete(route('TipoProductos.destroy', id), {
+            form.delete(route('Productos.destroy', id), {
                 onSuccess: () => {
                     toast('Registro eliminado', 'success');
                 },

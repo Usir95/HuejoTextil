@@ -18,13 +18,11 @@ class Productos extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
-    public function tipoProducto()
-    {
+    public function tipoProducto() {
         return $this->belongsTo(TiposProductos::class, 'tipo_producto_id');
     }
 
-    public function unidadMedida()
-    {
+    public function unidadMedida() {
         return $this->belongsTo(Unidades::class, 'unidad_id');
     }
 

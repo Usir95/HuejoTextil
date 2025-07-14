@@ -12,8 +12,8 @@ use Inertia\Inertia;
 class TiposProductosController extends Controller {
 
     public function index() {
-        $Productos = TiposProductos::get();
-        return Inertia::render('Catalogos/TiposProductos', compact('Productos'));
+        $TipoProductos = TiposProductos::get();
+        return Inertia::render('Catalogos/TiposProductos', compact('TipoProductos'));
     }
 
     public function store(Request $request) {

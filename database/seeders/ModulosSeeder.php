@@ -82,18 +82,29 @@ class ModulosSeeder extends Seeder
             'modulo_padre_id' => null,
         ]);
 
-        Permission::create(['name' => 'Usuarios'])->assignRole($rolConfAlmacen);
+        Permission::create(['name' => 'Clientes'])->assignRole($rolConfAlmacen);
+
+        // Modulos::create([
+        //     'nombre' => 'Tipos Productos',
+        //     'ruta' => 'TiposProductos.index',
+        //     'descripcion' => 'Catalogo de tipos productos',
+        //     'icono' => 'fa-solid fa-box-open',
+        //     'categoria_modulo_id' => $rolConfAlmacen->id,
+        //     'modulo_padre_id' => null,
+        // ]);
+
+        // Permission::create(['name' => 'TiposProductos'])->assignRole($rolConfAlmacen);
 
         Modulos::create([
             'nombre' => 'Productos',
             'ruta' => 'Productos.index',
-            'descripcion' => 'Catalogo de tipos productos',
-            'icono' => 'fa-solid fa-boxes-stacked',
+            'descripcion' => 'Catalogo de productos',
+            'icono' => 'fa-solid fa-box',
             'categoria_modulo_id' => $rolConfAlmacen->id,
             'modulo_padre_id' => null,
         ]);
 
-        Permission::create(['name' => 'Usuarios'])->assignRole($rolConfAlmacen);
+        Permission::create(['name' => 'Productos'])->assignRole($rolConfAlmacen);
 
     }
 }

@@ -17,13 +17,11 @@ class Unidades extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
-    public function tipoUnidad()
-    {
+    public function TipoUnidad() {
         return $this->belongsTo(TiposUnidades::class, 'tipo_unidad_id');
     }
 
-    public function productos()
-    {
+    public function Productos() {
         return $this->hasMany(Productos::class, 'unidad_id');
     }
 
