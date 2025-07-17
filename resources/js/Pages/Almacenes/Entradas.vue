@@ -124,35 +124,37 @@ const Insert = async () => {
 }
 
 const ImprimirEtiqueta = async (Id) => {
-    console.log('ID del movimiento:', Id);
-
     const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
     const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
     const cantidad = form.cantidad;
     const fecha = new Date().toLocaleDateString();
 
-    const codigoId = Id;
     const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
 
+    const qrDataUrl = await QRCode.toDataURL(codigo, {
+        width: 20 * 3.78, // 20mm en px
+        margin: 0
+    });
+
     const html = `
-        <div style="font-family: sans-serif; width: 90mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
-            <!-- Código de barras arriba -->
+        <div style="font-family: sans-serif; width: 60mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
+            <!-- Código de barras -->
             <div style="display: flex; justify-content: center; margin-bottom: 2mm;">
                 <svg id="barcode" style="width: 50mm; height: 10mm;"></svg>
             </div>
 
             <!-- Info + QR -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 3mm; font-weight: bold; line-height: 1.4;">
+                    <div text-align: center;> ${codigo} </div>
                     <div>Producto: ${producto}</div>
                     <div>Color: ${color}</div>
-                    <div>Calidad: ${calidad}</div>
                     <div>Cantidad: ${cantidad}</div>
-                    <div>Fecha: ${fecha}</div>
                 </div>
 
-                <canvas id="qrcode" width="20mm" height="20mm" style="width: 20mm; height: 20mm;"></canvas>
+                <!-- QR como imagen -->
+                <img src="${qrDataUrl}" width="60mm" height="60mm" style="object-fit: contain;" />
             </div>
         </div>
     `;
@@ -164,15 +166,9 @@ const ImprimirEtiqueta = async (Id) => {
 
     JsBarcode("#barcode", codigo, {
         format: "CODE128",
-        width: 2, // mm → se verá más delgado
-        height: 10 * 2.78, // mm → píxeles (1mm ≈ 3.78px)
+        width: 2,
+        height: 10 * 2.78,
         displayValue: false
-    });
-
-    const canvasQR = document.getElementById("qrcode");
-    await QRCode.toCanvas(canvasQR, codigo, {
-        width: 20 * 3.78, // mm → píxeles
-        margin: 0
     });
 
     ImprimirElemento(etiquetaDiv);
@@ -184,23 +180,31 @@ const ImprimirEtiqueta = async (Id) => {
     if (input) input.focus();
 };
 
-const ImprimirElemento = (elemento) => {
+const ImprimirElemento = (elementoOriginal) => {
     const ventana = window.open('', '', 'width=600,height=400');
+
     ventana.document.write(`
         <html>
             <head><title>Etiqueta</title></head>
-            <body style="margin:0; padding:0;">
-                ${elemento.innerHTML}
-            </body>
+            <body style="margin:0; padding:0;"></body>
         </html>
     `);
     ventana.document.close();
-    ventana.focus();
-    ventana.print();
-    ventana.close();
-    console.log('Simulación: orden de impresión enviada');
-    toast('Etiqueta lista para imprimir (simulado)', 'info');
+
+    // Clonar el nodo con todos sus hijos y canvas incluidos
+    const clon = elementoOriginal.cloneNode(true);
+
+    // Esperar a que la ventana esté lista
+    ventana.onload = () => {
+        ventana.document.body.appendChild(clon);
+        ventana.focus();
+        ventana.print();
+        ventana.close();
+        console.log('Simulación: orden de impresión enviada');
+        toast('Etiqueta lista para imprimir (simulado)', 'info');
+    };
 };
+
 
 
 </script>
