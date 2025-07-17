@@ -129,15 +129,15 @@ const ImprimirEtiqueta = async () => {
     const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}`;
 
     const html = `
-        <div style="font-family: sans-serif; width: 400px; border: 2px solid #000; padding: 10px; box-sizing: border-box;">
+        <div style="font-family: sans-serif; width: 90mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
             <!-- Código de barras arriba -->
-            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                <svg id="barcode" style="width: 200px; height: 40px;"></svg>
+            <div style="display: flex; justify-content: center; margin-bottom: 2mm;">
+                <svg id="barcode" style="width: 50mm; height: 10mm;"></svg>
             </div>
 
             <!-- Info + QR -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div style="font-size: 13px; font-weight: bold; line-height: 1.4;">
+                <div style="font-size: 3mm; font-weight: bold; line-height: 1.4;">
                     <div>Producto: ${producto}</div>
                     <div>Color: ${color}</div>
                     <div>Calidad: ${calidad}</div>
@@ -145,7 +145,7 @@ const ImprimirEtiqueta = async () => {
                     <div>Fecha: ${fecha}</div>
                 </div>
 
-                <canvas id="qrcode" width="80" height="80"></canvas>
+                <canvas id="qrcode" width="20mm" height="20mm" style="width: 20mm; height: 20mm;"></canvas>
             </div>
         </div>
     `;
@@ -157,14 +157,14 @@ const ImprimirEtiqueta = async () => {
 
     JsBarcode("#barcode", codigo, {
         format: "CODE128",
-        width: 2,
-        height: 40,
+        width: 2, // mm → se verá más delgado
+        height: 10 * 2.78, // mm → píxeles (1mm ≈ 3.78px)
         displayValue: false
     });
 
     const canvasQR = document.getElementById("qrcode");
     await QRCode.toCanvas(canvasQR, codigo, {
-        width: 80,
+        width: 20 * 3.78, // mm → píxeles
         margin: 0
     });
 
