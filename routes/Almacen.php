@@ -1,6 +1,7 @@
 <?php
 // routes/Almacen.php
 
+use App\Http\Controllers\Almacenes\EntradasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
 use App\Http\Controllers\Catalogos\ClientesController;
 use App\Http\Controllers\Catalogos\ColoresController;
@@ -16,3 +17,6 @@ Route::resource('/TiposProductos', TiposProductosController::class)->names('Tipo
 Route::resource('/Productos', ProductosController::class)->names('Productos');
 Route::resource('/Colores', ColoresController::class)->names('Colores');
 Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
+
+
+Route::resource('/Entradas', EntradasController::class)->names('Entradas');

@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Catalogos\TiposMovimientos;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
-{
+class DatabaseSeeder extends Seeder {
     /**
      * Seed the application's database.
      */
@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             TiposCalidadesSeeder::class,
             TiposProductosSeeder::class,
             TiposUnidadesSeeder::class,
+            TiposMovimientosSeeder::class,
+            AlmacenesSeeder::class,
             UnidadesSeeder::class,
             ProductosSeeder::class,
         ]);
