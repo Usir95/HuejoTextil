@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('plazo_pago', 30);
             $table->string('condiciones');
             $table->text('observaciones');
+            $table->json('detalle_pedido')->nullable();
 
             $table->unsignedBigInteger('cliente_id')->nullable()->index();
             $table->foreign('cliente_id')->references('id')->on('clientes');
