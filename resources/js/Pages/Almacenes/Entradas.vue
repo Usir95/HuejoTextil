@@ -72,12 +72,13 @@
 
 
 <script setup>
-import { ref, inject, defineProps, nextTick } from 'vue'
-import { useForm, } from '@inertiajs/vue3'
+import { ref, inject, defineProps, nextTick, computed } from 'vue'
+import { useForm, usePage  } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
+import axios from 'axios'
 import JsBarcode from 'jsbarcode'
 import QRCode from 'qrcode'
 
@@ -94,6 +95,8 @@ const FormValidate = inject('FormValidate');
 const IsLoading = ref(false);
 const FormSection = ref(null);
 
+const movimientoId = computed(() => props.value.flash?.movimiento_id)
+
 const form = useForm({
     producto_id: '',
     color_id: '',
@@ -101,32 +104,36 @@ const form = useForm({
     cantidad: ''
 })
 
-const Insert = () => {
+const Insert = async () => {
     if (!FormValidate(FormSection)) return
-    IsLoading.value = true;
-    form.post(route('Entradas.store'), {
-        onSuccess: (response) => {
-            console.log(response.data);
+    IsLoading.value = true
 
-            IsLoading.value = false;
-            ImprimirEtiqueta()
-            toast('Entrada registrada correctamente', 'success')
-        },
-        onError: () => {
-            IsLoading.value = false;
-            toast('Ocurrió un error al registrar la entrada', 'danger')
-        }
-    })
+    try {
+        const response = await axios.post(route('Entradas.store'), form)
+
+        const id = response?.data?.movimiento_id
+        if (id) ImprimirEtiqueta(id)
+
+        toast('Entrada registrada correctamente', 'success')
+    } catch (error) {
+        toast('Error al registrar la entrada', 'danger')
+        console.error(error)
+    } finally {
+        IsLoading.value = false
+    }
 }
 
-const ImprimirEtiqueta = async () => {
+const ImprimirEtiqueta = async (Id) => {
+    console.log('ID del movimiento:', Id);
+
     const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
     const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
     const cantidad = form.cantidad;
     const fecha = new Date().toLocaleDateString();
 
-    const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}`;
+    const codigoId = Id;
+    const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
 
     const html = `
         <div style="font-family: sans-serif; width: 90mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
