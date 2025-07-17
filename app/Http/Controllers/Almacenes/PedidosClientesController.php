@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Almacenes;
 
 use App\Http\Controllers\Controller;
 use App\Models\Almacenes\Pedidos;
+use App\Models\Catalogos\Productos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -13,6 +14,7 @@ class PedidosClientesController extends Controller {
 
     public function index() {
         $PedidosClientes = Pedidos::get();
+        $Productos = Productos::select('id as value', 'nombre as label')->get();
 
         $NombresEstados = ['Pendiente', 'En proceso', 'Completado', 'Cancelado'];
         $TiposPagos = ['Contado', 'Credito', 'Debito', 'Cheque', 'Transferencia'];
@@ -34,7 +36,7 @@ class PedidosClientesController extends Controller {
             ];
         }
 
-        return Inertia::render('Almacenes/Pedidos/PedidosClientes', compact('PedidosClientes', 'Estatus', 'FormasPagos'));
+        return Inertia::render('Almacenes/Pedidos/PedidosClientes', compact('PedidosClientes', 'Estatus', 'FormasPagos', 'Productos'));
     }
 
     public function store(Request $request) {
@@ -45,6 +47,9 @@ class PedidosClientesController extends Controller {
             'condiciones' => 'required|string',
             'observaciones' => 'nullable|string',
             'cliente_id' => 'nullable|exists:clientes,id',
+            'articulos' => 'required|array',
+            'articulos.*.producto_id' => 'required|exists:productos,id',
+            'articulos.*.cantidad' => 'required|numeric|min:1',
         ]);
 
         Pedidos::create([
@@ -54,6 +59,7 @@ class PedidosClientesController extends Controller {
             'condiciones' => $validated['condiciones'],
             'observaciones' => $validated['observaciones'],
             'cliente_id' => $validated['cliente_id'],
+            'detalle_pedido' => $validated['articulos'],
         ]);
         return back()->with('success', 'Pedido creado');
     }
@@ -68,6 +74,9 @@ class PedidosClientesController extends Controller {
             'condiciones' => 'required|string',
             'observaciones' => 'nullable|string',
             'cliente_id' => 'nullable|exists:clientes,id',
+            'articulos' => 'required|array',
+            'articulos.*.producto_id' => 'required|exists:productos,id',
+            'articulos.*.cantidad' => 'required|numeric|min:1',
         ]);
 
         $pedido->update([
@@ -77,6 +86,7 @@ class PedidosClientesController extends Controller {
             'condiciones'    => $validated['condiciones'],
             'observaciones'  => $validated['observaciones'] ?? '',
             'cliente_id'     => $validated['cliente_id'],
+            'detalle_pedido' => $validated['articulos'],
         ]);
 
         return back()->with('success', 'Pedido actualizado');

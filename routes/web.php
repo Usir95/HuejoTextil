@@ -4,7 +4,8 @@ use App\Http\Controllers\ExampleController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+include 'Administrador.php';
+include 'Almacen.php';
 Route::get('/', function () {
     return redirect()->route('login');
 });

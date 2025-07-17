@@ -19,7 +19,7 @@
                 </template>
 
                 <template #content>
-                    <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-32">
+                    <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <MdDateInput
                             id="fecha_pedido"
                             name="fecha_pedido"
@@ -75,6 +75,36 @@
                             :error="form.errors.observaciones"
                             :success="!form.errors.observaciones"
                         />
+
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Artículos</label>
+                            <div v-for="(articulo, index) in form.articulos" :key="index" class="flex mt-2 gap-5">
+                                <MdSelectInput
+                                    :id="'articulo_' + index"
+                                    :name="'articulo_' + index"
+                                    v-model="form.articulos[index].producto_id"
+                                    label="Selecciona un artículo"
+                                    :options="Productos"
+                                    class="flex-[2]"
+                                    :error="form.errors[`articulos.${index}.producto_id`]"
+                                />
+                                <MdNumberInput
+                                    :id="'cantidad_' + index"
+                                    :name="'cantidad_' + index"
+                                    v-model.number="form.articulos[index].cantidad"
+                                    label="Cantidad"
+                                    class="flex-1"
+                                    :error="form.errors[`articulos.${index}.cantidad`]"
+                                />
+                                <MdButton variant="danger" size="sm" @click="removeArticulo(index)">
+                                    Eliminar
+                                </MdButton>
+                            </div>
+                            <MdButton variant="success" size="sm" @click="addArticulo" class="mt-2">
+                                Agregar Artículo
+                            </MdButton>
+                        </div>
+
                     </section>
                 </template>
 
@@ -101,12 +131,14 @@ import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
 import MdTextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
+import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 
     /* ========================== Props ========================== */
     const props = defineProps({
         PedidosClientes: Object,
         Estatus: Array,
-        FormasPagos: Array
+        FormasPagos: Array,
+        Productos: Array
     })
 
     /* ========================== Refs ========================== */
@@ -127,10 +159,13 @@ import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
         condiciones: '',
         observaciones: '',
         cliente_id: '',
-    })
+        articulos: [{ producto_id: null, cantidad: 1 }], // Inicializa con un select
+    });
 
     const columnas = [
         { headerName: 'Fecha de Pedido', field: 'fecha_pedido' },
+        { headerName: 'Cliente', field: 'cliente.nombre' },
+        // { headerName: 'Detalle pedido', field: 'detalle_pedido' },
         { headerName: 'Estatus', field: 'estado_pedido' },
         { headerName: 'Plazo de Pago', field: 'plazo_pago' },
         { headerName: 'Condiciones', field: 'condiciones' },
@@ -218,6 +253,7 @@ import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
     const Edit = (data) => {
         IsLoading.value = false;
         Object.assign(form, data);
+        form.articulos = data.detalle_pedido || [{ producto_id: null, cantidad: 1 }];
         IsEditMode.value = true;
         ShowModal.value = true;
     };
@@ -244,4 +280,13 @@ import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
             }
         );
     };
+
+    const addArticulo = () => {
+        form.articulos.push({ producto_id: null, cantidad: 1 });
+    };
+
+    const removeArticulo = (index) => {
+        form.articulos.splice(index, 1);
+    };
+
     </script>

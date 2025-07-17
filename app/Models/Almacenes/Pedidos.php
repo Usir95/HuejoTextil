@@ -15,6 +15,10 @@ class Pedidos extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
+    protected $casts = [
+        'detalle_pedido' => 'array',
+    ];
+
     public function cliente() {
         return $this->belongsTo(Clientes::class, 'cliente_id');
     }
