@@ -6,7 +6,7 @@
             </div>
         </template>
 
-        <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mx-6 my-4">
+        <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2">
             <MdSelectInput
                 id="producto_id"
                 name="producto_id"
@@ -62,17 +62,25 @@
                 </MdButton>
             </div>
         </section>
+
+        <section class="w-full flex flex-row justify-center my-4">
+            <div id="Etiqueta">
+            </div>
+        </section>
     </AppLayout>
 </template>
 
 
 <script setup>
-import { ref, inject, defineProps } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { ref, inject, defineProps, nextTick } from 'vue'
+import { useForm, } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
+import JsBarcode from 'jsbarcode'
+import QRCode from 'qrcode'
+
 
 const props = defineProps({
     Productos: Object,
@@ -101,7 +109,7 @@ const Insert = () => {
             console.log(response.data);
 
             IsLoading.value = false;
-            ImprimirEtiqueta(FormSection)
+            ImprimirEtiqueta()
             toast('Entrada registrada correctamente', 'success')
         },
         onError: () => {
@@ -110,4 +118,82 @@ const Insert = () => {
         }
     })
 }
+
+const ImprimirEtiqueta = async () => {
+    const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
+    const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
+    const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
+    const cantidad = form.cantidad;
+    const fecha = new Date().toLocaleDateString();
+
+    const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}`;
+
+    const html = `
+        <div style="font-family: sans-serif; width: 400px; border: 2px solid #000; padding: 10px; box-sizing: border-box;">
+            <!-- Código de barras arriba -->
+            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                <svg id="barcode" style="width: 200px; height: 40px;"></svg>
+            </div>
+
+            <!-- Info + QR -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="font-size: 13px; font-weight: bold; line-height: 1.4;">
+                    <div>Producto: ${producto}</div>
+                    <div>Color: ${color}</div>
+                    <div>Calidad: ${calidad}</div>
+                    <div>Cantidad: ${cantidad}</div>
+                    <div>Fecha: ${fecha}</div>
+                </div>
+
+                <canvas id="qrcode" width="80" height="80"></canvas>
+            </div>
+        </div>
+    `;
+
+    const etiquetaDiv = document.getElementById('Etiqueta');
+    etiquetaDiv.innerHTML = html;
+
+    await nextTick();
+
+    JsBarcode("#barcode", codigo, {
+        format: "CODE128",
+        width: 2,
+        height: 40,
+        displayValue: false
+    });
+
+    const canvasQR = document.getElementById("qrcode");
+    await QRCode.toCanvas(canvasQR, codigo, {
+        width: 80,
+        margin: 0
+    });
+
+    ImprimirElemento(etiquetaDiv);
+
+    form.cantidad = '';
+    await nextTick();
+
+    const input = document.getElementById('cantidad');
+    if (input) input.focus();
+};
+
+const ImprimirElemento = (elemento) => {
+    const ventana = window.open('', '', 'width=600,height=400');
+    ventana.document.write(`
+        <html>
+            <head><title>Etiqueta</title></head>
+            <body style="margin:0; padding:0;">
+                ${elemento.innerHTML}
+            </body>
+        </html>
+    `);
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+    console.log('Simulación: orden de impresión enviada');
+    toast('Etiqueta lista para imprimir (simulado)', 'info');
+};
+
+
 </script>
