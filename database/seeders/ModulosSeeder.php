@@ -113,6 +113,15 @@ class ModulosSeeder extends Seeder {
                 'categoria_id' => $categoriaAlmacen->id,
                 'roles' => ['Almacenes']
             ],
+
+            [
+                'nombre' => 'ProductosTerminados',
+                'ruta' => 'ProductosTerminados.index',
+                'descripcion' => 'Inventario de productos terminados',
+                'icono' => 'fa-solid fa-boxes-stacked',
+                'categoria_id' => $categoriaAlmacen->id,
+                'roles' => ['Almacenes']
+            ],
         ];
 
         foreach ($modulos as $modulo) {
