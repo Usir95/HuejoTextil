@@ -12,6 +12,7 @@ use App\Models\Catalogos\TiposCalidades;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -58,20 +59,31 @@ class EntradasController extends Controller {
     public function store(Request $request) {
         $request->validate([
             'producto_id' => 'required',
-            'cantidad' => 'required',
+            'cantidad' => 'required|numeric',
             'color_id' => 'required',
             'tipo_calidad_id' => 'required',
         ]);
 
-        DB::transaction(function () use ($request) {
-            Movimientos::create([
+        $movimiento = null;
+
+        DB::transaction(function () use ($request, &$movimiento) {
+            $movimiento = Movimientos::create([
                 'cantidad' => $request->cantidad,
                 'fecha_movimiento' => now(),
-                'unidad_id' => $request->producto,
-                'tipo_movimiento_id' => 1, // Entrada
+                'producto_id' => $request->producto_id,
+                'unidad_id' => 1,
+                'color_id' => $request->color_id,
+                'tipo_calidad_id' => $request->tipo_calidad_id,
+                'tipo_movimiento_id' => 1,
                 'usuario_id' => Auth::id(),
                 'almacen_id' => 1,
             ]);
+
+            if (!$movimiento) {
+                throw new \Exception('No se pudo crear el movimiento');
+            }
+
+            Log::info('Movimiento creado:', ['id' => $movimiento->id]);
 
             $inventario = Inventarios::where('producto_id', $request->producto_id)
                 ->where('almacen_id', 1)
@@ -79,11 +91,10 @@ class EntradasController extends Controller {
                 ->where('tipo_calidad_id', $request->tipo_calidad_id)
                 ->first();
 
-            if ($inventario) { //Entrada
+            if ($inventario) {
                 $inventario->cantidad += $request->cantidad;
                 $inventario->save();
             } else {
-                // Nuevo registro de inventario
                 Inventarios::create([
                     'producto_id' => $request->producto_id,
                     'almacen_id' => 1,
@@ -94,6 +105,13 @@ class EntradasController extends Controller {
             }
         });
 
-        return redirect()->back()->with('success', 'Entrada registrada correctamente');
+        if (!$movimiento) {
+            return redirect()->back()->withErrors(['Error al registrar el movimiento']);
+        }
+
+        return response()->json([
+            'movimiento_id' => $movimiento->id,
+        ]);
     }
+
 }

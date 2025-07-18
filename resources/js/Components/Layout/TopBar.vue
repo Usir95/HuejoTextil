@@ -24,23 +24,19 @@
             <!-- Usuario -->
             <Dropdown align="right" width="48">
                 <template #trigger>
-                    <button
-                        class="inline-flex items-center gap-3 px-3 py-1.5 text-sm font-semibold uppercase transition duration-300 ease-in-out transform rounded-full hover:bg-[var(--color-topbar-hover)] hover:scale-105 focus:outline-none"
-                    >
-                        <span class="hidden md:inline">
-                            {{ page.props.auth.user.name }}
-                        </span>
-                        <div
-                            class="flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full shadow-md"
-                            style="background-color: var(--color-avatar-bg); color: var(--color-avatar-text)"
-                        >
-                            {{
-                                page.props.auth.user.name?.split(' ')[0]?.[0] || ''
-                            }}{{
-                                page.props.auth.user.name?.split(' ')[1]?.[0] || ''
-                            }}
-                        </div>
+                    <button v-if="$page.props.jetstream.managesProfilePhotos" class="flex text-sm transition border-2 border-transparent rounded-full focus:outline-hidden focus:border-gray-300">
+                        <img class="object-cover rounded-full size-8" :src="$page.props.auth.user.profile_photo_url" :alt="$page.props.auth.user.nombre">
                     </button>
+
+                    <span v-else class="inline-flex rounded-md">
+                        <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-bold uppercase leading-4 text-gray-500 transition duration-150 ease-in-out bg-white border border-transparent rounded-md dark:text-gray-400 dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-hidden focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700">
+                            {{ $page.props.auth.user.nombre }}
+
+                            <svg class="ms-2 -me-0.5 size-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                        </button>
+                    </span>
                 </template>
 
                 <template #content>
@@ -48,12 +44,8 @@
                         Administrar cuenta
                     </div>
 
-                    <DropdownLink
-                        :href="route('profile.show')"
-                        class="transition hover:bg-gray-100 dark:hover:bg-gray-800"
-                    >
-                        <i class="w-4 mr-2 text-sm text-gray-500 fas fa-user"></i>
-                        Perfil
+                    <DropdownLink :href="route('profile.show')" class="transition hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <i class="w-4 mr-2 text-sm text-gray-500 fas fa-user"></i> Perfil
                     </DropdownLink>
 
                     <div class="my-1 border-t border-gray-200 dark:border-gray-700" />

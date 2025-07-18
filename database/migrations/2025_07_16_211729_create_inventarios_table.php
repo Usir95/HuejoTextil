@@ -9,7 +9,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('inventarios', function (Blueprint $table) {
             $table->id();
-            $table->decimal('cantidad', 10, 2)->default(0);
+            $table->text('cantidad', 5)->default(0);
 
             $table->foreignId('almacen_id')->constrained('almacenes')->cascadeOnDelete();
             $table->foreignId('producto_id')->constrained('productos')->cascadeOnDelete();
