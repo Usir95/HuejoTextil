@@ -6,14 +6,13 @@
             </div>
         </template>
 
-        <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Interfaz de Conexión de Báscula Serial -->
-            <div class="col-span-2 flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Conexión de Báscula</h2>
+        <!-- Interfaz de Conexión de Báscula Serial -->
+        <section ref="FormSection">
+            <div class="col-span-2 flex flex-col items-center justify-center py-2 m-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <button
                     @click="connectSerial"
                     :disabled="isConnecting || isConnected"
-                    class="px-6 py-3 text-lg font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-6 py-2  font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ isConnecting ? 'Conectando...' : (isConnected ? 'Conectado' : 'Conectar Báscula') }}
                 </button>
@@ -31,64 +30,102 @@
                 </button>
             </div>
             <!-- Fin Interfaz de Conexión de Báscula Serial -->
+            <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-2 h-[60vh] overflow-auto">
 
-            <MdSelectInput
-                id="producto_id"
-                name="producto_id"
-                class="col-span-2"
-                v-model="form.producto_id"
-                required
-                label="Producto"
-                helper="Seleccione un producto"
-                :error="form.errors.producto_id"
-                :success="!form.errors.producto_id"
-                :options="Productos"
-            />
+                    <MdSelectSearchInput
+                        id="cliente_id"
+                        name="cliente_id"
+                        class="col-span-2"
+                        v-model="form.cliente_id"
+                        required
+                        label="Cliente"
+                        helper="Seleccione un cliente"
+                        :error="form.errors.cliente_id"
+                        :success="!form.errors.cliente_id"
+                        :options="Clientes"
+                    />
 
-            <MdSelectSearchInput
-                id="color_id"
-                name="color_id"
-                v-model="form.color_id"
-                required
-                label="Color"
-                helper="Seleccione un color (opcional)"
-                :error="form.errors.color_id"
-                :success="!form.errors.color_id"
-                :options="Colores"
-            />
+                    <MdTextInput
+                        id="num_tarjeta"
+                        name="num_tarjeta"
+                        v-model="form.num_tarjeta"
+                        required
+                        label="Tarjeta viajera"
+                        helper="Ingrese el numero de tarjeta"
+                        :error="form.errors.num_tarjeta"
+                        :success="!form.errors.num_tarjeta"
+                    />
 
-            <MdSelectInput
-                id="tipo_calidad_id"
-                name="tipo_calidad_id"
-                v-model="form.tipo_calidad_id"
-                required
-                label="Calidad"
-                helper="Seleccione una calidad (opcional)"
-                :error="form.errors.tipo_calidad_id"
-                :success="!form.errors.tipo_calidad_id"
-                :options="TiposCalidades"
-            />
+                    <MdTextInput
+                        id="num_rollo"
+                        name="num_rollo"
+                        v-model="form.num_rollo"
+                        label="Número de rollo"
+                        helper="Ingrese el numero de rollo"
+                        :error="form.errors.num_rollo"
+                        :success="!form.errors.num_rollo"
+                    />
 
-            <MdNumberInput
-                id="cantidad"
-                name="cantidad"
-                class="col-span-2"
-                v-model="form.cantidad"
-                required
-                label="Cantidad"
-                :helper="cantidadHelperText"
-                :error="form.errors.cantidad"
-                :success="!form.errors.cantidad"
-            />
+                    <MdSelectInput
+                        id="producto_id"
+                        name="producto_id"
+                        class="col-span-2"
+                        v-model="form.producto_id"
+                        required
+                        label="Producto"
+                        helper="Seleccione un producto"
+                        :error="form.errors.producto_id"
+                        :success="!form.errors.producto_id"
+                        :options="Productos"
+                    />
 
-            <div class="flex justify-center col-span-2 w-full mt-4">
-                <MdButton variant="primary" :loading="IsLoading" class="w-full py-2" @click="Insert()">
-                    Regitrar material
-                </MdButton>
+                    <MdSelectSearchInput
+                        id="color_id"
+                        name="color_id"
+                        v-model="form.color_id"
+                        required
+                        label="Color"
+                        helper="Seleccione un color (opcional)"
+                        :error="form.errors.color_id"
+                        :success="!form.errors.color_id"
+                        :options="Colores"
+                    />
+
+                    <MdSelectInput
+                        id="tipo_calidad_id"
+                        name="tipo_calidad_id"
+                        v-model="form.tipo_calidad_id"
+                        required
+                        label="Calidad"
+                        helper="Seleccione una calidad (opcional)"
+                        :error="form.errors.tipo_calidad_id"
+                        :success="!form.errors.tipo_calidad_id"
+                        :options="TiposCalidades"
+                    />
+
+                    <MdNumberInput
+                        id="cantidad"
+                        name="cantidad"
+                        class="col-span-2"
+                        v-model="form.cantidad"
+                        required
+                        label="Cantidad"
+                        :helper="cantidadHelperText"
+                        :error="form.errors.cantidad"
+                        :success="!form.errors.cantidad"
+                    />
+                </div>
+
+                <div class="flex justify-center col-span-2 w-full mt-4">
+                    <MdButton variant="primary" :loading="IsLoading" class="w-full py-2" @click="Insert()">
+                        Regitrar material
+                    </MdButton>
+                </div>
             </div>
         </section>
 
-        <section class="w-full flex flex-row justify-center my-4">
+        <section class="w-full flex flex-row justify-center my-4 pb-36">
             <div id="Etiqueta">
             </div>
         </section>
@@ -135,9 +172,9 @@ let readerRef = ref(null);
 
 // Propiedad computada para la clase de estilo del mensaje de estado
 const statusClass = computed(() => {
-  if (isConnected.value) return 'text-green-600 font-semibold';
-  if (isConnecting.value) return 'text-yellow-600 font-semibold';
-  return 'text-red-600';
+    if (isConnected.value) return 'text-green-600 font-semibold';
+    if (isConnecting.value) return 'text-yellow-600 font-semibold';
+    return 'text-red-600';
 });
 
 // Propiedad computada para el texto de ayuda del MdNumberInput
@@ -156,7 +193,7 @@ const form = useForm({
     producto_id: '',
     color_id: '',
     tipo_calidad_id: '',
-    cantidad: '' // Este valor será actualizado por los datos seriales
+    cantidad: ''
 })
 
 /**
@@ -165,57 +202,57 @@ const form = useForm({
  * Solicita al usuario que seleccione un puerto, lo abre y comienza a leer los datos.
  */
 const connectSerial = async () => {
-  if (!('serial' in navigator)) {
-    status.value = 'Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.';
-    toast('Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.', 'danger');
-    return;
-  }
-
-  isConnecting.value = true;
-  status.value = 'Buscando puerto serial...';
-
-  try {
-    // Solicita al usuario que seleccione un puerto serial
-    portRef.value = await navigator.serial.requestPort();
-
-    // Abre el puerto con la configuración de la báscula LP7516
-    // El baud rate de 9600 es común para la LP7516.
-    await portRef.value.open({ baudRate: 9600 });
-
-    status.value = 'Conectado al puerto serial. Esperando datos...';
-    isConnected.value = true;
-    isConnecting.value = false;
-    toast('Conexión serial establecida', 'success');
-
-    // Configura el TextDecoder para leer los datos como texto
-    const textDecoder = new TextDecoderStream();
-    const readableStreamClosed = portRef.value.readable.pipeTo(textDecoder.writable);
-    readerRef.value = textDecoder.readable.getReader();
-
-    // Inicia la lectura continua de datos
-    readSerialData();
-
-  } catch (error) {
-    let errorMessage = 'Error desconocido al conectar.'; // Mensaje por defecto
-
-    if (error.message) {
-      if (error.message.includes('No port selected by the user')) {
-        errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
-      } else if (error.message.includes('Failed to open serial port')) {
-        errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
-      } else {
-        errorMessage = `Error al conectar: ${error.message}`; // Mostrar el mensaje original si no es reconocido
-      }
+    if (!('serial' in navigator)) {
+        status.value = 'Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.';
+        toast('Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.', 'danger');
+        return;
     }
 
-    status.value = errorMessage;
-    console.error('Error Web Serial API:', error);
-    toast(errorMessage, 'danger');
-    isConnecting.value = false;
-    isConnected.value = false;
-    portRef.value = null;
-    readerRef.value = null;
-  }
+    isConnecting.value = true;
+    status.value = 'Buscando puerto serial...';
+
+    try {
+        // Solicita al usuario que seleccione un puerto serial
+        portRef.value = await navigator.serial.requestPort();
+
+        // Abre el puerto con la configuración de la báscula LP7516
+        // El baud rate de 9600 es común para la LP7516.
+        await portRef.value.open({ baudRate: 9600 });
+
+        status.value = 'Conectado al puerto serial. Esperando datos...';
+        isConnected.value = true;
+        isConnecting.value = false;
+        toast('Conexión serial establecida', 'success');
+
+        // Configura el TextDecoder para leer los datos como texto
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = portRef.value.readable.pipeTo(textDecoder.writable);
+        readerRef.value = textDecoder.readable.getReader();
+
+        // Inicia la lectura continua de datos
+        readSerialData();
+
+    } catch (error) {
+        let errorMessage = 'Error desconocido al conectar.'; // Mensaje por defecto
+
+        if (error.message) {
+        if (error.message.includes('No port selected by the user')) {
+            errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
+        } else if (error.message.includes('Failed to open serial port')) {
+            errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
+        } else {
+            errorMessage = `Error al conectar: ${error.message}`; // Mostrar el mensaje original si no es reconocido
+        }
+        }
+
+        status.value = errorMessage;
+        console.error('Error Web Serial API:', error);
+        toast(errorMessage, 'danger');
+        isConnecting.value = false;
+        isConnected.value = false;
+        portRef.value = null;
+        readerRef.value = null;
+    }
 };
 
 /**
@@ -224,53 +261,53 @@ const connectSerial = async () => {
  * Maneja el formato de salida de la báscula LP7516.
  */
 const readSerialData = async () => {
-  while (true) {
-    try {
-      if (!readerRef.value) { // Asegurarse de que el lector exista
-        break;
-      }
-      const { value, done } = await readerRef.value.read();
-
-      if (done) {
-        // El lector ha sido cancelado o el puerto se cerró
-        console.log('Lector de puerto serial cerrado.');
-        break;
-      }
-
-      const rawData = value.trim(); // Limpiar espacios en blanco
-
-      // Solo procesar lecturas estables (ST) de la báscula
-      if (rawData.startsWith('ST,')) {
-        // Expresión regular para extraer el valor numérico y la unidad
-        // Soporta signos (+/-), números con decimales y unidades (kg/lb)
-        const weightMatch = rawData.match(/([+-]?\d+\.\d+)\s*(kg|lb)/i);
-
-        if (weightMatch && weightMatch[1]) {
-          const weightValue = parseFloat(weightMatch[1]); // Obtener el número flotante
-          const unit = weightMatch[2] ? weightMatch[2].toLowerCase() : '';
-
-          form.cantidad = weightValue; // Asignar el valor numérico directamente al v-model
-          currentUnit.value = unit; // Actualizar la unidad para el helper text
-          status.value = `Recibiendo peso: ${weightValue} ${unit}`;
-        } else {
-          // Si no se pudo extraer el peso pero es una lectura estable
-          console.warn('Datos estables sin formato de peso reconocido:', rawData);
-          status.value = `Datos estables (formato desconocido): ${rawData}`;
+    while (true) {
+        try {
+        if (!readerRef.value) { // Asegurarse de que el lector exista
+            break;
         }
-      } else {
-        // Datos inestables (US) o de otro tipo, se pueden ignorar o registrar
-        console.log('Datos inestables o no reconocidos:', rawData);
-        status.value = `Recibiendo datos inestables/otros: ${rawData}`;
-      }
-    } catch (error) {
-      status.value = `Error de lectura: ${error.message}`;
-      console.error('Error al leer del puerto serial:', error);
-      toast(`Error de lectura: ${error.message}`, 'danger');
-      // Si hay un error fatal, intentar desconectar
-      disconnectSerial();
-      break; // Salir del bucle de lectura
+        const { value, done } = await readerRef.value.read();
+
+        if (done) {
+            // El lector ha sido cancelado o el puerto se cerró
+            console.log('Lector de puerto serial cerrado.');
+            break;
+        }
+
+        const rawData = value.trim(); // Limpiar espacios en blanco
+
+        // Solo procesar lecturas estables (ST) de la báscula
+        if (rawData.startsWith('ST,')) {
+            // Expresión regular para extraer el valor numérico y la unidad
+            // Soporta signos (+/-), números con decimales y unidades (kg/lb)
+            const weightMatch = rawData.match(/([+-]?\d+\.\d+)\s*(kg|lb)/i);
+
+            if (weightMatch && weightMatch[1]) {
+            const weightValue = parseFloat(weightMatch[1]); // Obtener el número flotante
+            const unit = weightMatch[2] ? weightMatch[2].toLowerCase() : '';
+
+            form.cantidad = weightValue; // Asignar el valor numérico directamente al v-model
+            currentUnit.value = unit; // Actualizar la unidad para el helper text
+            status.value = `Recibiendo peso: ${weightValue} ${unit}`;
+            } else {
+            // Si no se pudo extraer el peso pero es una lectura estable
+            console.warn('Datos estables sin formato de peso reconocido:', rawData);
+            status.value = `Datos estables (formato desconocido): ${rawData}`;
+            }
+        } else {
+            // Datos inestables (US) o de otro tipo, se pueden ignorar o registrar
+            console.log('Datos inestables o no reconocidos:', rawData);
+            status.value = `Recibiendo datos inestables/otros: ${rawData}`;
+        }
+        } catch (error) {
+        status.value = `Error de lectura: ${error.message}`;
+        console.error('Error al leer del puerto serial:', error);
+        toast(`Error de lectura: ${error.message}`, 'danger');
+        // Si hay un error fatal, intentar desconectar
+        disconnectSerial();
+        break; // Salir del bucle de lectura
+        }
     }
-  }
 };
 
 /**
@@ -278,48 +315,48 @@ const readSerialData = async () => {
  * @description Desconecta el puerto serial y reinicia el estado.
  */
 const disconnectSerial = async () => {
-  if (readerRef.value) {
-    try {
-      await readerRef.value.cancel(); // Cancela cualquier lectura pendiente
-      readerRef.value.releaseLock(); // Libera el bloqueo del lector
-    } catch (error) {
-      console.error('Error al cancelar/liberar lector:', error);
+    if (readerRef.value) {
+        try {
+        await readerRef.value.cancel(); // Cancela cualquier lectura pendiente
+        readerRef.value.releaseLock(); // Libera el bloqueo del lector
+        } catch (error) {
+        console.error('Error al cancelar/liberar lector:', error);
+        }
+        readerRef.value = null;
     }
-    readerRef.value = null;
-  }
-  if (portRef.value && portRef.value.opened) {
-    try {
-      await portRef.value.close();
-    } catch (error) {
-      console.error('Error al cerrar el puerto:', error);
+    if (portRef.value && portRef.value.opened) {
+        try {
+        await portRef.value.close();
+        } catch (error) {
+        console.error('Error al cerrar el puerto:', error);
+        }
     }
-  }
-  portRef.value = null;
-  isConnected.value = false;
-  isConnecting.value = false;
-  status.value = 'Desconectado';
-  form.cantidad = ''; // Limpiar la cantidad al desconectar
-  currentUnit.value = '';
-  toast('Puerto serial desconectado', 'info');
-  console.log('Puerto serial desconectado.');
+    portRef.value = null;
+    isConnected.value = false;
+    isConnecting.value = false;
+    status.value = 'Desconectado';
+    form.cantidad = ''; // Limpiar la cantidad al desconectar
+    currentUnit.value = '';
+    toast('Puerto serial desconectado', 'info');
+    console.log('Puerto serial desconectado.');
 };
 
 // Maneja la desconexión inesperada del dispositivo
 onMounted(() => {
-  if ('serial' in navigator) {
-    navigator.serial.addEventListener('disconnect', (event) => {
-      if (portRef.value && event.target === portRef.value) {
-        status.value = 'Báscula desconectada inesperadamente.';
-        toast('Báscula desconectada inesperadamente.', 'danger');
-        disconnectSerial(); // Llama a la función de desconexión para limpiar el estado
-      }
-    });
-  }
+    if ('serial' in navigator) {
+        navigator.serial.addEventListener('disconnect', (event) => {
+        if (portRef.value && event.target === portRef.value) {
+            status.value = 'Báscula desconectada inesperadamente.';
+            toast('Báscula desconectada inesperadamente.', 'danger');
+            disconnectSerial(); // Llama a la función de desconexión para limpiar el estado
+        }
+        });
+    }
 });
 
 // Limpieza al desmontar el componente
 onUnmounted(() => {
-  disconnectSerial();
+    disconnectSerial();
 });
 
 
@@ -346,6 +383,7 @@ const ImprimirEtiqueta = async (Id) => {
     const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
     const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
+    const tipo_calidad = form.tipo_calidad_id;
     const cantidad = form.cantidad;
     const fecha = new Date().toLocaleDateString();
 
@@ -367,7 +405,7 @@ const ImprimirEtiqueta = async (Id) => {
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="font-size: 3mm; font-weight: bold; line-height: 1.4;">
                     <div text-align: center;> ${codigo} </div>
-                    <div>Producto: ${producto}</div>
+                    <div>Producto: ${producto}</div> <div>(${tipo_calidad})</div>
                     <div>Color: ${color}</div>
                     <div>Cantidad: ${cantidad}</div>
                 </div>

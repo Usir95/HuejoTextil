@@ -48,63 +48,64 @@ class EntradasController extends Controller {
             'num_rollo'         => 'nullable|string|max:255',
         ]);
 
-        DB::transaction(function () use ($request) {
-            //  Registrar movimiento (entrada)
-            Movimientos::create([
-                'cliente_id'        => $request->cliente_id,
-                'num_tarjeta'       => $request->num_tarjeta,
-                'num_rollo'         => $request->num_rollo,
-                'producto_id'       => $request->producto_id,
-                'color_id'          => $request->color_id,
-                'tipo_calidad_id'   => $request->tipo_calidad_id,
-                'cantidad'          => $request->cantidad,
-                'fecha_movimiento'  => now(),
-                'tipo_movimiento_id'=> 1,
-                'usuario_id'        => Auth::id(),
-                'almacen_id'        => 1,
+        try {
+            $movimiento = DB::transaction(function () use ($request) {
+                // Crear movimiento
+                $movimiento = Movimientos::create([
+                    'cliente_id'         => $request->cliente_id,
+                    'num_tarjeta'        => $request->num_tarjeta,
+                    'num_rollo'          => $request->num_rollo,
+                    'producto_id'        => $request->producto_id,
+                    'color_id'           => $request->color_id,
+                    'tipo_calidad_id'    => $request->tipo_calidad_id,
+                    'cantidad'           => $request->cantidad,
+                    'fecha_movimiento'   => now(),
+                    'tipo_movimiento_id' => 1,
+                    'usuario_id'         => Auth::id(),
+                    'almacen_id'         => 1,
+                ]);
+
+                if (!$movimiento) {
+                    throw new \Exception('No se pudo crear el movimiento');
+                }
+
+                Log::info('Movimiento creado correctamente', ['id' => $movimiento->id]);
+
+                // Actualizar o crear inventario
+                $inventario = Inventarios::where('producto_id', $request->producto_id)
+                    ->where('almacen_id', 1)
+                    ->where('color_id', $request->color_id)
+                    ->where('tipo_calidad_id', $request->tipo_calidad_id)
+                    ->first();
+
+                if ($inventario) {
+                    $inventario->cantidad += $request->cantidad;
+                    $inventario->save();
+                } else {
+                    Inventarios::create([
+                        'producto_id'      => $request->producto_id,
+                        'almacen_id'       => 1,
+                        'color_id'         => $request->color_id,
+                        'tipo_calidad_id'  => $request->tipo_calidad_id,
+                        'cantidad'         => $request->cantidad,
+                    ]);
+                }
+
+                return $movimiento;
+            });
+
+            return response()->json([
+                'success'        => true,
+                'movimiento_id'  => $movimiento->id,
             ]);
 
-            if (!$movimiento) {
-                throw new \Exception('No se pudo crear el movimiento');
-            }
-
-            Log::info('Movimiento creado:', ['id' => $movimiento->id]);
-
-            if (!$movimiento) {
-                throw new \Exception('No se pudo crear el movimiento');
-            }
-
-            Log::info('Movimiento creado:', ['id' => $movimiento->id]);
-
-            //  Actualizar o crear inventario
-            $inventario = Inventarios::where('producto_id', $request->producto_id)
-                ->where('almacen_id', 1)
-                ->where('color_id', $request->color_id)
-                ->where('tipo_calidad_id', $request->tipo_calidad_id)
-                ->first();
-
-            if ($inventario) {
-            if ($inventario) {
-                $inventario->cantidad += $request->cantidad;
-                $inventario->save();
-            } else {
-                Inventarios::create([
-                    'producto_id'       => $request->producto_id,
-                    'almacen_id'        => 1,
-                    'color_id'          => $request->color_id,
-                    'tipo_calidad_id'   => $request->tipo_calidad_id,
-                    'cantidad'          => $request->cantidad,
-                ]);
-            }
-        });
-
-        if (!$movimiento) {
-            return redirect()->back()->withErrors(['Error al registrar el movimiento']);
+        } catch (\Exception $e) {
+            Log::error('Error al registrar movimiento de entrada', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al registrar el movimiento: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'movimiento_id' => $movimiento->id,
-        ]);
     }
 
 }
