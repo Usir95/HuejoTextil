@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\Almacenes\EntradasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
+use App\Http\Controllers\Almacenes\ProductosTerminadosController;
 use App\Http\Controllers\Catalogos\ClientesController;
 use App\Http\Controllers\Catalogos\ColoresController;
 use App\Http\Controllers\Catalogos\TiposProductosController;
@@ -20,3 +21,5 @@ Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
 
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
+
+Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->names('ProductosTerminados');

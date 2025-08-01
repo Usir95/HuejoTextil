@@ -6,7 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
 
-    public function up(): void {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
         Schema::create('movimientos', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad');
@@ -17,15 +21,22 @@ return new class extends Migration {
 
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->foreignId('unidad_id')->nullable()->constrained('unidades')->nullOnDelete();
+            $table->foreignId('color_id')->nullable()->constrained('colores')->nullOnDelete();
+            $table->foreignId('tipo_calidad_id')->nullable()->constrained('tipos_calidades')->nullOnDelete();
             $table->foreignId('tipo_movimiento_id')->nullable()->constrained('tipos_movimientos')->nullOnDelete();
-            $table->foreignId('almacen_id')->nullable()->after('usuario_id')->constrained('almacenes')->nullOnDelete();
             $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->nullOnDelete();
+            $table->foreignId('almacen_id')->nullable()->constrained('almacenes')->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    public function down(): void {
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
         Schema::dropIfExists('movimientos');
     }
 };

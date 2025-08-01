@@ -13,6 +13,7 @@ use App\Models\Catalogos\TiposCalidades;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -63,6 +64,18 @@ class EntradasController extends Controller {
                 'almacen_id'        => 1,
             ]);
 
+            if (!$movimiento) {
+                throw new \Exception('No se pudo crear el movimiento');
+            }
+
+            Log::info('Movimiento creado:', ['id' => $movimiento->id]);
+
+            if (!$movimiento) {
+                throw new \Exception('No se pudo crear el movimiento');
+            }
+
+            Log::info('Movimiento creado:', ['id' => $movimiento->id]);
+
             //  Actualizar o crear inventario
             $inventario = Inventarios::where('producto_id', $request->producto_id)
                 ->where('almacen_id', 1)
@@ -70,6 +83,7 @@ class EntradasController extends Controller {
                 ->where('tipo_calidad_id', $request->tipo_calidad_id)
                 ->first();
 
+            if ($inventario) {
             if ($inventario) {
                 $inventario->cantidad += $request->cantidad;
                 $inventario->save();
@@ -84,6 +98,13 @@ class EntradasController extends Controller {
             }
         });
 
-        return redirect()->back()->with('success', 'Entrada registrada correctamente.');
+        if (!$movimiento) {
+            return redirect()->back()->withErrors(['Error al registrar el movimiento']);
+        }
+
+        return response()->json([
+            'movimiento_id' => $movimiento->id,
+        ]);
     }
+
 }
