@@ -16,4 +16,13 @@ class TiposCalidades extends Model implements AuditableContract {
     protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
     protected $dates = ['deleted_at'];
 
+
+    /* ======================================== HELPERS ======================================== */
+    public static function Catalogo() {
+        return self::select('id', 'nombre')->get()->map(fn($item) => [
+            'value' => $item->id,
+            'label' => $item->nombre,
+        ]);
+    }
+
 }

@@ -7,7 +7,41 @@
         </template>
 
         <section ref="FormSection" class="grid grid-cols-1 md:grid-cols-2 gap-4 mx-6 my-4">
-            <MdSelectInput
+            <MdSelectSearchInput
+                id="cliente_id"
+                name="cliente_id"
+                class="col-span-2"
+                v-model="form.cliente_id"
+                required
+                label="Cliente"
+                helper="Seleccione un cliente"
+                :error="form.errors.cliente_id"
+                :success="!form.errors.cliente_id"
+                :options="Clientes"
+            />
+
+            <MdTextInput
+                id="num_tarjeta"
+                name="num_tarjeta"
+                v-model="form.num_tarjeta"
+                required
+                label="Tarjeta viajera"
+                helper="Ingrese el numero de tarjeta"
+                :error="form.errors.num_tarjeta"
+                :success="!form.errors.num_tarjeta"
+            />
+
+            <MdTextInput
+                id="num_rollo"
+                name="num_rollo"
+                v-model="form.num_rollo"
+                label="Número de rollo"
+                helper="Ingrese el numero de rollo"
+                :error="form.errors.num_rollo"
+                :success="!form.errors.num_rollo"
+            />
+
+            <MdSelectSearchInput
                 id="producto_id"
                 name="producto_id"
                 class="col-span-2"
@@ -20,7 +54,7 @@
                 :options="Productos"
             />
 
-            <MdSelectInput
+            <MdSelectSearchInput
                 id="color_id"
                 name="color_id"
                 v-model="form.color_id"
@@ -73,12 +107,15 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
+import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
+import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 
 const props = defineProps({
     Productos: Object,
     Colores: Object,
     TiposCalidades: Object,
     Almacenes: Object,
+    Clientes: Object
 })
 
 const toast = inject('$toast');
@@ -87,6 +124,9 @@ const IsLoading = ref(false);
 const FormSection = ref(null);
 
 const form = useForm({
+    cliente_id: '',
+    num_tarjeta: '',
+    num_rollo: '',
     producto_id: '',
     color_id: '',
     tipo_calidad_id: '',

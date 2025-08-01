@@ -10,7 +10,12 @@ return new class extends Migration {
         Schema::create('movimientos', function (Blueprint $table) {
             $table->id();
             $table->integer('cantidad');
+            $table->string('num_tarjeta', 20);
             $table->dateTime('fecha_movimiento');
+            $table->string('num_rollo', 25)->nullable();
+            $table->string('peso_tara',5)->nullable();
+
+            $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
             $table->foreignId('unidad_id')->nullable()->constrained('unidades')->nullOnDelete();
             $table->foreignId('tipo_movimiento_id')->nullable()->constrained('tipos_movimientos')->nullOnDelete();
             $table->foreignId('almacen_id')->nullable()->after('usuario_id')->constrained('almacenes')->nullOnDelete();

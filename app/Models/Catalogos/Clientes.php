@@ -32,4 +32,11 @@ class Clientes extends Model implements AuditableContract {
     }
 
 
+    /* ======================================== HELPERS ======================================== */
+    public static function Catalogo() {
+        return self::select('id', 'nombre')->get()->map(fn($item) => [
+            'value' => $item->id,
+            'label' => $item->nombre,
+        ]);
+    }
 }

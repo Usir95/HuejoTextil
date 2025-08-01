@@ -35,4 +35,13 @@ class Almacenes extends Model implements AuditableContract {
         return $this->belongsTo(TiposCalidades::class, 'tipo_calidad_id');
     }
 
+
+    /* ======================================== HELPERS ======================================== */
+    public static function Catalogo() {
+        return self::select('id', 'nombre')->get()->map(fn($item) => [
+            'value' => $item->id,
+            'label' => $item->nombre,
+        ]);
+    }
+
 }
