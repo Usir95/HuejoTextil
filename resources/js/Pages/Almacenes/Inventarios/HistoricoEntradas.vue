@@ -29,7 +29,7 @@
             </section>
 
             <section class="mt-4 mx-4  h-[60vh] overflow-auto pdf-imprimible">
-                <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table">
+                <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table bg-gray-800">
                     <thead class="bg-gray-700 text-white uppercase text-xs">
                         <tr>
                             <th class="px-4 py-2">Tarjeta</th>
@@ -66,7 +66,7 @@
 
                 <div class="mt-4 mx-4 print-page-break">
                     <h2 class="text-lg font-bold text-white mb-2">Resumen por producto</h2>
-                    <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table">
+                    <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table bg-gray-800">
                         <thead class="bg-gray-700 text-white uppercase text-xs">
                             <tr>
                                 <th class="px-4 py-2">Producto</th>
