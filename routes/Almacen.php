@@ -22,6 +22,7 @@ Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
 
 Route::resource('/HistoricoEntradas', HistoricoEntradasController::class)->names('HistoricoEntradas');
 Route::post('/HistoricoEntradas/FiltrarEntradas', [HistoricoEntradasController::class, 'FiltrarEntradas'])->name('HistoricoEntradas.FiltrarEntradas');
+Route::post('/HistoricoEntradas/ExpotarPedido', [HistoricoEntradasController::class, 'ExpotarPedido'])->name('HistoricoEntradas.ExpotarPedido');
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
 

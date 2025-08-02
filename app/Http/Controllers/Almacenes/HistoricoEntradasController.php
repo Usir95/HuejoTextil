@@ -8,6 +8,7 @@ use App\Models\Catalogos\Clientes;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Inertia\Inertia;
 
 
@@ -51,6 +52,41 @@ class HistoricoEntradasController extends Controller {
             'entradas' => $HistoricoEntradas,
             'resumen'  => $ResumenProductos,
         ];
+    }
+
+    public function ExpotarPedido(Request $request): StreamedResponse {
+        $entradas = $request->input('entradas', []);
+        $resumen = $request->input('resumen', []);
+
+        return response()->streamDownload(function () use ($entradas, $resumen) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Tarjeta', 'Cliente', 'Rollo', 'Cantidad', 'Calidad', 'Fecha']);
+
+            foreach ($entradas as $item) {
+                fputcsv($handle, [
+                    $item['num_tarjeta'] ?? '',
+                    $item['cliente']['nombre'] ?? '',
+                    $item['num_rollo'] ?? '',
+                    $item['cantidad'] ?? '',
+                    ($item['tipo_calidad_id'] == 1 ? 'Buena' : 'Regular'),
+                    $item['fecha_movimiento'] ?? '',
+                ]);
+            }
+
+            fputcsv($handle, ['']);
+
+            fputcsv($handle, ['Producto', 'Rollos', 'Total KG']);
+
+            foreach ($resumen as $res) {
+                fputcsv($handle, [
+                    $res['producto'] ?? '',
+                    $res['rollos'] ?? '',
+                    $res['total_kg'] ?? '',
+                ]);
+            }
+
+            fclose($handle);
+        }, 'HistoricoEntradas.csv');
     }
 
 }

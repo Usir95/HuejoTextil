@@ -86,7 +86,7 @@
             </section>
 
             <div>
-                <MdButton :loading="IsLoading" class="w-full mt-6" @click="DescargarPDF()">Imprimir</MdButton>
+                <MdButton class="mt-4" @click="ExportarCSV()">Exportar CSV</MdButton>
             </div>
 
 
@@ -94,7 +94,7 @@
     </template>
 
 <script setup>
-import { ref, inject, defineProps } from 'vue'
+import { ref, inject, defineProps, nextTick  } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
@@ -188,48 +188,33 @@ import axios from 'axios'
         }
     }
 
-    const DescargarPDF = () => {
-        const contenedor = document.querySelector('.pdf-imprimible');
+    const ExportarCSV = async () => {
+        try {
+            const response = await axios.post(route('HistoricoEntradas.ExpotarPedido'),{
+                    entradas: HistoricoEntradas.value,
+                    resumen: ResumenEntradas.value
+                },
+                {
+                    responseType: 'blob',
+                }
+            );
 
-        if (!contenedor) {
-            toast('No se encontró el contenido para exportar', 'error');
-            return;
+            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const fecha = new Date().toISOString().slice(0, 10);
+            link.setAttribute('download', `HistoricoEntradas-${fecha}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            toast('Error al exportar CSV', 'error');
+            console.error(error);
         }
-
-        const options = {
-            margin: 0.5,
-            filename: `HistoricoEntradas-${new Date().toISOString().slice(0,10)}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(options).from(contenedor).save();
-    };
+    }
 
 
 
     </script>
 
-<style>
-    @media print {
-        .no-print {
-            display: none !important;
-        }
-
-        table {
-            font-size: 12px;
-        }
-
-        .print-table th,
-        .print-table td {
-            border: 1px solid black;
-            padding: 4px;
-        }
-
-        .print-page-break {
-            page-break-before: always;
-        }
-    }
-
-</style>
