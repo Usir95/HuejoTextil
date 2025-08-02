@@ -2,7 +2,7 @@
     <!-- ===================== Sidebar expandido ===================== -->
     <div v-if="!sidebarCollapsed" class="flex items-center justify-between pt-4 transition-all duration-300">
         <div class="flex items-center justify-center w-full">
-            <img src="/Img/LogoLargo.png" alt="Logo completo" class="h-16 w-9/12 transition-all duration-300" />
+            <img src="/Img/LogoLargo.png" alt="Logo completo" class="h-16 w-9/12 transition-all duration-300 cursor-pointer hover:animate-pulse" @click="Redirecciona()" />
         </div>
         <button
             v-if="!isMobile"
@@ -32,4 +32,8 @@
     });
 
     defineEmits(['update-collapsed']);
+
+    const Redirecciona = () => {
+        window.location.href = '/dashboard';
+    };
 </script>
