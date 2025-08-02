@@ -2,6 +2,7 @@
 // routes/Almacen.php
 
 use App\Http\Controllers\Almacenes\EntradasController;
+use App\Http\Controllers\Almacenes\HistoricoEntradasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
 use App\Http\Controllers\Almacenes\ProductosTerminadosController;
 use App\Http\Controllers\Catalogos\ClientesController;
@@ -19,6 +20,8 @@ Route::resource('/Productos', ProductosController::class)->names('Productos');
 Route::resource('/Colores', ColoresController::class)->names('Colores');
 Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
 
+Route::resource('/HistoricoEntradas', HistoricoEntradasController::class)->names('HistoricoEntradas');
+Route::post('/HistoricoEntradas/FiltrarEntradas', [HistoricoEntradasController::class, 'FiltrarEntradas'])->name('HistoricoEntradas.FiltrarEntradas');
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
 

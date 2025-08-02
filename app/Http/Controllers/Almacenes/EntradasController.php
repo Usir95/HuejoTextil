@@ -45,16 +45,25 @@ class EntradasController extends Controller {
             'color_id'          => 'required',
             'tipo_calidad_id'   => 'required',
             'cantidad'          => 'required|numeric|min:0.01',
-            'num_rollo'         => 'nullable|string|max:255',
         ]);
 
         try {
             $movimiento = DB::transaction(function () use ($request) {
+
+                $ultimoRollo = Movimientos::where('cliente_id', $request->cliente_id)
+                    ->where('num_tarjeta', $request->num_tarjeta)
+                    ->orderByDesc('num_rollo')
+                    ->value('num_rollo');
+
+                $nuevoRollo = $ultimoRollo
+                    ? str_pad(((int) $ultimoRollo) + 1, 4, '0', STR_PAD_LEFT)
+                    : '0001';
+
                 // Crear movimiento
                 $movimiento = Movimientos::create([
                     'cliente_id'         => $request->cliente_id,
                     'num_tarjeta'        => $request->num_tarjeta,
-                    'num_rollo'          => $request->num_rollo,
+                    'num_rollo'          => $nuevoRollo,
                     'producto_id'        => $request->producto_id,
                     'color_id'           => $request->color_id,
                     'tipo_calidad_id'    => $request->tipo_calidad_id,
@@ -71,7 +80,6 @@ class EntradasController extends Controller {
 
                 Log::info('Movimiento creado correctamente', ['id' => $movimiento->id]);
 
-                // Actualizar o crear inventario
                 $inventario = Inventarios::where('producto_id', $request->producto_id)
                     ->where('almacen_id', 1)
                     ->where('color_id', $request->color_id)
@@ -94,10 +102,7 @@ class EntradasController extends Controller {
                 return $movimiento;
             });
 
-            return response()->json([
-                'success'        => true,
-                'movimiento_id'  => $movimiento->id,
-            ]);
+            return back()->with('success', 'Entrada creada exitosamente.');
 
         } catch (\Exception $e) {
             Log::error('Error al registrar movimiento de entrada', ['error' => $e->getMessage()]);

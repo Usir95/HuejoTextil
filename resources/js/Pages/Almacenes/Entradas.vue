@@ -31,90 +31,83 @@
             </div>
             <!-- Fin Interfaz de Conexión de Báscula Serial -->
             <div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-2 h-[60vh] overflow-auto">
+                <div class="h-[40vh] overflow-auto px-4 ">
+                    <div class="flex">
+                        <MdSelectSearchInput
+                            id="cliente_id"
+                            name="cliente_id"
+                            class="col-span-2"
+                            v-model="form.cliente_id"
+                            required
+                            label="Cliente"
+                            helper="Seleccione un cliente"
+                            :error="form.errors.cliente_id"
+                            :success="!form.errors.cliente_id"
+                            :options="Clientes"
+                        />
 
-                    <MdSelectSearchInput
-                        id="cliente_id"
-                        name="cliente_id"
-                        class="col-span-2"
-                        v-model="form.cliente_id"
-                        required
-                        label="Cliente"
-                        helper="Seleccione un cliente"
-                        :error="form.errors.cliente_id"
-                        :success="!form.errors.cliente_id"
-                        :options="Clientes"
-                    />
+                        <MdTextInput
+                            id="num_tarjeta"
+                            name="num_tarjeta"
+                            v-model="form.num_tarjeta"
+                            required
+                            label="Tarjeta viajera"
+                            helper="Ingrese el numero de tarjeta"
+                            :error="form.errors.num_tarjeta"
+                            :success="!form.errors.num_tarjeta"
+                        />
+                    </div>
+                    <div class="flex">
+                        <MdSelectInput
+                            id="producto_id"
+                            name="producto_id"
+                            v-model="form.producto_id"
+                            required
+                            label="Producto"
+                            helper="Seleccione un producto"
+                            :error="form.errors.producto_id"
+                            :success="!form.errors.producto_id"
+                            :options="Productos"
+                        />
 
-                    <MdTextInput
-                        id="num_tarjeta"
-                        name="num_tarjeta"
-                        v-model="form.num_tarjeta"
-                        required
-                        label="Tarjeta viajera"
-                        helper="Ingrese el numero de tarjeta"
-                        :error="form.errors.num_tarjeta"
-                        :success="!form.errors.num_tarjeta"
-                    />
+                        <MdSelectSearchInput
+                            id="color_id"
+                            name="color_id"
+                            v-model="form.color_id"
+                            required
+                            label="Color"
+                            helper="Seleccione un color (opcional)"
+                            :error="form.errors.color_id"
+                            :success="!form.errors.color_id"
+                            :options="Colores"
+                        />
+                    </div>
 
-                    <MdTextInput
-                        id="num_rollo"
-                        name="num_rollo"
-                        v-model="form.num_rollo"
-                        label="Número de rollo"
-                        helper="Ingrese el numero de rollo"
-                        :error="form.errors.num_rollo"
-                        :success="!form.errors.num_rollo"
-                    />
+                    <div class="flex">
+                        <MdSelectInput
+                            id="tipo_calidad_id"
+                            name="tipo_calidad_id"
+                            v-model="form.tipo_calidad_id"
+                            required
+                            label="Calidad"
+                            helper="Seleccione una calidad (opcional)"
+                            :error="form.errors.tipo_calidad_id"
+                            :success="!form.errors.tipo_calidad_id"
+                            :options="TiposCalidades"
+                        />
 
-                    <MdSelectInput
-                        id="producto_id"
-                        name="producto_id"
-                        class="col-span-2"
-                        v-model="form.producto_id"
-                        required
-                        label="Producto"
-                        helper="Seleccione un producto"
-                        :error="form.errors.producto_id"
-                        :success="!form.errors.producto_id"
-                        :options="Productos"
-                    />
-
-                    <MdSelectSearchInput
-                        id="color_id"
-                        name="color_id"
-                        v-model="form.color_id"
-                        required
-                        label="Color"
-                        helper="Seleccione un color (opcional)"
-                        :error="form.errors.color_id"
-                        :success="!form.errors.color_id"
-                        :options="Colores"
-                    />
-
-                    <MdSelectInput
-                        id="tipo_calidad_id"
-                        name="tipo_calidad_id"
-                        v-model="form.tipo_calidad_id"
-                        required
-                        label="Calidad"
-                        helper="Seleccione una calidad (opcional)"
-                        :error="form.errors.tipo_calidad_id"
-                        :success="!form.errors.tipo_calidad_id"
-                        :options="TiposCalidades"
-                    />
-
-                    <MdNumberInput
-                        id="cantidad"
-                        name="cantidad"
-                        class="col-span-2"
-                        v-model="form.cantidad"
-                        required
-                        label="Cantidad"
-                        :helper="cantidadHelperText"
-                        :error="form.errors.cantidad"
-                        :success="!form.errors.cantidad"
-                    />
+                        <MdNumberInput
+                            id="cantidad"
+                            name="cantidad"
+                            class="col-span-2"
+                            v-model="form.cantidad"
+                            required
+                            label="Cantidad"
+                            :helper="cantidadHelperText"
+                            :error="form.errors.cantidad"
+                            :success="!form.errors.cantidad"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex justify-center col-span-2 w-full mt-4">
@@ -125,7 +118,7 @@
             </div>
         </section>
 
-        <section class="w-full flex flex-row justify-center my-4 pb-36">
+        <section class="w-full flex flex-row justify-center my-4">
             <div id="Etiqueta">
             </div>
         </section>

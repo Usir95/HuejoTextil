@@ -122,6 +122,15 @@ class ModulosSeeder extends Seeder {
                 'categoria_id' => $categoriaAlmacen->id,
                 'roles' => ['Almacenes']
             ],
+
+            [
+                'nombre' => 'Historico de Entradas',
+                'ruta' => 'HistoricoEntradas.index',
+                'descripcion' => 'Historico de Entradas de productos',
+                'icono' => 'fa-solid fa-clock-rotate-left',
+                'categoria_id' => $categoriaAlmacen->id,
+                'roles' => ['Almacenes']
+            ],
         ];
 
         foreach ($modulos as $modulo) {

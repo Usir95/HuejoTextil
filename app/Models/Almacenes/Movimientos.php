@@ -4,6 +4,7 @@ namespace App\Models\Almacenes;
 
 use App\Models\Catalogos\Clientes;
 use App\Models\Almacenes\Pedidos;
+use App\Models\Catalogos\Productos;
 use App\Models\Catalogos\TiposMovimientos;
 use App\Models\Catalogos\TiposProductos;
 use App\Models\Catalogos\TiposUnidades;
@@ -45,6 +46,10 @@ class Movimientos extends Model implements AuditableContract {
 
     public function tipoProducto() {
         return $this->belongsTo(TiposProductos::class, 'tipo_producto_id');
+    }
+
+    public function producto() {
+        return $this->belongsTo(Productos::class, 'producto_id');
     }
 
     public function usuario() {

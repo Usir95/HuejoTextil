@@ -77,7 +77,7 @@
                 <section v-if="$slots.header || $slots['header-left'] || $slots['header-right']" class="bg-gray-100 mb-4 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
                     <div class="px-3 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <!-- Filtros u opciones -->
-                        <div class="flex flex-wrap items-center space-x-2">
+                        <div class="flex items-center space-x-4">
                             <slot name="header-left" />
                         </div>
 

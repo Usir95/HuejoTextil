@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('peso_tara',5)->nullable();
 
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
+            $table->foreignId('producto_id')->nullable()->constrained('productos')->nullOnDelete();
             $table->foreignId('unidad_id')->nullable()->constrained('unidades')->nullOnDelete();
             $table->foreignId('color_id')->nullable()->constrained('colores')->nullOnDelete();
             $table->foreignId('tipo_calidad_id')->nullable()->constrained('tipos_calidades')->nullOnDelete();
