@@ -102,7 +102,10 @@ class EntradasController extends Controller {
                 return $movimiento;
             });
 
-            return back()->with('success', 'Entrada creada exitosamente.');
+            return response()->json([
+                'success' => true,
+                'movimiento_id' => $movimiento->id,
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error al registrar movimiento de entrada', ['error' => $e->getMessage()]);

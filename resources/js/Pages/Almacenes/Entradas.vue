@@ -6,6 +6,8 @@
             </div>
         </template>
 
+            <div id="Etiqueta">
+            </div>
         <!-- Interfaz de Conexión de Báscula Serial -->
         <section ref="FormSection">
             <div class="col-span-2 flex flex-col items-center justify-center py-2 m-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -359,7 +361,7 @@ const Insert = async () => {
 
     try {
         const response = await axios.post(route('Entradas.store'), form)
-
+        console.log(response.data.movimiento_id)
         const id = response?.data?.movimiento_id
         if (id) ImprimirEtiqueta(id)
 
