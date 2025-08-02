@@ -96,6 +96,17 @@
                             :options="TiposCalidades"
                         />
 
+
+                        <MdNumberInput
+                            id="num_rollo"
+                            name="num_rollo"
+                            class="col-span-2"
+                            v-model="form.num_rollo"
+                            label="Num rollo"
+                            :error="form.errors.num_rollo"
+                            :success="!form.errors.num_rollo"
+                        />
+
                         <MdNumberInput
                             id="cantidad"
                             name="cantidad"
