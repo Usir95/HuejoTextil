@@ -38,24 +38,26 @@ class EntradasController extends Controller {
     }
 
     public function store(Request $request) {
-        $request->validate([
-            'cliente_id'        => 'required',
-            'num_tarjeta'       => 'required',
-            'num_rollo'         => 'nullable',
-            'producto_id'       => 'required',
-            'color_id'          => 'required',
-            'tipo_calidad_id'   => 'required',
-            'cantidad'          => 'required|numeric|min:0.01',
+        $data = $request->validate([
+            'cliente_id'      => 'required',
+            'num_tarjeta'     => 'required|numeric',
+            'num_rollo'       => 'nullable|numeric',
+            'producto_id'     => 'required',
+            'color_id'        => 'required',
+            'tipo_calidad_id' => 'required',
+            'cantidad'        => 'required|numeric|min:0.01',
         ]);
 
-        try {
-                $movimiento = DB::transaction(function () use ($request) {
+        $cantidad = round((float) $data['cantidad'], 3);
 
-                if ($request->filled('num_rollo')) {
-                    $numRolloFinal = $request->num_rollo;
+        try {
+            $movimiento = DB::transaction(function () use ($data, $cantidad) {
+
+                if (!empty($data['num_rollo'])) {
+                    $numRolloFinal = $data['num_rollo'];
                 } else {
-                    $ultimoRollo = Movimientos::where('cliente_id', $request->cliente_id)
-                        ->where('num_tarjeta', $request->num_tarjeta)
+                    $ultimoRollo = Movimientos::where('cliente_id', $data['cliente_id'])
+                        ->where('num_tarjeta', $data['num_tarjeta'])
                         ->orderByDesc('num_rollo')
                         ->value('num_rollo');
 
@@ -64,15 +66,14 @@ class EntradasController extends Controller {
                         : '0001';
                 }
 
-                // Crear movimiento
                 $movimiento = Movimientos::create([
-                    'cliente_id'         => $request->cliente_id,
-                    'num_tarjeta'        => $request->num_tarjeta,
+                    'cliente_id'         => $data['cliente_id'],
+                    'num_tarjeta'        => $data['num_tarjeta'],
                     'num_rollo'          => $numRolloFinal,
-                    'producto_id'        => $request->producto_id,
-                    'color_id'           => $request->color_id,
-                    'tipo_calidad_id'    => $request->tipo_calidad_id,
-                    'cantidad'           => $request->cantidad,
+                    'producto_id'        => $data['producto_id'],
+                    'color_id'           => $data['color_id'],
+                    'tipo_calidad_id'    => $data['tipo_calidad_id'],
+                    'cantidad'           => $cantidad,
                     'fecha_movimiento'   => now(),
                     'tipo_movimiento_id' => 1,
                     'usuario_id'         => Auth::id(),
@@ -85,22 +86,24 @@ class EntradasController extends Controller {
 
                 Log::info('Movimiento creado correctamente', ['id' => $movimiento->id]);
 
-                $inventario = Inventarios::where('producto_id', $request->producto_id)
+                $inventario = Inventarios::where('producto_id', $data['producto_id'])
                     ->where('almacen_id', 1)
-                    ->where('color_id', $request->color_id)
-                    ->where('tipo_calidad_id', $request->tipo_calidad_id)
+                    ->where('color_id', $data['color_id'])
+                    ->where('tipo_calidad_id', $data['tipo_calidad_id'])
+                    ->lockForUpdate()
                     ->first();
 
                 if ($inventario) {
-                    $inventario->cantidad += $request->cantidad;
-                    $inventario->save();
+                    $inventario->update([
+                        'cantidad' => DB::raw("cantidad + {$cantidad}")
+                    ]);
                 } else {
                     Inventarios::create([
-                        'producto_id'      => $request->producto_id,
-                        'almacen_id'       => 1,
-                        'color_id'         => $request->color_id,
-                        'tipo_calidad_id'  => $request->tipo_calidad_id,
-                        'cantidad'         => $request->cantidad,
+                        'producto_id'     => $data['producto_id'],
+                        'almacen_id'      => 1,
+                        'color_id'        => $data['color_id'],
+                        'tipo_calidad_id' => $data['tipo_calidad_id'],
+                        'cantidad'        => $cantidad,
                     ]);
                 }
 
@@ -108,11 +111,11 @@ class EntradasController extends Controller {
             });
 
             return response()->json([
-                'success' => true,
-                'movimiento_id' => $movimiento->id,
+                'success'        => true,
+                'movimiento_id'  => $movimiento->id,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Error al registrar movimiento de entrada', ['error' => $e->getMessage()]);
             return response()->json([
                 'success' => false,
@@ -120,5 +123,6 @@ class EntradasController extends Controller {
             ], 500);
         }
     }
+
 
 }

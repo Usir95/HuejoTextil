@@ -46,19 +46,21 @@
                             :options="Clientes"
                         />
 
-                        <MdTextInput
+                        <MdNumberInput
                             id="num_tarjeta"
                             name="num_tarjeta"
                             v-model="form.num_tarjeta"
                             required
                             label="Tarjeta viajera"
+                            :minlength="1"
+                            :maxlength="6"
                             helper="Ingrese el numero de tarjeta"
                             :error="form.errors.num_tarjeta"
                             :success="!form.errors.num_tarjeta"
                         />
                     </div>
                     <div class="flex">
-                        <MdSelectInput
+                        <MdSelectSearchInput
                             id="producto_id"
                             name="producto_id"
                             v-model="form.producto_id"
@@ -96,13 +98,13 @@
                             :options="TiposCalidades"
                         />
 
-
                         <MdNumberInput
                             id="num_rollo"
                             name="num_rollo"
                             class="col-span-2"
                             v-model="form.num_rollo"
                             label="Num rollo"
+                            maxlength="6"
                             :error="form.errors.num_rollo"
                             :success="!form.errors.num_rollo"
                         />
@@ -114,6 +116,7 @@
                             v-model="form.cantidad"
                             required
                             label="Cantidad"
+                            inputRestrict="decimal"
                             :helper="cantidadHelperText"
                             :error="form.errors.cantidad"
                             :success="!form.errors.cantidad"
@@ -192,11 +195,11 @@ const cantidadHelperText = computed(() => {
 
 const form = useForm({
     cliente_id: '',
-    num_tarjeta: '',
-    num_rollo: '',
+    num_tarjeta: null,
+    num_rollo: null,
     producto_id: '',
     color_id: '',
-    tipo_calidad_id: '',
+    tipo_calidad_id: 1,
     cantidad: ''
 })
 
