@@ -100,7 +100,17 @@ import axios from 'axios'
         { headerName: 'Cliente', field: 'cliente.nombre' },
         { headerName: 'Rollo', field: 'num_rollo' },
         { headerName: 'Producto', field: 'producto.nombre' },
-        { headerName: 'Cantidad', field: 'cantidad', valueFormatter: params => `${params.value} kg` },
+        {
+            headerName: 'Cantidad',
+            field: 'cantidad',
+            valueFormatter: params => {
+                if (params.value == null) return '';
+                let num = parseFloat(params.value);
+                const str = num % 1 === 0 ? num.toString() : parseFloat(num.toFixed(3)).toString();
+                return `${str} kg`;
+            }
+        },
+
         {
             headerName: 'Calidad',
             field: 'tipo_calidad_id',
