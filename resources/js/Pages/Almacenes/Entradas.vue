@@ -443,6 +443,10 @@ const ImprimirEtiqueta = async (Id) => {
 
 const ImprimirElemento = (elementoOriginal) => {
     const ventana = window.open('', '', 'width=600,height=400');
+    if (!ventana) {
+        toast('Error.', 'danger');
+        return;
+    }
 
     ventana.document.write(`
         <html>
@@ -452,17 +456,15 @@ const ImprimirElemento = (elementoOriginal) => {
     `);
     ventana.document.close();
 
-    // Clonar el nodo con todos sus hijos y canvas incluidos
     const clon = elementoOriginal.cloneNode(true);
 
-    // Esperar a que la ventana esté lista
-    ventana.onload = () => {
+    setTimeout(() => {
         ventana.document.body.appendChild(clon);
         ventana.focus();
         ventana.print();
         ventana.close();
         console.log('Simulación: orden de impresión enviada');
         toast('Etiqueta lista para imprimir (simulado)', 'info');
-    };
+    }, 300);
 };
 </script>
