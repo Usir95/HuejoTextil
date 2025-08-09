@@ -28,44 +28,15 @@
                 </div>
             </section>
 
-            <section class="mt-4 mx-4  h-[60vh] overflow-auto pdf-imprimible">
-                <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table bg-gray-800">
-                    <thead class="bg-gray-700 text-white uppercase text-xs">
-                        <tr>
-                            <th class="px-4 py-2">Tarjeta</th>
-                            <th class="px-4 py-2">Cliente</th>
-                            <th class="px-4 py-2">Rollo</th>
-                            <th class="px-4 py-2">Cantidad</th>
-                            <th class="px-4 py-2">Calidad</th>
-                            <th class="px-4 py-2">Fecha de entrada</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="entrada in HistoricoEntradas" :key="entrada.id" class="border-t border-gray-700 hover:bg-gray-800">
-                            <td class="px-4 py-2">{{ entrada.num_tarjeta }}</td>
-                            <td class="px-4 py-2">{{ entrada.cliente?.nombre }}</td>
-                            <td class="px-4 py-2">{{ entrada.num_rollo }}</td>
-                            <td class="px-4 py-2">{{ entrada.cantidad }} kg</td>
-                            <td class="px-4 py-2">
-                                <span
-                                    v-if="entrada.tipo_calidad_id == 1"
-                                    class="inline-block px-3 py-1 text-xs font-semibold text-white bg-teal-500 rounded-full"
-                                >Buena</span>
-                                <span
-                                    v-else
-                                    class="inline-block px-3 py-1 text-xs font-semibold text-white bg-red-500 rounded-full"
-                                >Regular</span>
-                            </td>
-                            <td class="px-4 py-2">{{ entrada.fecha_movimiento }}</td>
-                        </tr>
-                        <tr v-if="!HistoricoEntradas.length">
-                            <td colspan="6" class="text-center px-4 py-4 text-gray-400">Sin resultados</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="mt-4 mx-4 print-page-break">
-                    <h2 class="text-lg font-bold text-white mb-2">Resumen por producto</h2>
+            <section class="m-2 h-[60vh] overflow-auto pdf-imprimible">
+                <AgGrid
+                    :initial-row-data="HistoricoEntradas"
+                    :initial-column-defs="columnas"
+                    @cell-clicked="onCellClicked"
+                    height="50vh"
+                />
+                <div class="mt-2 mx-4 print-page-break">
+                    <h2 class="text-lg text-center font-bold text-sky-600 mb-2">Resumen por producto</h2>
                     <table class="min-w-full text-sm text-left text-gray-300 border border-gray-600 print-table bg-gray-800">
                         <thead class="bg-gray-700 text-white uppercase text-xs">
                             <tr>
@@ -85,7 +56,7 @@
                 </div>
             </section>
 
-            <div>
+            <div class="flex justify-center">
                 <MdButton class="mt-4" @click="ExportarCSV()">Exportar CSV</MdButton>
             </div>
 
@@ -97,11 +68,12 @@
 import { ref, inject, defineProps, nextTick  } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import AgGrid from '@/Components/Dependencies/AgGrid.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
-import html2pdf from 'html2pdf.js'
 import axios from 'axios'
+
 
     /* ========================== Props ========================== */
     const props = defineProps({
@@ -127,6 +99,7 @@ import axios from 'axios'
         { headerName: 'Tarjeta', field: 'num_tarjeta' },
         { headerName: 'Cliente', field: 'cliente.nombre' },
         { headerName: 'Rollo', field: 'num_rollo' },
+        { headerName: 'Producto', field: 'producto.nombre' },
         { headerName: 'Cantidad', field: 'cantidad', valueFormatter: params => `${params.value} kg` },
         {
             headerName: 'Calidad',
@@ -213,8 +186,6 @@ import axios from 'axios'
             console.error(error);
         }
     }
-
-
 
     </script>
 

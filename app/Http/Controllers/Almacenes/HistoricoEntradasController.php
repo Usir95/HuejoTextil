@@ -60,13 +60,14 @@ class HistoricoEntradasController extends Controller {
 
         return response()->streamDownload(function () use ($entradas, $resumen) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Tarjeta', 'Cliente', 'Rollo', 'Cantidad', 'Calidad', 'Fecha']);
+            fputcsv($handle, ['Tarjeta', 'Cliente', 'Rollo', 'Producto', 'Cantidad', 'Calidad', 'Fecha']);
 
             foreach ($entradas as $item) {
                 fputcsv($handle, [
                     $item['num_tarjeta'] ?? '',
                     $item['cliente']['nombre'] ?? '',
                     $item['num_rollo'] ?? '',
+                    $item['producto']['nombre'] ?? '',
                     $item['cantidad'] ?? '',
                     ($item['tipo_calidad_id'] == 1 ? 'Buena' : 'Regular'),
                     $item['fecha_movimiento'] ?? '',
