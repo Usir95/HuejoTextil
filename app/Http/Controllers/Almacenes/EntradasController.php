@@ -41,6 +41,7 @@ class EntradasController extends Controller {
         $request->validate([
             'cliente_id'        => 'required',
             'num_tarjeta'       => 'required',
+            'num_rollo'         => 'nullable',
             'producto_id'       => 'required',
             'color_id'          => 'required',
             'tipo_calidad_id'   => 'required',
@@ -48,22 +49,26 @@ class EntradasController extends Controller {
         ]);
 
         try {
-            $movimiento = DB::transaction(function () use ($request) {
+                $movimiento = DB::transaction(function () use ($request) {
 
-                $ultimoRollo = Movimientos::where('cliente_id', $request->cliente_id)
-                    ->where('num_tarjeta', $request->num_tarjeta)
-                    ->orderByDesc('num_rollo')
-                    ->value('num_rollo');
+                if ($request->filled('num_rollo')) {
+                    $numRolloFinal = $request->num_rollo;
+                } else {
+                    $ultimoRollo = Movimientos::where('cliente_id', $request->cliente_id)
+                        ->where('num_tarjeta', $request->num_tarjeta)
+                        ->orderByDesc('num_rollo')
+                        ->value('num_rollo');
 
-                $nuevoRollo = $ultimoRollo
-                    ? str_pad(((int) $ultimoRollo) + 1, 4, '0', STR_PAD_LEFT)
-                    : '0001';
+                    $numRolloFinal = $ultimoRollo
+                        ? str_pad(((int) $ultimoRollo) + 1, 4, '0', STR_PAD_LEFT)
+                        : '0001';
+                }
 
                 // Crear movimiento
                 $movimiento = Movimientos::create([
                     'cliente_id'         => $request->cliente_id,
                     'num_tarjeta'        => $request->num_tarjeta,
-                    'num_rollo'          => $nuevoRollo,
+                    'num_rollo'          => $numRolloFinal,
                     'producto_id'        => $request->producto_id,
                     'color_id'           => $request->color_id,
                     'tipo_calidad_id'    => $request->tipo_calidad_id,
