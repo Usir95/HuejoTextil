@@ -442,29 +442,61 @@ const ImprimirEtiqueta = async (Id) => {
 };
 
 const ImprimirElemento = (elementoOriginal) => {
-    const ventana = window.open('', '', 'width=600,height=400');
-    if (!ventana) {
-        toast('Error.', 'danger');
-        return;
+  const win = window.open('', '', 'width=600,height=400');
+  if (!win) {
+    toast('Error al abrir la ventana de impresión.', 'danger');
+    return;
+  }
+
+  const estilos = `
+    <style>
+      @page {
+        size: 600px 400px;
+        margin: 0;
+      }
+      @media print {
+        html, body { margin: 0; padding: 0; }
+        .etiqueta { width: 600px; height: 400px; }
+      }
+    </style>
+  `;
+
+  const htmlEtiqueta = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Etiqueta</title>
+        ${estilos}
+      </head>
+      <body>
+        ${elementoOriginal.outerHTML}
+      </body>
+    </html>
+  `;
+
+  win.document.open();
+  win.document.write(htmlEtiqueta);
+  win.document.close();
+
+  const imprimir = () => {
+    win.focus();
+    win.print();
+    setTimeout(() => win.close(), 300);
+    toast('Etiqueta enviada a impresión', 'info');
+  };
+
+  const imgs = win.document.images;
+  if (imgs.length === 0) {
+    imprimir();
+  } else {
+    let cargadas = 0;
+    for (const img of imgs) {
+      if (img.complete) cargadas++;
+      else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
     }
-
-    ventana.document.write(`
-        <html>
-            <head><title>Etiqueta</title></head>
-            <body style="margin:0; padding:0;"></body>
-        </html>
-    `);
-    ventana.document.close();
-
-    const clon = elementoOriginal.cloneNode(true);
-
-    setTimeout(() => {
-        ventana.document.body.appendChild(clon);
-        ventana.focus();
-        ventana.print();
-        ventana.close();
-        console.log('Simulación: orden de impresión enviada');
-        toast('Etiqueta lista para imprimir (simulado)', 'info');
-    }, 300);
+    if (cargadas === imgs.length) imprimir();
+  }
 };
+
 </script>
