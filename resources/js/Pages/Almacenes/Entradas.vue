@@ -8,12 +8,10 @@
 
         <!-- Interfaz de Conexión de Báscula Serial -->
         <section ref="FormSection">
-            <div class="col-span-2 flex flex-col items-center justify-center py-2 m-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                <button
-                    @click="connectSerial"
-                    :disabled="isConnecting || isConnected"
-                    class="px-6 py-2  font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+            <div
+                class="col-span-2 flex flex-col items-center justify-center py-2 m-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <button @click="connectSerial" :disabled="isConnecting || isConnected"
+                    class="px-6 py-2  font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
                     {{ isConnecting ? 'Conectando...' : (isConnected ? 'Conectado' : 'Conectar Báscula') }}
                 </button>
 
@@ -21,11 +19,8 @@
                     Estado: <span :class="statusClass">{{ status }}</span>
                 </p>
 
-                <button
-                    v-if="isConnected"
-                    @click="disconnectSerial"
-                    class="mt-4 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200 ease-in-out"
-                >
+                <button v-if="isConnected" @click="disconnectSerial"
+                    class="mt-4 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200 ease-in-out">
                     Desconectar
                 </button>
             </div>
@@ -33,80 +28,33 @@
             <div>
                 <div class="h-[40vh] overflow-auto px-4 ">
                     <div class="flex">
-                        <MdSelectSearchInput
-                            id="cliente_id"
-                            name="cliente_id"
-                            class="col-span-2"
-                            v-model="form.cliente_id"
-                            required
-                            label="Cliente"
-                            helper="Seleccione un cliente"
-                            :error="form.errors.cliente_id"
-                            :success="!form.errors.cliente_id"
-                            :options="Clientes"
-                        />
+                        <MdSelectSearchInput id="cliente_id" name="cliente_id" class="col-span-2"
+                            v-model="form.cliente_id" required label="Cliente" helper="Seleccione un cliente"
+                            :error="form.errors.cliente_id" :success="!form.errors.cliente_id" :options="Clientes" />
 
-                        <MdTextInput
-                            id="num_tarjeta"
-                            name="num_tarjeta"
-                            v-model="form.num_tarjeta"
-                            required
-                            label="Tarjeta viajera"
-                            helper="Ingrese el numero de tarjeta"
-                            :error="form.errors.num_tarjeta"
-                            :success="!form.errors.num_tarjeta"
-                        />
+                        <MdTextInput id="num_tarjeta" name="num_tarjeta" v-model="form.num_tarjeta" required
+                            label="Tarjeta viajera" helper="Ingrese el numero de tarjeta"
+                            :error="form.errors.num_tarjeta" :success="!form.errors.num_tarjeta" />
                     </div>
                     <div class="flex">
-                        <MdSelectInput
-                            id="producto_id"
-                            name="producto_id"
-                            v-model="form.producto_id"
-                            required
-                            label="Producto"
-                            helper="Seleccione un producto"
-                            :error="form.errors.producto_id"
-                            :success="!form.errors.producto_id"
-                            :options="Productos"
-                        />
+                        <MdSelectInput id="producto_id" name="producto_id" v-model="form.producto_id" required
+                            label="Producto" helper="Seleccione un producto" :error="form.errors.producto_id"
+                            :success="!form.errors.producto_id" :options="Productos" />
 
-                        <MdSelectSearchInput
-                            id="color_id"
-                            name="color_id"
-                            v-model="form.color_id"
-                            required
-                            label="Color"
-                            helper="Seleccione un color (opcional)"
-                            :error="form.errors.color_id"
-                            :success="!form.errors.color_id"
-                            :options="Colores"
-                        />
+                        <MdSelectSearchInput id="color_id" name="color_id" v-model="form.color_id" required
+                            label="Color" helper="Seleccione un color (opcional)" :error="form.errors.color_id"
+                            :success="!form.errors.color_id" :options="Colores" />
                     </div>
 
                     <div class="flex">
-                        <MdSelectInput
-                            id="tipo_calidad_id"
-                            name="tipo_calidad_id"
-                            v-model="form.tipo_calidad_id"
-                            required
-                            label="Calidad"
-                            helper="Seleccione una calidad (opcional)"
-                            :error="form.errors.tipo_calidad_id"
-                            :success="!form.errors.tipo_calidad_id"
-                            :options="TiposCalidades"
-                        />
+                        <MdSelectInput id="tipo_calidad_id" name="tipo_calidad_id" v-model="form.tipo_calidad_id"
+                            required label="Calidad" helper="Seleccione una calidad (opcional)"
+                            :error="form.errors.tipo_calidad_id" :success="!form.errors.tipo_calidad_id"
+                            :options="TiposCalidades" />
 
-                        <MdNumberInput
-                            id="cantidad"
-                            name="cantidad"
-                            class="col-span-2"
-                            v-model="form.cantidad"
-                            required
-                            label="Cantidad"
-                            :helper="cantidadHelperText"
-                            :error="form.errors.cantidad"
-                            :success="!form.errors.cantidad"
-                        />
+                        <MdNumberInput id="cantidad" name="cantidad" class="col-span-2" v-model="form.cantidad" required
+                            label="Cantidad" :helper="cantidadHelperText" :error="form.errors.cantidad"
+                            :success="!form.errors.cantidad" />
                     </div>
                 </div>
 
@@ -128,7 +76,7 @@
 
 <script setup>
 import { ref, inject, defineProps, nextTick, computed, onMounted, onUnmounted } from 'vue'
-import { useForm, usePage  } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
@@ -229,13 +177,13 @@ const connectSerial = async () => {
         let errorMessage = 'Error desconocido al conectar.'; // Mensaje por defecto
 
         if (error.message) {
-        if (error.message.includes('No port selected by the user')) {
-            errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
-        } else if (error.message.includes('Failed to open serial port')) {
-            errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
-        } else {
-            errorMessage = `Error al conectar: ${error.message}`; // Mostrar el mensaje original si no es reconocido
-        }
+            if (error.message.includes('No port selected by the user')) {
+                errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
+            } else if (error.message.includes('Failed to open serial port')) {
+                errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
+            } else {
+                errorMessage = `Error al conectar: ${error.message}`; // Mostrar el mensaje original si no es reconocido
+            }
         }
 
         status.value = errorMessage;
@@ -256,49 +204,49 @@ const connectSerial = async () => {
 const readSerialData = async () => {
     while (true) {
         try {
-        if (!readerRef.value) { // Asegurarse de que el lector exista
-            break;
-        }
-        const { value, done } = await readerRef.value.read();
-
-        if (done) {
-            // El lector ha sido cancelado o el puerto se cerró
-            console.log('Lector de puerto serial cerrado.');
-            break;
-        }
-
-        const rawData = value.trim(); // Limpiar espacios en blanco
-
-        // Solo procesar lecturas estables (ST) de la báscula
-        if (rawData.startsWith('ST,')) {
-            // Expresión regular para extraer el valor numérico y la unidad
-            // Soporta signos (+/-), números con decimales y unidades (kg/lb)
-            const weightMatch = rawData.match(/([+-]?\d+\.\d+)\s*(kg|lb)/i);
-
-            if (weightMatch && weightMatch[1]) {
-            const weightValue = parseFloat(weightMatch[1]); // Obtener el número flotante
-            const unit = weightMatch[2] ? weightMatch[2].toLowerCase() : '';
-
-            form.cantidad = weightValue; // Asignar el valor numérico directamente al v-model
-            currentUnit.value = unit; // Actualizar la unidad para el helper text
-            status.value = `Recibiendo peso: ${weightValue} ${unit}`;
-            } else {
-            // Si no se pudo extraer el peso pero es una lectura estable
-            console.warn('Datos estables sin formato de peso reconocido:', rawData);
-            status.value = `Datos estables (formato desconocido): ${rawData}`;
+            if (!readerRef.value) { // Asegurarse de que el lector exista
+                break;
             }
-        } else {
-            // Datos inestables (US) o de otro tipo, se pueden ignorar o registrar
-            console.log('Datos inestables o no reconocidos:', rawData);
-            status.value = `Recibiendo datos inestables/otros: ${rawData}`;
-        }
+            const { value, done } = await readerRef.value.read();
+
+            if (done) {
+                // El lector ha sido cancelado o el puerto se cerró
+                console.log('Lector de puerto serial cerrado.');
+                break;
+            }
+
+            const rawData = value.trim(); // Limpiar espacios en blanco
+
+            // Solo procesar lecturas estables (ST) de la báscula
+            if (rawData.startsWith('ST,')) {
+                // Expresión regular para extraer el valor numérico y la unidad
+                // Soporta signos (+/-), números con decimales y unidades (kg/lb)
+                const weightMatch = rawData.match(/([+-]?\d+\.\d+)\s*(kg|lb)/i);
+
+                if (weightMatch && weightMatch[1]) {
+                    const weightValue = parseFloat(weightMatch[1]); // Obtener el número flotante
+                    const unit = weightMatch[2] ? weightMatch[2].toLowerCase() : '';
+
+                    form.cantidad = weightValue; // Asignar el valor numérico directamente al v-model
+                    currentUnit.value = unit; // Actualizar la unidad para el helper text
+                    status.value = `Recibiendo peso: ${weightValue} ${unit}`;
+                } else {
+                    // Si no se pudo extraer el peso pero es una lectura estable
+                    console.warn('Datos estables sin formato de peso reconocido:', rawData);
+                    status.value = `Datos estables (formato desconocido): ${rawData}`;
+                }
+            } else {
+                // Datos inestables (US) o de otro tipo, se pueden ignorar o registrar
+                console.log('Datos inestables o no reconocidos:', rawData);
+                status.value = `Recibiendo datos inestables/otros: ${rawData}`;
+            }
         } catch (error) {
-        status.value = `Error de lectura: ${error.message}`;
-        console.error('Error al leer del puerto serial:', error);
-        toast(`Error de lectura: ${error.message}`, 'danger');
-        // Si hay un error fatal, intentar desconectar
-        disconnectSerial();
-        break; // Salir del bucle de lectura
+            status.value = `Error de lectura: ${error.message}`;
+            console.error('Error al leer del puerto serial:', error);
+            toast(`Error de lectura: ${error.message}`, 'danger');
+            // Si hay un error fatal, intentar desconectar
+            disconnectSerial();
+            break; // Salir del bucle de lectura
         }
     }
 };
@@ -310,18 +258,18 @@ const readSerialData = async () => {
 const disconnectSerial = async () => {
     if (readerRef.value) {
         try {
-        await readerRef.value.cancel(); // Cancela cualquier lectura pendiente
-        readerRef.value.releaseLock(); // Libera el bloqueo del lector
+            await readerRef.value.cancel(); // Cancela cualquier lectura pendiente
+            readerRef.value.releaseLock(); // Libera el bloqueo del lector
         } catch (error) {
-        console.error('Error al cancelar/liberar lector:', error);
+            console.error('Error al cancelar/liberar lector:', error);
         }
         readerRef.value = null;
     }
     if (portRef.value && portRef.value.opened) {
         try {
-        await portRef.value.close();
+            await portRef.value.close();
         } catch (error) {
-        console.error('Error al cerrar el puerto:', error);
+            console.error('Error al cerrar el puerto:', error);
         }
     }
     portRef.value = null;
@@ -338,11 +286,11 @@ const disconnectSerial = async () => {
 onMounted(() => {
     if ('serial' in navigator) {
         navigator.serial.addEventListener('disconnect', (event) => {
-        if (portRef.value && event.target === portRef.value) {
-            status.value = 'Báscula desconectada inesperadamente.';
-            toast('Báscula desconectada inesperadamente.', 'danger');
-            disconnectSerial(); // Llama a la función de desconexión para limpiar el estado
-        }
+            if (portRef.value && event.target === portRef.value) {
+                status.value = 'Báscula desconectada inesperadamente.';
+                toast('Báscula desconectada inesperadamente.', 'danger');
+                disconnectSerial(); // Llama a la función de desconexión para limpiar el estado
+            }
         });
     }
 });
@@ -431,29 +379,61 @@ const ImprimirEtiqueta = async (Id) => {
 };
 
 const ImprimirElemento = (elementoOriginal) => {
-    const ventana = window.open('', '', 'width=600,height=400');
-    if (!ventana) {
-        toast('Error.', 'danger');
-        return;
+  const win = window.open('', '', 'width=600,height=400');
+  if (!win) {
+    toast('Error al abrir la ventana de impresión.', 'danger');
+    return;
+  }
+
+  const estilos = `
+    <style>
+      @page {
+        size: 600px 400px;
+        margin: 0;
+      }
+      @media print {
+        html, body { margin: 0; padding: 0; }
+        .etiqueta { width: 600px; height: 400px; }
+      }
+    </style>
+  `;
+
+  const htmlEtiqueta = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Etiqueta</title>
+        ${estilos}
+      </head>
+      <body>
+        ${elementoOriginal.outerHTML}
+      </body>
+    </html>
+  `;
+
+  win.document.open();
+  win.document.write(htmlEtiqueta);
+  win.document.close();
+
+  const imprimir = () => {
+    win.focus();
+    win.print();
+    setTimeout(() => win.close(), 300);
+    toast('Etiqueta enviada a impresión', 'info');
+  };
+
+  const imgs = win.document.images;
+  if (imgs.length === 0) {
+    imprimir();
+  } else {
+    let cargadas = 0;
+    for (const img of imgs) {
+      if (img.complete) cargadas++;
+      else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
     }
-
-    ventana.document.write(`
-        <html>
-            <head><title>Etiqueta</title></head>
-            <body style="margin:0; padding:0;"></body>
-        </html>
-    `);
-    ventana.document.close();
-
-    const clon = elementoOriginal.cloneNode(true);
-
-    setTimeout(() => {
-        ventana.document.body.appendChild(clon);
-        ventana.focus();
-        ventana.print();
-        ventana.close();
-        console.log('Simulación: orden de impresión enviada');
-        toast('Etiqueta lista para imprimir (simulado)', 'info');
-    }, 300);
+    if (cargadas === imgs.length) imprimir();
+  }
 };
+
 </script>
