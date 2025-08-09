@@ -35,6 +35,7 @@
             :class="{ 'pl-10 pr-4': iconLeft || iconClass, 'px-4': !iconLeft && !iconClass }"
             @click="toggleOpen"
             @focus="isFocused = true"
+            @keydown.enter.prevent="onEnterFromCombobox"
             :style="{ backgroundColor, borderColor, '--tw-ring-color': borderColor, borderWidth: '1px' }"
         >
             <span class="truncate select-none text-gray-800 dark:text-gray-100" :class="{ 'opacity-50': !modelValue }">
@@ -47,10 +48,12 @@
             <div v-if="isOpen" class="absolute z-20 left-2 right-2 mt-1 max-h-60 overflow-auto rounded-xl border border-[var(--color-primary-light)] bg-[#f3f4f6] dark:bg-[#101828] shadow-lg text-sm text-gray-800 dark:text-gray-100">
                 <li class="px-3 py-2 sticky top-0 bg-[#f3f4f6] dark:bg-[#101828] z-10">
                     <input
+                        ref="searchInputRef"
                         v-model="search"
                         placeholder="Buscar..."
                         class="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
                         type="text"
+                        @keydown.enter.prevent="onEnterFromSearch"
                     />
                 </li>
                 <div @click.stop="clearSelection" class="px-4 py-2 italic text-gray-500 hover:bg-[var(--color-primary-light)] cursor-pointer transition-colors">
@@ -78,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, useSlots } from 'vue'
+import { ref, computed, watch, onMounted, useSlots, nextTick } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 
 const props = defineProps({
@@ -99,6 +102,7 @@ const isFocused = ref(false)
 const internalError = ref('')
 const search = ref('')
 const isDark = ref(false)
+const searchInputRef = ref(null)
 const iconLeft = computed(() => !!useSlots().iconLeft)
 
 const backgroundColor = computed(() => isDark.value ? '#101828' : '#f3f4f6')
@@ -139,10 +143,11 @@ function selectOption(option) {
 }
 
 function toggleOpen() {
-    isOpen.value = !isOpen.value
-    if (isOpen.value) {
-        search.value = ''
-    }
+  isOpen.value = !isOpen.value
+  if (isOpen.value) {
+    search.value = ''
+    nextTick(() => searchInputRef.value?.focus())
+  }
 }
 
 function clearSelection() {
@@ -158,6 +163,25 @@ function validate() {
     }
     internalError.value = ''
     return true
+}
+
+function selectFirstFiltered() {
+    const first = filteredOptions.value?.[0]
+    if (first) {
+        selectOption(first)   // ya emite y cierra
+    }
+}
+
+function onEnterFromCombobox() {
+    if (!isOpen.value) {
+        toggleOpen()
+    } else {
+        selectFirstFiltered()
+    }
+}
+
+function onEnterFromSearch() {
+    selectFirstFiltered()
 }
 
 onMounted(() => {
