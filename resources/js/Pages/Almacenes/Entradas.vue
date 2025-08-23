@@ -401,27 +401,22 @@ const ImprimirEtiqueta = async (Id) => {
         margin: 0
     });
 
-    const html = `
-        <div style="font-family: sans-serif; width: 60mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
-            <!-- Código de barras -->
-            <div style="display: flex; justify-content: center; margin-bottom: 2mm;">
-                <svg id="barcode" style="width: 50mm; height: 10mm;"></svg>
-            </div>
-
-            <!-- Info + QR -->
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-size: 3mm; font-weight: bold; line-height: 1.4;">
-                    <div text-align: center;> ${codigo} </div>
-                    <div>Producto: ${producto}</div> <div>(${tipo_calidad})</div>
-                    <div>Color: ${color}</div>
-                    <div>Cantidad: ${cantidad}</div>
-                </div>
-
-                <!-- QR como imagen -->
-                <img src="${qrDataUrl}" width="60mm" height="60mm" style="object-fit: contain;" />
-            </div>
-        </div>
-    `;
+const html = `
+  <div class="etiqueta-print" style="font-family:sans-serif; width:60mm; border:0.5mm solid #000; padding:2mm; box-sizing:border-box;">
+    <div style="display:flex; justify-content:center; margin-bottom:2mm;">
+      <svg id="barcode" style="width:50mm; height:10mm;"></svg>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-size:3mm; font-weight:bold; line-height:1.4;">
+        <div>${codigo}</div>
+        <div>Producto: ${producto}</div><div>(${tipo_calidad})</div>
+        <div>Color: ${color}</div>
+        <div>Cantidad: ${cantidad}</div>
+      </div>
+      <img src="${qrDataUrl}" width="20mm" height="20mm" style="object-fit:contain;" />
+    </div>
+  </div>
+`;
 
     const etiquetaDiv = document.getElementById('Etiqueta');
     etiquetaDiv.innerHTML = html;
@@ -445,36 +440,60 @@ const ImprimirEtiqueta = async (Id) => {
 };
 
 const ImprimirElemento = (elementoOriginal) => {
+  const LABEL_W = 60;  // mm ancho de etiqueta “normal”
+  const LABEL_H = 40;  // mm alto de etiqueta “normal”
+  const ROTATE_90 = true; // true = imprime girada 90° (vertical)
+
   const win = window.open('', '', 'width=800,height=600');
   if (!win) {
     toast('Error al abrir la ventana de impresión.', 'danger');
     return;
   }
 
+  // Si rotas 90°, la página (hoja) queda W x H pero el bloque se gira.
   const estilos = `
     <style>
       @page {
-        size: 850px 650px;
+        size: ${LABEL_W}mm ${LABEL_H}mm;   /* Tamaño exacto en mm */
         margin: 0;
       }
+      html, body { margin:0; padding:0; }
+      /* Contenedor para recorte y centrado */
+      .page {
+        width: ${LABEL_W}mm;
+        height: ${LABEL_H}mm;
+        overflow: hidden;
+        position: relative;
+      }
+      /* La etiqueta real */
+      .etiqueta-print {
+        /* ya trae width:60mm en tu HTML inline */
+      }
+      /* Rotación opcional 90° sentido horario */
+      .rotate {
+        position: absolute;
+        top: 0; left: 0;
+        width: ${LABEL_H}mm;   /* ojo: se invierten */
+        height: ${LABEL_W}mm;
+        transform: rotate(90deg) translateY(-${LABEL_H}mm);
+        transform-origin: top left;
+      }
       @media print {
-        html, body { margin: 0; padding: 0; }
-        .etiqueta { width: 600px; height: 400px; }
+        .screen-only { display: none; }
       }
     </style>
   `;
 
+  // Si rotas, envolvemos la etiqueta en .rotate. Si no, la pegamos directo.
+  const contenido = ROTATE_90
+    ? `<div class="page"><div class="rotate">${elementoOriginal.outerHTML}</div></div>`
+    : `<div class="page">${elementoOriginal.outerHTML}</div>`;
+
   const htmlEtiqueta = `
     <!DOCTYPE html>
     <html>
-      <head>
-        <meta charset="utf-8" />
-        <title>Etiqueta</title>
-        ${estilos}
-      </head>
-      <body>
-        ${elementoOriginal.outerHTML}
-      </body>
+      <head><meta charset="utf-8"><title>Etiqueta</title>${estilos}</head>
+      <body>${contenido}</body>
     </html>
   `;
 
@@ -490,16 +509,16 @@ const ImprimirElemento = (elementoOriginal) => {
   };
 
   const imgs = win.document.images;
-  if (imgs.length === 0) {
-    imprimir();
-  } else {
-    let cargadas = 0;
+  if (imgs.length === 0) imprimir();
+  else {
+    let ok = 0;
     for (const img of imgs) {
-      if (img.complete) cargadas++;
-      else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
+      if (img.complete) ok++;
+      else img.addEventListener('load', () => { if (++ok === imgs.length) imprimir(); });
     }
-    if (cargadas === imgs.length) imprimir();
+    if (ok === imgs.length) imprimir();
   }
 };
+
 
 </script>
