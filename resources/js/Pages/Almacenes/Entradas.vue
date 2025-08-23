@@ -445,7 +445,7 @@ const ImprimirEtiqueta = async (Id) => {
 };
 
 const ImprimirElemento = (elementoOriginal) => {
-  const win = window.open('', '', 'width=600,height=400');
+  const win = window.open('', '', 'width=800,height=600');
   if (!win) {
     toast('Error al abrir la ventana de impresión.', 'danger');
     return;
@@ -454,7 +454,7 @@ const ImprimirElemento = (elementoOriginal) => {
   const estilos = `
     <style>
       @page {
-        size: 600px 400px;
+        size: 850px 650px;
         margin: 0;
       }
       @media print {
@@ -485,7 +485,7 @@ const ImprimirElemento = (elementoOriginal) => {
   const imprimir = () => {
     win.focus();
     win.print();
-    setTimeout(() => win.close(), 300);
+    setTimeout(() => win.close(), 200);
     toast('Etiqueta enviada a impresión', 'info');
   };
 
