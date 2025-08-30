@@ -392,30 +392,35 @@ const ImprimirEtiqueta = async (Id) => {
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
     const tipo_calidad = form.tipo_calidad_id;
     const cantidad = form.cantidad;
+    const fecha = new Date().toLocaleDateString();
 
     const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
 
     const qrDataUrl = await QRCode.toDataURL(codigo, {
-        width: 20 * 3.78, // ~20mm
+        width: 20 * 3.78, // 20mm en px
         margin: 0
     });
 
     const html = `
-      <div class="etiqueta-print"
-           style="width:60mm; height:40mm; box-sizing:border-box; border:0.5mm solid #000; padding:2mm; font-family:sans-serif;">
-        <div style="display:flex; justify-content:center; margin-bottom:2mm;">
-          <svg id="barcode" style="width:50mm; height:10mm;"></svg>
+        <div style="font-family: sans-serif; width: 60mm; border: 0.5mm solid #000; padding: 2mm; box-sizing: border-box;">
+            <!-- Código de barras -->
+            <div style="display: flex; justify-content: center; margin-bottom: 2mm;">
+                <svg id="barcode" style="width: 50mm; height: 10mm;"></svg>
+            </div>
+
+            <!-- Info + QR -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 3mm; font-weight: bold; line-height: 1.4;">
+                    <div text-align: center;> ${codigo} </div>
+                    <div>Producto: ${producto}</div> <div>(${tipo_calidad})</div>
+                    <div>Color: ${color}</div>
+                    <div>Cantidad: ${cantidad}</div>
+                </div>
+
+                <!-- QR como imagen -->
+                <img src="${qrDataUrl}" width="60mm" height="60mm" style="object-fit: contain;" />
+            </div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="font-size:3mm; font-weight:bold; line-height:1.4;">
-            <div>${codigo}</div>
-            <div>Producto: ${producto}</div><div>(${tipo_calidad})</div>
-            <div>Color: ${color}</div>
-            <div>Cantidad: ${cantidad}</div>
-          </div>
-          <img src="${qrDataUrl}" width="20mm" height="20mm" style="object-fit:contain" />
-        </div>
-      </div>
     `;
 
     const etiquetaDiv = document.getElementById('Etiqueta');
@@ -426,43 +431,49 @@ const ImprimirEtiqueta = async (Id) => {
     JsBarcode("#barcode", codigo, {
         format: "CODE128",
         width: 2,
-        height: 28,
+        height: 10 * 2.78,
         displayValue: false
     });
 
     ImprimirElemento(etiquetaDiv);
-};
 
+    form.cantidad = '';
+    await nextTick();
+
+    const input = document.getElementById('cantidad');
+    if (input) input.focus();
+};
 
 const ImprimirElemento = (elementoOriginal) => {
   const win = window.open('', '', 'width=800,height=600');
   if (!win) {
-    toast('No se pudo abrir la ventana de impresión.', 'danger');
+    toast('Error al abrir la ventana de impresión.', 'danger');
     return;
   }
 
   const estilos = `
     <style>
-      @page { size: 40mm 60mm; margin: 0; } /* hoja retrato */
-      html, body { margin:0; padding:0; }
-      .page { position:relative; width:40mm; height:60mm; overflow:hidden; }
-      .rotate-90 {
-        position:absolute; top:0; left:0;
-        width:60mm; height:40mm;
-        transform: rotate(-90deg) translateX(-60mm);
-        transform-origin: top left;
+      @page {
+        size: 850px 650px;
+        margin: 0;
+      }
+      @media print {
+        html, body { margin: 0; padding: 0; }
+        .etiqueta { width: 600px; height: 400px; }
       }
     </style>
   `;
 
-  const soloEtiqueta = elementoOriginal.querySelector('.etiqueta-print').outerHTML;
-
   const htmlEtiqueta = `
     <!DOCTYPE html>
     <html>
-      <head><meta charset="utf-8">${estilos}</head>
+      <head>
+        <meta charset="utf-8" />
+        <title>Etiqueta</title>
+        ${estilos}
+      </head>
       <body>
-        <div class="page"><div class="rotate-90">${soloEtiqueta}</div></div>
+        ${elementoOriginal.outerHTML}
       </body>
     </html>
   `;
@@ -471,19 +482,24 @@ const ImprimirElemento = (elementoOriginal) => {
   win.document.write(htmlEtiqueta);
   win.document.close();
 
-  const imprimir = () => { win.focus(); win.print(); setTimeout(() => win.close(), 200); };
+  const imprimir = () => {
+    win.focus();
+    win.print();
+    setTimeout(() => win.close(), 200);
+    toast('Etiqueta enviada a impresión', 'info');
+  };
 
   const imgs = win.document.images;
-  if (!imgs.length) imprimir();
-  else {
-    let ok = 0;
+  if (imgs.length === 0) {
+    imprimir();
+  } else {
+    let cargadas = 0;
     for (const img of imgs) {
-      if (img.complete) ok++;
-      else img.addEventListener('load', () => (++ok === imgs.length && imprimir()));
+      if (img.complete) cargadas++;
+      else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
     }
-    if (ok === imgs.length) imprimir();
+    if (cargadas === imgs.length) imprimir();
   }
 };
-
 
 </script>
