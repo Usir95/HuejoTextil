@@ -42,6 +42,7 @@ class EntradasController extends Controller {
             'cliente_id'      => 'required',
             'num_tarjeta'     => 'required|numeric',
             'num_rollo'       => 'nullable|numeric',
+            'peso_tara'       => 'nullable|numeric|min:0.01',
             'producto_id'     => 'required',
             'color_id'        => 'required',
             'tipo_calidad_id' => 'required',
@@ -70,6 +71,7 @@ class EntradasController extends Controller {
                     'cliente_id'         => $data['cliente_id'],
                     'num_tarjeta'        => $data['num_tarjeta'],
                     'num_rollo'          => $numRolloFinal,
+                    'peso_tara'          => $data['peso_tara'] ?? 0,
                     'producto_id'        => $data['producto_id'],
                     'color_id'           => $data['color_id'],
                     'tipo_calidad_id'    => $data['tipo_calidad_id'],
@@ -110,6 +112,43 @@ class EntradasController extends Controller {
                 return $movimiento;
             });
 
+            // === Registro en archivo CSV ===
+            $logDir = storage_path('app/logs');
+            if (!file_exists($logDir)) {
+                mkdir($logDir, 0777, true);
+            }
+
+            $file = $logDir . '/movimientos.csv';
+
+            // Si el archivo no existe, crea encabezados
+            if (!file_exists($file)) {
+                $headers = [
+                    'fecha', 'id', 'cliente_id', 'num_tarjeta', 'num_rollo',
+                    'producto_id', 'color_id', 'tipo_calidad_id',
+                    'cantidad', 'peso_tara', 'usuario_id'
+                ];
+                $fh = fopen($file, 'w');
+                fputcsv($fh, $headers);
+                fclose($fh);
+            }
+
+            // Añade la fila
+            $fh = fopen($file, 'a');
+            fputcsv($fh, [
+                now()->toDateTimeString(),
+                $movimiento->id,
+                $movimiento->cliente_id,
+                $movimiento->num_tarjeta,
+                $movimiento->num_rollo,
+                $movimiento->producto_id,
+                $movimiento->color_id,
+                $movimiento->tipo_calidad_id,
+                $movimiento->cantidad,
+                $movimiento->peso_tara,
+                $movimiento->usuario_id,
+            ]);
+            fclose($fh);
+
             return response()->json([
                 'success'        => true,
                 'movimiento_id'  => $movimiento->id,
@@ -123,6 +162,7 @@ class EntradasController extends Controller {
             ], 500);
         }
     }
+
 
 
 }

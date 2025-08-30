@@ -31,7 +31,7 @@
             </div>
             <!-- Fin Interfaz de Conexión de Báscula Serial -->
             <div>
-                <div class="h-[40vh] overflow-auto px-4 ">
+                <div class="h-[50vh] overflow-auto px-4 ">
                     <div class="flex">
                         <MdSelectSearchInput
                             id="cliente_id"
@@ -82,6 +82,17 @@
                             :error="form.errors.color_id"
                             :success="!form.errors.color_id"
                             :options="Colores"
+                        />
+
+                        <MdNumberInput
+                            id="peso_tara"
+                            name="peso_tara"
+                            v-model="form.peso_tara"
+                            label="Ingresar Tara"
+                            helper="peso_tara"
+                            inputRestrict="decimal"
+                            :error="form.errors.peso_tara"
+                            :success="!form.errors.peso_tara"
                         />
                     </div>
 
@@ -197,6 +208,7 @@ const form = useForm({
     cliente_id: '',
     num_tarjeta: null,
     num_rollo: null,
+    peso_tara: null,
     producto_id: '',
     color_id: '',
     tipo_calidad_id: 1,
@@ -435,25 +447,24 @@ const ImprimirEtiqueta = async (Id) => {
 
 
 const ImprimirElemento = (elementoOriginal) => {
-  const win = window.open('', '', 'width=800,height=600');
-  if (!win) {
-    toast('No se pudo abrir la ventana de impresión.', 'danger');
-    return;
-  }
+    const win = window.open('', '', 'width=800,height=600');
+    if (!win) {
+        toast('No se pudo abrir la ventana de impresión.', 'danger');
+        return;
+    }
 
-  const estilos = `
-    <style>
-      @page { size: 40mm 60mm; margin: 0; } /* hoja retrato */
-      html, body { margin:0; padding:0; }
-      .page { position:relative; width:40mm; height:60mm; overflow:hidden; }
-      .rotate-90 {
-        position:absolute; top:0; left:0;
-        width:60mm; height:40mm;
-        transform: rotate(-90deg) translateX(-60mm);
-        transform-origin: top left;
-      }
-    </style>
-  `;
+    const estilos = `
+        <style>
+        @page { size: 50mm 90mm; margin: 0; } /* hoja retrato */
+        html, body { margin:0; padding:0; }
+        .page { position:relative; width:60mm; height:40mm; overflow:hidden; }
+        .rotate-90 {
+            position:absolute; top:0; left:0;
+            width:50mm; height:85mm;
+            transform-origin: top left;
+        }
+        </style>
+    `;
 
   const soloEtiqueta = elementoOriginal.querySelector('.etiqueta-print').outerHTML;
 
@@ -462,7 +473,7 @@ const ImprimirElemento = (elementoOriginal) => {
     <html>
       <head><meta charset="utf-8">${estilos}</head>
       <body>
-        <div class="page"><div class="rotate-90">${soloEtiqueta}</div></div>
+        <div class="page"><div>${soloEtiqueta}</div></div>
       </body>
     </html>
   `;
