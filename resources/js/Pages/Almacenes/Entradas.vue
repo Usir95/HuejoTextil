@@ -1,14 +1,14 @@
 <template>
     <AppLayout title="Entradas">
         <template #header-left>
-            <div class=" text-gray-600 dark:text-gray-300 text-lg font-semibold uppercase">
+            <div class=" text-gray-600 dark:text-gray-300  font-semibold uppercase">
                 Registra una entrada seleccionando el producto, almacén y cantidad a ingresar.
             </div>
         </template>
 
         <!-- Interfaz de Conexión de Báscula Serial -->
         <section ref="FormSection">
-            <div class="col-span-2 flex flex-col items-center justify-center py-2 m-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div class="col-span-2 flex flex-col items-center justify-center py-2 mx-4 my-2 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <button
                     @click="connectSerial"
                     :disabled="isConnecting || isConnected"
