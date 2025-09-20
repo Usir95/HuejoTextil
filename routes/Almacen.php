@@ -5,6 +5,7 @@ use App\Http\Controllers\Almacenes\EntradasController;
 use App\Http\Controllers\Almacenes\HistoricoEntradasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
 use App\Http\Controllers\Almacenes\ProductosTerminadosController;
+use App\Http\Controllers\Almacenes\ReporteEntradasController;
 use App\Http\Controllers\Catalogos\ClientesController;
 use App\Http\Controllers\Catalogos\ColoresController;
 use App\Http\Controllers\Catalogos\TiposProductosController;
@@ -23,6 +24,8 @@ Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
 Route::resource('/HistoricoEntradas', HistoricoEntradasController::class)->names('HistoricoEntradas');
 Route::post('/HistoricoEntradas/FiltrarEntradas', [HistoricoEntradasController::class, 'FiltrarEntradas'])->name('HistoricoEntradas.FiltrarEntradas');
 Route::post('/HistoricoEntradas/ExpotarPedido', [HistoricoEntradasController::class, 'ExpotarPedido'])->name('HistoricoEntradas.ExpotarPedido');
+
+Route::resource('/ReporteEntradas', ReporteEntradasController::class)->names('ReporteEntradas');
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
 
