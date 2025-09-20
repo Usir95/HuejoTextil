@@ -205,15 +205,16 @@ const cantidadHelperText = computed(() => {
 
 
 const form = useForm({
-    cliente_id: '',
+    cliente_id: null,
     num_tarjeta: null,
     num_rollo: null,
     peso_tara: null,
-    producto_id: '',
-    color_id: '',
+    producto_id: null,
+    color_id: null,
     tipo_calidad_id: 1,
-    cantidad: ''
+    cantidad: null,
 })
+
 
 /**
  * @function connectSerial
@@ -399,81 +400,80 @@ const Insert = async () => {
 }
 
 const ImprimirEtiqueta = async (Id) => {
-    const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
-    const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
-    const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
-    const tipo_calidad = form.tipo_calidad_id;
-    const cantidad = form.cantidad;
+  const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
+  const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
+  const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
+  const tipo_calidad = form.tipo_calidad_id;
+  const cantidad = form.cantidad;
 
-    const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
+  const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
+  const qrDataUrl = await QRCode.toDataURL(codigo, { width: 20 * 3.78, margin: 0 });
 
-    const qrDataUrl = await QRCode.toDataURL(codigo, {
-        width: 20 * 3.78, // ~20mm
-        margin: 0
-    });
-
-    const html = `
-      <div class="etiqueta-print"
-           style="width:60mm; height:40mm; box-sizing:border-box; border:0.5mm solid #000; padding:2mm; font-family:sans-serif;">
-        <div style="display:flex; justify-content:center; margin-bottom:2mm;">
-          <svg id="barcode" style="width:50mm; height:10mm;"></svg>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="font-size:3mm; font-weight:bold; line-height:1.4;">
-            <div>${codigo}</div>
-            <div>Producto: ${producto}</div><div>(${tipo_calidad})</div>
-            <div>Color: ${color}</div>
-            <div>Cantidad: ${cantidad}</div>
-          </div>
-          <img src="${qrDataUrl}" width="20mm" height="20mm" style="object-fit:contain" />
-        </div>
+  const html = `
+    <div style="font-family:sans-serif; width:160mm; height:83mm; border:0.1mm solid #000; padding:5mm; box-sizing:border-box; text-align:left;">
+      <!-- Código de barras -->
+      <div style="display:flex; justify-content:flex-start; margin-bottom:4mm;">
+        <svg id="barcode" style="width:75mm; height:80mm;"></svg>
       </div>
-    `;
 
-    const etiquetaDiv = document.getElementById('Etiqueta');
-    etiquetaDiv.innerHTML = html;
+      <!-- Info + QR -->
+      <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
+        <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
+            <div style="text-align:left; font-size:5mm;">${codigo}</div>
+            <div style="text-align:left; font-size:8mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
+            <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
+            <div style="text-align:left; font-size:9mm;">PESO NETO: ${cantidad}</div>
+        </div>
 
-    await nextTick();
+        <img src="${qrDataUrl}" style="flex:0 0 25mm; width:30mm; height:30mm; object-fit:contain;" />
+      </div>
+    </div>
+  `;
 
-    JsBarcode("#barcode", codigo, {
-        format: "CODE128",
-        width: 2,
-        height: 28,
-        displayValue: false
-    });
+  const etiquetaDiv = document.getElementById('Etiqueta');
+  etiquetaDiv.innerHTML = html;
 
-    ImprimirElemento(etiquetaDiv);
+  await nextTick();
+
+  JsBarcode("#barcode", codigo, {
+    format: "CODE128",
+    width: 2,
+    height: 10 * 4.78,
+    displayValue: false
+  });
+
+  ImprimirElemento(etiquetaDiv);
+
+  form.cantidad = '';
+  await nextTick();
+  const input = document.getElementById('cantidad');
+  if (input) input.focus();
 };
 
 
 const ImprimirElemento = (elementoOriginal) => {
-    const win = window.open('', '', 'width=800,height=600');
-    if (!win) {
-        toast('No se pudo abrir la ventana de impresión.', 'danger');
-        return;
-    }
+  const win = window.open('', '', 'width=800,height=600');
+  if (!win) { toast('Error al abrir la ventana de impresión.', 'danger'); return; }
 
-    const estilos = `
-        <style>
-        @page { size: 50mm 90mm; margin: 0; } /* hoja retrato */
-        html, body { margin:0; padding:0; }
-        .page { position:relative; width:60mm; height:40mm; overflow:hidden; }
-        .rotate-90 {
-            position:absolute; top:0; left:0;
-            width:50mm; height:85mm;
-            transform-origin: top left;
-        }
-        </style>
-    `;
+  const estilos = `
+    <style>
+      @page { size: 950px 650px; margin: 0; }
+      html, body, #Etiqueta, .sheet { margin:0 !important; padding:0 !important; border:0 !important; }
+      /* evita empujes heredados */
+      body > * { margin:0 !important; }
+      img, svg { display:block; }
+    </style>
+  `;
 
-  const soloEtiqueta = elementoOriginal.querySelector('.etiqueta-print').outerHTML;
-
+  // Usa un wrapper limpio y evita outerHTML del contenedor original
   const htmlEtiqueta = `
     <!DOCTYPE html>
     <html>
-      <head><meta charset="utf-8">${estilos}</head>
+      <head><meta charset="utf-8" /><title>Etiqueta</title>${estilos}</head>
       <body>
-        <div class="page"><div>${soloEtiqueta}</div></div>
+        <div class="sheet">
+          ${elementoOriginal.innerHTML}
+        </div>
       </body>
     </html>
   `;
@@ -482,19 +482,18 @@ const ImprimirElemento = (elementoOriginal) => {
   win.document.write(htmlEtiqueta);
   win.document.close();
 
-  const imprimir = () => { win.focus(); win.print(); setTimeout(() => win.close(), 200); };
+  const imprimir = () => { win.focus(); win.print(); setTimeout(() => win.close(), 200); toast('Etiqueta enviada a impresión', 'info'); };
 
   const imgs = win.document.images;
-  if (!imgs.length) imprimir();
-  else {
-    let ok = 0;
-    for (const img of imgs) {
-      if (img.complete) ok++;
-      else img.addEventListener('load', () => (++ok === imgs.length && imprimir()));
-    }
-    if (ok === imgs.length) imprimir();
+  if (!imgs.length) return imprimir();
+  let cargadas = 0;
+  for (const img of imgs) {
+    if (img.complete) cargadas++;
+    else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
   }
+  if (cargadas === imgs.length) imprimir();
 };
+
 
 
 </script>
