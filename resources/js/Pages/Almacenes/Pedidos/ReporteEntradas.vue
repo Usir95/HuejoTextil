@@ -37,14 +37,14 @@
                 </div>
 
                 <!-- Vista previa simple -->
-                <div class="mt-4 mx-8">
+                <div class="mt-4 mx-8 h-[50vh] overflow-auto">
                     <div v-for="(bloque, bi) in Bloques" :key="bi" class="rounded border p-2">
-                    <div class="font-semibold mb-2 text-lg">
-                        {{ Encabezado.cliente }} • TV {{ Encabezado.tarjeta }}
-                    </div>
+                        <div class="font-semibold mb-2 text-lg" v-if="bi == 0">
+                            {{ Encabezado.cliente }} • TV {{ Encabezado.tarjeta }}
+                        </div>
                     <div class="space-y-1">
                         <div v-for="(ln,i) in bloque" :key="i" class="font-mono text-md tracking-tight">
-                        {{ ln }}
+                            {{ ln }}
                         </div>
                     </div>
                     </div>
@@ -102,7 +102,8 @@ const Buscar = async () => {
 }
 
 /* ========================== Reporte en “etiquetas” ========================== */
-const MAX_LINEAS_POR_BLOQUE = 10
+const MAX_LINEAS_TITULO = 6;
+const MAX_LINEAS_NORMAL = 7;
 
 const toKgm = v => {
     const n = Number(v)
@@ -126,59 +127,72 @@ const Lineas = computed(() => {
 })
 
 const Bloques = computed(() => {
-    const out = []
-    const src = Lineas.value
-    for (let i = 0; i < src.length; i += MAX_LINEAS_POR_BLOQUE) {
-        out.push(src.slice(i, i + MAX_LINEAS_POR_BLOQUE))
-    }
-    return out
-})
+  const out = [];
+  const src = Lineas.value;
+  let i = 0;
+
+  // Primer bloque con título: 6 líneas
+  if (src.length > 0) {
+    out.push(src.slice(i, i + MAX_LINEAS_TITULO));
+    i += MAX_LINEAS_TITULO;
+  }
+
+  // Resto de bloques: 7 líneas
+  for (; i < src.length; i += MAX_LINEAS_NORMAL) {
+    out.push(src.slice(i, i + MAX_LINEAS_NORMAL));
+  }
+
+  return out;
+});
 
 const ImprimirReporteEtiquetas = () => {
-    if (!Bloques.value.length) {
-        toast('Sin datos para imprimir', 'warning');
-        return
-    }
+  if (!Bloques.value.length) {
+    toast('Sin datos para imprimir', 'warning');
+    return;
+  }
 
-    const estilos = `
-        <style>
-            @page { size: 60mm 40mm; margin: 0; }
-            html, body { margin:0; padding:0; }
-            .page { position: relative; width:60mm; height:40mm; overflow:hidden; }
-            .rotate-90 { position:absolute; top:0; left:0; width:40mm; height:60mm; transform-origin: top left; transform: rotate(90deg); }
+  const estilos = `
+  <style>
+    @page { size: 102mm 51mm; margin: 0; }
+    html, body { margin:0; padding:0; }
+    img, svg { display:block; }
+    .page { width:102mm; height:51mm; page-break-after:always; }
+    .etiqueta-print { box-sizing:border-box; width:102mm; height:51mm; padding:2mm; display:flex; flex-direction:column; gap:1mm; font-family:system-ui,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .hdr { font-weight:700; font-size:12pt; }
+    .ln { font-size:11pt; white-space:nowrap; }
+    @media screen { .page { margin:8px auto; outline:1px dashed #ccc; } }
+    @media print { html, body { width:102mm; height:51mm; } }
+  </style>`;
 
-            .etiqueta-print {
-                width:60mm; height:40mm; box-sizing:border-box;
-                border:0.5mm solid #000; padding:2mm; font-family: ui-monospace, Menlo, monospace;
-                display:flex; flex-direction:column;
-            }
-            .hdr { font-size:3.0mm; font-weight:700; margin-bottom:1mm; white-space:nowrap; }
-            .ln  { font-size:2.8mm; line-height:1.15; white-space:nowrap; }
-        </style>`;
+  const encabezado = `${safe(Encabezado.value.cliente)}${Encabezado.value.tarjeta ? ' • TV ' + Encabezado.value.tarjeta : ''}`;
+  const marca = '&lt;1&gt;';
+  let tamanio = Bloques.value.length;
+  // Solo para imprimir: invertir el orden de las páginas
+  const toPrint = Bloques.value.slice().reverse();
 
-    const encabezado = `${safe(Encabezado.value.cliente)}${Encabezado.value.tarjeta ? ' • TV ' + Encabezado.value.tarjeta : ''}`;
-    const marca = '&lt;1&gt;';
+  let paginas = '';
+  toPrint.forEach((bloque, idx) => {
+    const cuerpo = bloque.map(l => `<div class="ln">${l.replace('<1>', marca)}</div>`).join('');
+    const headerHtml = idx === tamanio-1 ? `<div class="hdr">${encabezado}</div>` : '';
+    paginas += `
+      <div class="page">
+        <div class="etiqueta-print">
+          ${headerHtml}
+          ${cuerpo}
+        </div>
+      </div>`;
+  });
 
-    let paginas = '';
-    for (const bloque of Bloques.value) {
-        const cuerpo = bloque.map(l => `<div class="ln">${l.replace('<1>', marca)}</div>`).join('');
-        paginas += `
-        <div class="page">
-            <div class="etiqueta-print">
-            <div class="hdr">${encabezado}</div>
-            ${cuerpo}
-            </div>
-        </div>`;
-    }
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8">${estilos}</head><body>${paginas}</body></html>`;
 
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8">${estilos}</head><body>${paginas}</body></html>`;
-
-    const w = window.open('', '', 'width=800,height=600');
-    if (!w) { toast('No se pudo abrir la ventana de impresión', 'danger'); return; }
-    w.document.open(); w.document.write(html); w.document.close();
-    w.focus(); w.print();
-    setTimeout(() => { try { w.close(); } catch {} }, 300);
+  const w = window.open('', '', 'width=900,height=700');
+  if (!w) { toast('No se pudo abrir la ventana de impresión', 'danger'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  w.focus(); w.print();
+  setTimeout(() => { try { w.close(); } catch {} }, 300);
 };
+
+
 
 
 </script>

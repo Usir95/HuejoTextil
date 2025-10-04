@@ -56,4 +56,13 @@ class Movimientos extends Model implements AuditableContract {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function getCantidadAttribute($value)
+    {
+        return number_format((float)$value, 2, '.', '');
+    }
+
+    protected $casts = [
+        'cantidad' => 'float',
+    ];
+
 }

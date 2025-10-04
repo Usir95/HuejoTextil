@@ -30,8 +30,10 @@
 
             <section class="m-2 h-[60vh] overflow-auto pdf-imprimible">
                 <AgGrid
+                    ref="gridRef"
                     :initial-row-data="HistoricoEntradas"
                     :initial-column-defs="columnas"
+                    @grid-ready="onGridReady"
                     @cell-clicked="onCellClicked"
                     height="50vh"
                 />
@@ -61,6 +63,123 @@
             </div>
 
 
+            <MdDialogModal v-if="ShowModalEdit" :show="ShowModalEdit" @close="ToggleModalEdit" maxWidth="3xl">
+                <template #title>
+                    Crear Productos
+                </template>
+
+                <template #content>
+                    <section ref="FormSection" class="grid grid-cols-2 gap-4">
+                            <MdSelectSearchInput
+                                id="cliente_id"
+                                name="cliente_id"
+                                class="col-span-2"
+                                v-model="formH.cliente_id"
+                                required
+                                label="Cliente"
+                                helper="Seleccione un cliente"
+                                :error="formH.errors.cliente_id"
+                                :success="!formH.errors.cliente_id"
+                                :options="Clientes"
+                            />
+
+                            <MdNumberInput
+                                id="num_tarjeta"
+                                name="num_tarjeta"
+                                v-model="formH.num_tarjeta"
+                                required
+                                label="Tarjeta viajera"
+                                :minlength="1"
+                                :maxlength="6"
+                                helper="Ingrese el numero de tarjeta"
+                                :error="formH.errors.num_tarjeta"
+                                :success="!formH.errors.num_tarjeta"
+                            />
+
+
+
+                            <MdSelectSearchInput
+                                id="producto_id"
+                                name="producto_id"
+                                v-model="formH.producto_id"
+                                required
+                                label="Producto"
+                                helper="Seleccione un producto"
+                                :error="formH.errors.producto_id"
+                                :success="!formH.errors.producto_id"
+                                :options="Productos"
+                            />
+
+                            <MdSelectSearchInput
+                                id="color_id"
+                                name="color_id"
+                                v-model="formH.color_id"
+                                required
+                                label="Color"
+                                helper="Seleccione un color (opcional)"
+                                :error="formH.errors.color_id"
+                                :success="!formH.errors.color_id"
+                                :options="Colores"
+                            />
+
+                            <MdNumberInput
+                                id="peso_tara"
+                                name="peso_tara"
+                                v-model="formH.peso_tara"
+                                label="Ingresar Tara"
+                                helper="peso_tara"
+                                inputRestrict="decimal"
+                                :error="formH.errors.peso_tara"
+                                :success="!formH.errors.peso_tara"
+                            />
+
+                            <MdSelectInput
+                                id="tipo_calidad_id"
+                                name="tipo_calidad_id"
+                                v-model="formH.tipo_calidad_id"
+                                required
+                                label="Calidad"
+                                helper="Seleccione una calidad (opcional)"
+                                :error="formH.errors.tipo_calidad_id"
+                                :success="!formH.errors.tipo_calidad_id"
+                                :options="TiposCalidades"
+                            />
+
+                            <MdNumberInput
+                                id="num_rollo"
+                                name="num_rollo"
+                                v-model="formH.num_rollo"
+                                label="Num rollo"
+                                :error="formH.errors.num_rollo"
+                                :success="!formH.errors.num_rollo"
+                            />
+
+                            <MdNumberInput
+                                id="cantidad"
+                                name="cantidad"
+                                class="col-span-2"
+                                v-model="formH.cantidad"
+                                required
+                                label="Cantidad"
+                                inputRestrict="decimal"
+                                :helper="cantidadHelperText"
+                                :error="formH.errors.cantidad"
+                                :success="!formH.errors.cantidad"
+                            />
+                    </section>
+                </template>
+
+                <template #footer>
+                    <div class="space-x-2">
+                        <MdButton variant="primary" :loading="IsLoading" @click="Upsert()">
+                            {{ IsEditMode ? 'Actualizar' : 'Registrar' }}
+                        </MdButton>
+                        <MdButton variant="dark" @click="ToggleModalEdit()">Cancelar</MdButton>
+                    </div>
+                </template>
+            </MdDialogModal>
+
+
         </AppLayout>
     </template>
 
@@ -72,6 +191,9 @@ import AgGrid from '@/Components/Dependencies/AgGrid.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
+import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
+import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
+import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import axios from 'axios'
 
 
@@ -79,6 +201,10 @@ import axios from 'axios'
     const props = defineProps({
         Clientes: Object,
         Entradas: Object,
+        Productos: Object,
+        Colores: Object,
+        TiposCalidades: Object,
+        Almacenes: Object,
     })
 
     /* ========================== Refs ========================== */
@@ -86,8 +212,28 @@ import axios from 'axios'
     const IsLoading = ref(false);
     const IsEditMode = ref(false);
     const ShowModal = ref(false);
+    const ShowModalEdit = ref(false);
+    const FormValidate = inject('FormValidate');
+    const FormSection = ref(null);
+    const confirm = inject('$confirm');
     const HistoricoEntradas = ref(props.Entradas)
     const ResumenEntradas = ref([])
+
+    const gridRef = ref(null);
+    const gridApi = ref(null);
+
+    const formH = useForm({
+        cliente_id: null,
+        num_tarjeta: null,
+        num_rollo: null,
+        peso_tara: null,
+        producto_id: null,
+        color_id: null,
+        tipo_calidad_id: 1,
+        cantidad: null,
+    })
+
+    const onGridReady = (params) => { gridApi.value = params.api; };
 
     const form = useForm({
         id: '',
@@ -124,12 +270,37 @@ import axios from 'axios'
             }
         },
         { headerName: 'Fecha de Entrada', field: 'fecha_movimiento' },
+
+        {
+            headerName: 'Acciones',
+            field: 'acciones',
+            pinned: 'right',
+            maxWidth: 200,
+            cellRenderer: (params) => {
+                return `
+                <div>
+                    <button data-action="Edit" data-id="${params.data.id}" title="Editar" class="text-indigo-500 hover:text-indigo-900">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button data-action="Delete" data-id="${params.data.id}" title="Borrar" class="text-red-600 hover:text-red-900 ms-4">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                `;
+            },
+            sortable: false,
+            filter: false,
+        },
     ]
 
     /* ========================== Funciones ========================== */
     const ToggleModal = () => {
         IsEditMode.value ? IsEditMode.value = false : form.reset();
         ShowModal.value = !ShowModal.value
+    }
+
+    const ToggleModalEdit = () => {
+        ShowModalEdit.value = !ShowModalEdit.value
     }
 
     const onCellClicked = (event) => {
@@ -196,6 +367,90 @@ import axios from 'axios'
             console.error(error);
         }
     }
+
+    const upsertLocal = (row) => {
+        const i = HistoricoEntradas.value.findIndex(r => r.id === row.id);
+        if (i === -1) HistoricoEntradas.value.unshift(row);
+        else HistoricoEntradas.value[i] = row;
+        gridApi.value?.applyTransaction({ update: [row] });
+    };
+
+    const removeLocal = (id) => {
+        const row = HistoricoEntradas.value.find(r => r.id === id);
+        if (!row) return;
+        HistoricoEntradas.value = HistoricoEntradas.value.filter(r => r.id !== id);
+        gridApi.value?.applyTransaction({ remove: [row] });
+    };
+
+    const Edit = (data) => {
+        console.log(data);
+        IsLoading.value = false;
+        Object.assign(formH, data);
+        formH.num_rollo = parseInt(data.num_rollo);
+        IsEditMode.value = true;
+        ShowModalEdit.value = true;
+    };
+
+    const Upsert = () => {
+        if (!FormValidate(FormSection)) return
+        IsLoading.value = true;
+        if (IsEditMode.value) {
+            formH.put(route('HistoricoEntradas.update', formH.id), {
+            onSuccess: ({ props }) => {
+                const updated = props?.registro ?? { ...formH };
+                upsertLocal(updated);
+                ToggleModalEdit();
+                formH.reset(); IsLoading.value = false;
+                toast('Registro actualizado', 'success');
+            },
+            onError(){
+                    IsLoading.value = false; toast('Ocurrió un error','danger');
+                }
+            });
+        } else {
+            formH.post(route('HistoricoEntradas.store'), {
+                onSuccess: (response) => {
+                    console.log(response);
+                    ToggleModalEdit();
+                    formH.reset();
+                    IsLoading.value = false;
+                    toast('Registro guardado correctamente', 'success');
+                    location.reload();
+                },
+                onError: (e) => {
+                    IsLoading.value = false;
+                    console.error(e);
+                    toast('Ocurrió un error', 'danger');
+                }
+            });
+        }
+    };
+
+    const Delete = (id) => {
+        console.log(id);
+
+        confirm(
+            '¿Estás seguro?',
+            'Esta acción no se puede deshacer.',
+            'Sí, eliminar',
+            'Cancelar',
+            () => {
+            formH.delete(route('HistoricoEntradas.destroy', id), {
+                onSuccess: () => {
+                    removeLocal(id);
+                    toast('Registro eliminado', 'success');
+                },
+                onError(e){
+                    toast('Ocurrió un error al eliminar','danger');
+                    console.error(e);
+                }
+            });
+            },
+            () => {
+            console.log('Acción cancelada');
+            }
+        );
+    };
 
     </script>
 

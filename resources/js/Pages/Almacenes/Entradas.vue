@@ -404,7 +404,8 @@ const ImprimirEtiqueta = async (Id) => {
   const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
   const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
   const tipo_calidad = form.tipo_calidad_id;
-  const cantidad = form.cantidad;
+  const cantidad = Number(form.cantidad || 0).toFixed(2);
+
 
   const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
   const qrDataUrl = await QRCode.toDataURL(codigo, { width: 20 * 3.78, margin: 0 });
@@ -417,16 +418,17 @@ const ImprimirEtiqueta = async (Id) => {
       </div>
 
       <!-- Info + QR -->
-      <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
-        <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
-            <div style="text-align:left; font-size:5mm;">${codigo}</div>
-            <div style="text-align:left; font-size:8mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
-            <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
-            <div style="text-align:left; font-size:9mm;">PESO NETO: ${cantidad}</div>
+        <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
+            <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
+                <div style="text-align:left; font-size:4mm;">${codigo}</div>
+                <div style="text-align:left; font-size:7mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
+                <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
+                <div style="text-align:left; font-size:8mm;">PESO NETO: ${cantidad}</div>
+            </div>
+
+        <img src="${qrDataUrl}" style="width:30mm; height:30mm; padding-right: 10mm;" />
         </div>
 
-        <img src="${qrDataUrl}" style="flex:0 0 25mm; width:30mm; height:30mm; object-fit:contain;" />
-      </div>
     </div>
   `;
 
@@ -437,35 +439,60 @@ const ImprimirEtiqueta = async (Id) => {
 
   JsBarcode("#barcode", codigo, {
     format: "CODE128",
-    width: 2,
-    height: 10 * 4.78,
+    width: 1.6,
+    height: 10 * 3.78,
     displayValue: false
   });
 
   ImprimirElemento(etiquetaDiv);
 
-  form.cantidad = '';
+    form.num_rollo = '';
+    form.cantidad = '';
   await nextTick();
-  const input = document.getElementById('cantidad');
+  const input = document.getElementById('num_rollo');
   if (input) input.focus();
 };
 
 
 const ImprimirElemento = (elementoOriginal) => {
-  const win = window.open('', '', 'width=800,height=600');
+  const win = window.open('', '', 'width=900,height=700');
   if (!win) { toast('Error al abrir la ventana de impresión.', 'danger'); return; }
 
   const estilos = `
     <style>
-      @page { size: 950px 650px; margin: 0; }
-      html, body, #Etiqueta, .sheet { margin:0 !important; padding:0 !important; border:0 !important; }
-      /* evita empujes heredados */
-      body > * { margin:0 !important; }
-      img, svg { display:block; }
+      @page { size: 102mm 51mm; margin: 0; }
+
+      html, body { margin:0; padding:0; }
+      img, svg { display:block; max-width:100%; }
+
+      /* Contenedor de UNA etiqueta exacta */
+      .sheet {
+        box-sizing: border-box;
+        width: 102mm;
+        height: 51mm;
+        padding: 0mm !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 1mm;
+        font-family: system-ui, sans-serif;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        page-break-after: always;     /* garantiza 1 etiqueta = 1 hoja */
+      }
+
+      /* Vista previa en pantalla */
+      @media screen {
+        .sheet { margin: 8px auto; outline: 1px dashed #ccc; }
+      }
+
+      /* Fuerza el canvas de impresión al tamaño real */
+      @media print {
+        html, body { width: 102mm; height: 51mm; }
+      }
     </style>
   `;
 
-  // Usa un wrapper limpio y evita outerHTML del contenedor original
   const htmlEtiqueta = `
     <!DOCTYPE html>
     <html>
@@ -482,10 +509,16 @@ const ImprimirElemento = (elementoOriginal) => {
   win.document.write(htmlEtiqueta);
   win.document.close();
 
-  const imprimir = () => { win.focus(); win.print(); setTimeout(() => win.close(), 200); toast('Etiqueta enviada a impresión', 'info'); };
+  const imprimir = () => {
+    win.focus();
+    win.print();
+    setTimeout(() => { try { win.close(); } catch {} }, 200);
+    toast('Etiqueta enviada a impresión', 'info');
+  };
 
   const imgs = win.document.images;
   if (!imgs.length) return imprimir();
+
   let cargadas = 0;
   for (const img of imgs) {
     if (img.complete) cargadas++;
@@ -493,6 +526,7 @@ const ImprimirElemento = (elementoOriginal) => {
   }
   if (cargadas === imgs.length) imprimir();
 };
+
 
 
 

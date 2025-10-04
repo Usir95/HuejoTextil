@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Almacenes;
 use App\Http\Controllers\Controller;
 use App\Models\Almacenes\Movimientos;
 use App\Models\Catalogos\Clientes;
+use App\Models\Almacenes\Almacenes;
+use App\Models\Almacenes\Inventarios;
+use App\Models\Catalogos\Colores;
+use App\Models\Catalogos\Productos;
+use App\Models\Catalogos\TiposCalidades;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +20,10 @@ use Inertia\Inertia;
 class HistoricoEntradasController extends Controller {
 
     public function index() {
+        $Productos       = Productos::Catalogo();
+        $Colores         = Colores::Catalogo();
+        $TiposCalidades  = TiposCalidades::Catalogo();
+        $Almacenes       = Almacenes::Catalogo();
         $Clientes = Clientes::Catalogo();
 
         $FechaLimite = Carbon::now()->subMonths(13)->startOfDay();
@@ -24,7 +33,19 @@ class HistoricoEntradasController extends Controller {
             ->whereDate('fecha_movimiento', '>=', $FechaLimite)
             ->get();
 
-        return Inertia::render('Almacenes/Inventarios/HistoricoEntradas', compact('Clientes', 'Entradas'));
+        $Entradas->transform(function ($item) {
+            $item->cantidad = (float) number_format($item->cantidad, 2, '.', '');
+            return $item;
+        });
+
+        return Inertia::render('Almacenes/Inventarios/HistoricoEntradas', compact(
+            'Clientes',
+            'Entradas',
+            'Productos',
+            'Colores',
+            'Clientes',
+            'TiposCalidades',
+        ));
     }
 
     public function FiltrarEntradas(Request $request) {
@@ -40,13 +61,20 @@ class HistoricoEntradasController extends Controller {
             ->orderByDesc('fecha_movimiento')
             ->get();
 
-        $ResumenProductos = $HistoricoEntradas->groupBy(fn($item) => $item->producto->nombre ?? 'Sin nombre')->map(function ($items, $nombre) {
-            return [
-                'producto'  => $nombre,
-                'rollos'    => $items->count(),
-                'total_kg'  => round($items->sum('cantidad'), 2),
-            ];
-        })->values();
+        $ResumenProductos = $HistoricoEntradas
+            ->groupBy(fn($item) => $item->producto->nombre ?? 'Sin nombre')
+            ->map(function ($items, $nombre) {
+                $first = $items->first();
+
+                return [
+                    'item_id'   => $first->id,
+                    'producto'  => $nombre,
+                    'rollos'    => $items->count(),
+                    'total_kg'  => round($items->sum('cantidad'), 2),
+                ];
+            })
+            ->values();
+
 
         return $data = [
             'entradas' => $HistoricoEntradas,
@@ -88,6 +116,27 @@ class HistoricoEntradasController extends Controller {
 
             fclose($handle);
         }, 'HistoricoEntradas.csv');
+    }
+
+    public function update(Request $request, $id) {
+
+        Movimientos::where('id', $id)->update([
+            'cantidad' => $request->cantidad,
+            'num_tarjeta' => $request->num_tarjeta,
+            'num_rollo' => $request->num_rollo,
+            'peso_tara' => $request->peso_tara,
+            'cliente_id' => $request->cliente_id,
+            'producto_id' =>$request->producto_id,
+            'color_id' =>$request->color_id,
+            'tipo_calidad_id' =>$request->tipo_calidad_id,
+        ]);
+
+        return back()->with('success', 'Producto actualizado');
+    }
+
+    public function destroy($id) {
+        Movimientos::findOrFail($id)->delete();
+        return back()->with('success', 'Producto eliminado');
     }
 
 }

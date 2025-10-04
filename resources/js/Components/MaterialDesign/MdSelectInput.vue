@@ -55,8 +55,7 @@
             tabindex="0"
             class="w-full min-h-10 rounded-xl text-sm flex flex-wrap items-center gap-1 cursor-pointer transition-all duration-300 ease-in-out shadow-sm ring-1 ring-inset"
             :class="{ 'pl-10 pr-4': iconLeft || iconClass, 'px-4': !iconLeft && !iconClass }"
-            @click="toggleOpen"
-            @focus="isFocused = true"
+            @focus="toggleOpen"
             :style="{
                 backgroundColor,
                 borderColor,
