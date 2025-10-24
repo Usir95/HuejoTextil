@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExampleController;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,9 +16,16 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+
     Route::get('/dashboard', function () {
+        $fechaLimite = Carbon::create(2025, 10, 24, 23, 59, 59);
+        if (now()->greaterThan($fechaLimite)) {
+            abort(403, 'Licencia expirada. Contacta al administrador.');
+        }
+
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
 });
 
 Route::resource('Example', ExampleController::class)->names('Example');
