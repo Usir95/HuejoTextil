@@ -152,7 +152,7 @@
 
 
 <script setup>
-import { ref, inject, defineProps, nextTick, computed, onMounted, onUnmounted } from 'vue'
+import { ref, inject, defineProps, nextTick, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useForm, usePage  } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
@@ -202,7 +202,6 @@ const cantidadHelperText = computed(() => {
     }
     return 'Ingrese el peso/cantidad';
 });
-
 
 const form = useForm({
     cliente_id: null,
@@ -400,134 +399,156 @@ const Insert = async () => {
 }
 
 const ImprimirEtiqueta = async (Id) => {
-  const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
-  const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
-  const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
-  const tipo_calidad = form.tipo_calidad_id;
-  const cantidad = Number(form.cantidad || 0).toFixed(2);
+    const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
+    const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
+    const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
+    const tipo_calidad = form.tipo_calidad_id;
+    const cantidad = Number(form.cantidad || 0).toFixed(2);
 
 
-  const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
-  const qrDataUrl = await QRCode.toDataURL(codigo, { width: 20 * 3.78, margin: 0 });
+    const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
+    const qrDataUrl = await QRCode.toDataURL(codigo, { width: 20 * 3.78, margin: 0 });
 
-  const html = `
-    <div style="font-family:sans-serif; width:160mm; height:83mm; border:0.1mm solid #000; padding:5mm; box-sizing:border-box; text-align:left;">
-      <!-- Código de barras -->
-      <div style="display:flex; justify-content:flex-start; margin-bottom:4mm;">
-        <svg id="barcode" style="width:75mm; height:80mm;"></svg>
-      </div>
-
-      <!-- Info + QR -->
-        <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
-            <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
-                <div style="text-align:left; font-size:4mm;">${codigo}</div>
-                <div style="text-align:left; font-size:7mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
-                <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
-                <div style="text-align:left; font-size:8mm;">PESO NETO: ${cantidad}</div>
-            </div>
-
-        <img src="${qrDataUrl}" style="width:30mm; height:30mm; padding-right: 10mm;" />
+    const html = `
+        <div style="font-family:sans-serif; width:160mm; height:83mm; border:0.1mm solid #000; padding:5mm; box-sizing:border-box; text-align:left;">
+        <!-- Código de barras -->
+        <div style="display:flex; justify-content:flex-start; margin-bottom:4mm;">
+            <svg id="barcode" style="width:75mm; height:80mm;"></svg>
         </div>
 
-    </div>
-  `;
+        <!-- Info + QR -->
+            <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
+                <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
+                    <div style="text-align:left; font-size:4mm;">${codigo}</div>
+                    <div style="text-align:left; font-size:7mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
+                    <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
+                    <div style="text-align:left; font-size:8mm;">PESO NETO: ${cantidad}</div>
+                </div>
 
-  const etiquetaDiv = document.getElementById('Etiqueta');
-  etiquetaDiv.innerHTML = html;
+            <img src="${qrDataUrl}" style="width:30mm; height:30mm; padding-right: 10mm;" />
+            </div>
 
-  await nextTick();
+        </div>
+    `;
 
-  JsBarcode("#barcode", codigo, {
-    format: "CODE128",
-    width: 1.6,
-    height: 10 * 3.78,
-    displayValue: false
-  });
+    const etiquetaDiv = document.getElementById('Etiqueta');
+    etiquetaDiv.innerHTML = html;
 
-  ImprimirElemento(etiquetaDiv);
+    await nextTick();
 
-    form.num_rollo = '';
-    form.cantidad = '';
-  await nextTick();
-  const input = document.getElementById('num_rollo');
-  if (input) input.focus();
+    JsBarcode("#barcode", codigo, {
+        format: "CODE128",
+        width: 1.6,
+        height: 10 * 3.78,
+        displayValue: false
+    });
+
+    ImprimirElemento(etiquetaDiv);
+
+        form.num_rollo = '';
+        form.cantidad = '';
+    await nextTick();
+    const input = document.getElementById('num_rollo');
+    if (input) input.focus();
 };
 
 
 const ImprimirElemento = (elementoOriginal) => {
-  const win = window.open('', '', 'width=900,height=700');
-  if (!win) { toast('Error al abrir la ventana de impresión.', 'danger'); return; }
+    const win = window.open('', '', 'width=900,height=700');
+    if (!win) { toast('Error al abrir la ventana de impresión.', 'danger'); return; }
 
-  const estilos = `
-    <style>
-      @page { size: 102mm 51mm; margin: 0; }
+    const estilos = `
+        <style>
+        @page { size: 102mm 51mm; margin: 0; }
 
-      html, body { margin:0; padding:0; }
-      img, svg { display:block; max-width:100%; }
+        html, body { margin:0; padding:0; }
+        img, svg { display:block; max-width:100%; }
 
-      /* Contenedor de UNA etiqueta exacta */
-      .sheet {
-        box-sizing: border-box;
-        width: 102mm;
-        height: 51mm;
-        padding: 0mm !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        gap: 1mm;
-        font-family: system-ui, sans-serif;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-        page-break-after: always;     /* garantiza 1 etiqueta = 1 hoja */
-      }
+        /* Contenedor de UNA etiqueta exacta */
+        .sheet {
+            box-sizing: border-box;
+            width: 102mm;
+            height: 51mm;
+            padding: 0mm !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 1mm;
+            font-family: system-ui, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            page-break-after: always;     /* garantiza 1 etiqueta = 1 hoja */
+        }
 
-      /* Vista previa en pantalla */
-      @media screen {
-        .sheet { margin: 8px auto; outline: 1px dashed #ccc; }
-      }
+        /* Vista previa en pantalla */
+        @media screen {
+            .sheet { margin: 8px auto; outline: 1px dashed #ccc; }
+        }
 
-      /* Fuerza el canvas de impresión al tamaño real */
-      @media print {
-        html, body { width: 102mm; height: 51mm; }
-      }
-    </style>
-  `;
+        /* Fuerza el canvas de impresión al tamaño real */
+        @media print {
+            html, body { width: 102mm; height: 51mm; }
+        }
+        </style>
+    `;
 
-  const htmlEtiqueta = `
-    <!DOCTYPE html>
-    <html>
-      <head><meta charset="utf-8" /><title>Etiqueta</title>${estilos}</head>
-      <body>
-        <div class="sheet">
-          ${elementoOriginal.innerHTML}
-        </div>
-      </body>
-    </html>
-  `;
+    const htmlEtiqueta = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8" /><title>Etiqueta</title>${estilos}</head>
+        <body>
+            <div class="sheet">
+            ${elementoOriginal.innerHTML}
+            </div>
+        </body>
+        </html>
+    `;
 
-  win.document.open();
-  win.document.write(htmlEtiqueta);
-  win.document.close();
+    win.document.open();
+    win.document.write(htmlEtiqueta);
+    win.document.close();
 
-  const imprimir = () => {
-    win.focus();
-    win.print();
-    setTimeout(() => { try { win.close(); } catch {} }, 200);
-    toast('Etiqueta enviada a impresión', 'info');
-  };
+    const imprimir = () => {
+        win.focus();
+        win.print();
+        setTimeout(() => { try { win.close(); } catch {} }, 200);
+        toast('Etiqueta enviada a impresión', 'info');
+    };
 
-  const imgs = win.document.images;
-  if (!imgs.length) return imprimir();
+    const imgs = win.document.images;
+    if (!imgs.length) return imprimir();
 
-  let cargadas = 0;
-  for (const img of imgs) {
-    if (img.complete) cargadas++;
-    else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
-  }
-  if (cargadas === imgs.length) imprimir();
+    let cargadas = 0;
+    for (const img of imgs) {
+        if (img.complete) cargadas++;
+        else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
+    }
+    if (cargadas === imgs.length) imprimir();
 };
 
+async function ConsultarTara() {
+    if (!form.producto_id) return
+    try {
+        IsLoading.value = true
+        const { data } = await axios.post(route('Entradas.FiltrarPorducto'), {
+            producto_id: form.producto_id,
+        })
+        console.log(data);
 
+        form.peso_tara = data.tara ?? null
+    } catch (err) {
+        console.error('Error consultando tara:', err)
+        form.peso_tara = null
+    } finally {
+        IsLoading.value = false
+    }
+}
+
+watch(() => form.producto_id,(nuevo) => {
+        if (nuevo) ConsultarTara()
+        else form.peso_tara = null
+    }
+)
 
 
 </script>

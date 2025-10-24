@@ -163,6 +163,20 @@ class EntradasController extends Controller {
         }
     }
 
+    public function FiltrarPorducto(Request $request) {
+        $producto = Productos::select('id', 'nombre', 'tara')
+            ->where('id', $request->producto_id)
+            ->first();
+
+        if (!$producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        return [
+            'tara' => $producto->tara
+        ];
+    }
+
 
 
 }

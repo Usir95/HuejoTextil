@@ -28,5 +28,6 @@ Route::post('/HistoricoEntradas/ExpotarPedido', [HistoricoEntradasController::cl
 Route::resource('/ReporteEntradas', ReporteEntradasController::class)->names('ReporteEntradas');
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
+Route::post('/Entradas/FiltrarPorducto', [EntradasController::class, 'FiltrarPorducto'])->name('Entradas.FiltrarPorducto');
 
 Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->names('ProductosTerminados');
