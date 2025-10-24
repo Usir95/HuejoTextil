@@ -7,14 +7,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-class ProductosSeeder extends Seeder
-{
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-
+class ProductosSeeder extends Seeder {
+    public function run(): void {
         $csvFile = storage_path('app/articulos.csv');
 
         // Verifica si el archivo CSV existe
