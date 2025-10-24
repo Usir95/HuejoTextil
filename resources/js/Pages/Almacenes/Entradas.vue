@@ -145,6 +145,11 @@
                         Regitrar material
                     </MdButton>
                 </div>
+                <div class="flex justify-center col-span-2 w-full mt-4">
+                    <MdButton variant="secondary" :loading="IsLoading" class="w-full py-2" @click="ImprimirReporte()">
+                        <i class="fa-solid fa-print"></i> Imprimir reporte
+                    </MdButton>
+                </div>
             </div>
         </section>
 
@@ -255,6 +260,7 @@ const props = defineProps({
 
 const toast = inject('$toast');
 const FormValidate = inject('FormValidate');
+const confirm = inject('$confirm');
 const IsLoading = ref(false);
 const FormSection = ref(null);
 const ShowModal = ref(false);
@@ -659,6 +665,21 @@ async function ConsultarTara() {
     } finally {
         IsLoading.value = false
     }
+}
+
+const ImprimirReporte = (id) => {
+    confirm(
+        '¿Estás seguro?',
+        'Irás a la impresión del reporte de esta entrada.',
+        'Ir a imprimir',
+        'Cancelar',
+        () => {
+            window.location.href = route('ReporteEntradas.index', id)
+        },
+        () => {
+        console.log('Acción cancelada')
+        }
+    )
 }
 
 const ListaNumRollos = computed(() => {

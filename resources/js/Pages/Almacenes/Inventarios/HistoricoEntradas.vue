@@ -179,6 +179,22 @@
                 </template>
             </MdDialogModal>
 
+            <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal">
+                <template #title>
+                    Configurar rollos
+                </template>
+
+                <template #content>
+                    <div id="Etiqueta"></div>
+                </template>
+
+                <template #footer>
+                    <div class="space-x-2">
+                        <MdButton variant="dark" @click="ToggleModal()">Cerrar</MdButton>
+                    </div>
+                </template>
+            </MdDialogModal>
+
 
         </AppLayout>
     </template>
@@ -195,7 +211,8 @@ import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import axios from 'axios'
-
+import JsBarcode from 'jsbarcode'
+import QRCode from 'qrcode'
 
     /* ========================== Props ========================== */
     const props = defineProps({
@@ -218,6 +235,7 @@ import axios from 'axios'
     const confirm = inject('$confirm');
     const HistoricoEntradas = ref(props.Entradas)
     const ResumenEntradas = ref([])
+    const Entrada = ref({})
 
     const gridRef = ref(null);
     const gridApi = ref(null);
@@ -279,11 +297,8 @@ import axios from 'axios'
             cellRenderer: (params) => {
                 return `
                 <div>
-                    <button data-action="Edit" data-id="${params.data.id}" title="Editar" class="text-indigo-500 hover:text-indigo-900">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button data-action="Delete" data-id="${params.data.id}" title="Borrar" class="text-red-600 hover:text-red-900 ms-4">
-                        <i class="fas fa-trash-alt"></i>
+                    <button data-action="Reimprimir" data-id="${params.data.id}" title="Reimprimir etiqueta" class="text-green-600 hover:text-green-900 ms-4">
+                        <i class="fas fa-print"></i>
                     </button>
                 </div>
                 `;
@@ -315,6 +330,9 @@ import axios from 'axios'
                     break;
                 case 'Delete':
                     Delete(event.data.id);
+                    break;
+                case 'Reimprimir':
+                    Reimprimir(event.data.id);
                     break;
                 default:
                     console.info('Acción desconocida:', action);
@@ -450,6 +468,141 @@ import axios from 'axios'
             console.log('Acción cancelada');
             }
         );
+    };
+
+    const Reimprimir = async (id) => {
+        try {
+            const { data } = await axios.post(route('HistoricoEntradas.ObtenerEntrada'), { id })
+            ShowModal.value = !ShowModal.value
+            Entrada.value = data;
+            ImprimirEtiqueta(data);
+        } catch (error) {
+            toast('Error al obtener datos de la entrada', 'danger')
+            console.error(error)
+        }
+    }
+
+    const ImprimirEtiqueta = async (data) => {
+        const producto = data.producto_label;
+        const color = data.color_label;
+        const tipo_calidad = data.tipo_calidad_id;
+        const cantidad = Number(data.cantidad || 0).toFixed(2);
+
+        const codigo = `PROD-${data.producto_id}-COL-${data.color_id}-CAL-${data.tipo_calidad_id}-MOV-${data.id}`;
+        const qrDataUrl = await QRCode.toDataURL(codigo, { width: 20 * 3.78, margin: 0 });
+
+        const html = `
+            <div style="font-family:sans-serif; width:160mm; height:83mm; border:0.1mm solid #000; padding:5mm; box-sizing:border-box; text-align:left;">
+            <!-- Código de barras -->
+            <div style="display:flex; justify-content:flex-start; margin-bottom:4mm;">
+                <svg id="barcode" style="width:75mm; height:80mm;"></svg>
+            </div>
+
+            <!-- Info + QR -->
+                <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
+                    <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
+                        <div style="text-align:left; font-size:4mm;">${codigo}</div>
+                        <div style="text-align:left; font-size:7mm;">TV: ${data.num_tarjeta} # ROLLO: ${data.num_rollo}</div>
+                        <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
+                        <div style="text-align:left; font-size:8mm;">PESO NETO: ${cantidad}</div>
+                    </div>
+
+                <img src="${qrDataUrl}" style="width:30mm; height:30mm; padding-right: 10mm;" />
+                </div>
+
+            </div>
+        `;
+
+        const etiquetaDiv = document.getElementById('Etiqueta');
+        etiquetaDiv.innerHTML = html;
+
+        await nextTick();
+
+        JsBarcode("#barcode", codigo, {
+            format: "CODE128",
+            width: 1.6,
+            height: 10 * 3.78,
+            displayValue: false
+        });
+
+        ImprimirElemento(etiquetaDiv);
+
+        await nextTick();
+        // const input = document.getElementById('cantidad');
+        // if (input) input.focus();
+    };
+
+    const ImprimirElemento = (elementoOriginal) => {
+        const win = window.open('', '', 'width=900,height=700');
+        if (!win) { toast('Error al abrir la ventana de impresión.', 'danger'); return; }
+
+        const estilos = `
+            <style>
+            @page { size: 102mm 51mm; margin: 0; }
+
+            html, body { margin:0; padding:0; }
+            img, svg { display:block; max-width:100%; }
+
+            /* Contenedor de UNA etiqueta exacta */
+            .sheet {
+                box-sizing: border-box;
+                width: 102mm;
+                height: 51mm;
+                padding: 0mm !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 1mm;
+                font-family: system-ui, sans-serif;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-after: always;     /* garantiza 1 etiqueta = 1 hoja */
+            }
+
+            /* Vista previa en pantalla */
+            @media screen {
+                .sheet { margin: 8px auto; outline: 1px dashed #ccc; }
+            }
+
+            /* Fuerza el canvas de impresión al tamaño real */
+            @media print {
+                html, body { width: 102mm; height: 51mm; }
+            }
+            </style>
+        `;
+
+        const htmlEtiqueta = `
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="utf-8" /><title>Etiqueta</title>${estilos}</head>
+            <body>
+                <div class="sheet">
+                ${elementoOriginal.innerHTML}
+                </div>
+            </body>
+            </html>
+        `;
+
+        win.document.open();
+        win.document.write(htmlEtiqueta);
+        win.document.close();
+
+        const imprimir = () => {
+            win.focus();
+            win.print();
+            setTimeout(() => { try { win.close(); } catch {} }, 200);
+            toast('Etiqueta enviada a impresión', 'info');
+        };
+
+        const imgs = win.document.images;
+        if (!imgs.length) return imprimir();
+
+        let cargadas = 0;
+        for (const img of imgs) {
+            if (img.complete) cargadas++;
+            else img.addEventListener('load', () => { if (++cargadas === imgs.length) imprimir(); });
+        }
+        if (cargadas === imgs.length) imprimir();
     };
 
     </script>

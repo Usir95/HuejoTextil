@@ -118,6 +118,46 @@ class HistoricoEntradasController extends Controller {
         }, 'HistoricoEntradas.csv');
     }
 
+    public function ObtenerEntrada(Request $request) {
+        $data = $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        $mov = Movimientos::with(['producto:id,nombre', 'color:id,nombre', 'cliente:id,nombre'])
+            ->select(
+                'id',
+                'cliente_id',
+                'num_tarjeta',
+                'num_rollo',
+                'producto_id',
+                'color_id',
+                'tipo_calidad_id',
+                'cantidad',
+                'peso_tara',
+                'fecha_movimiento'
+            )
+            ->find($data['id']);
+
+        if (!$mov) {
+            return response()->json(['message' => 'Entrada no encontrada'], 404);
+        }
+
+        return $Entrada =[
+            'id'              => $mov->id,
+            'cliente_id'      => $mov->cliente_id,
+            'num_tarjeta'     => $mov->num_tarjeta,
+            'num_rollo'       => $mov->num_rollo,
+            'producto_id'     => $mov->producto_id,
+            'color_id'        => $mov->color_id,
+            'tipo_calidad_id' => $mov->tipo_calidad_id,
+            'cantidad'        => (float) $mov->getRawOriginal('cantidad'),
+            'peso_tara'       => (float) $mov->getRawOriginal('peso_tara'),
+            'producto_label'  => $mov->producto?->nombre,
+            'color_label'     => $mov->color?->nombre,
+            'cliente_label'   => $mov->cliente?->nombre,
+        ];
+    }
+
     public function update(Request $request, $id) {
 
         Movimientos::where('id', $id)->update([
