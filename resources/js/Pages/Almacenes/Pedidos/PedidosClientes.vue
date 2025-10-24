@@ -159,7 +159,7 @@ import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
         condiciones: '',
         observaciones: '',
         cliente_id: '',
-        articulos: [{ producto_id: null, cantidad: 1 }], // Inicializa con un select
+        articulos: [{ producto_id: null, cantidad: 1 }],
     });
 
     const columnas = [

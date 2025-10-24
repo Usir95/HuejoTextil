@@ -29,6 +29,11 @@
                     Desconectar
                 </button>
             </div>
+            <div class="flex justify-center my-4">
+                <button @click="ToggleModal()" class="w-96 bg-blue-500 rounded-xl">
+                    <i class="fa fa-list-ol mr-2"></i> Configurar rollos
+                </button>
+            </div>
             <!-- Fin Interfaz de Conexión de Báscula Serial -->
             <div>
                 <div class="h-[50vh] overflow-auto px-4 ">
@@ -147,6 +152,80 @@
             <div id="Etiqueta">
             </div>
         </section>
+
+
+        <!-- ============================ Modal =========================== -->
+        <MdDialogModal v-if="ShowModal" :show="ShowModal" @close="ToggleModal">
+                <template #title>
+                    Configurar rollos
+                </template>
+
+                <template #content>
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <MdNumberInput
+                            id="num_rollo_base"
+                            name="num_rollo_base"
+                            v-model="numRolloBase"
+                            required
+                            maxlength="6"
+                            label="Numero de Rollo base"
+                            helper="Ingrese el número de rollo base"
+                            :error="form.errors.num_rollo_base"
+                            :success="!form.errors.num_rollo_base"
+                        />
+
+                        <MdNumberInput
+                            id="cantidad_rollo_base"
+                            name="cantidad_rollo_base"
+                            v-model="cantidadRolloBase"
+                            required
+                            label="Cantidad de Rollo base"
+                            helper="Ingrese la cantidad de rollos"
+                            :error="form.errors.cantidad_rollo_base"
+                            :success="!form.errors.cantidad_rollo_base"
+                        />
+
+                        <div class="h-[25vh] col-span-2">
+                            <MdSelectInput
+                                id="orden_rollos"
+                                name="orden_rollos"
+                                v-model="ordenRollos"
+                                required
+                                label="Orden de rollos"
+                                helper="Selecciona el orden de numeracion de rollos"
+                                :error="form.errors.orden_rollos"
+                                :success="!form.errors.orden_rollos"
+                                :options="OrdenRollos"
+                            />
+                        </div>
+
+                        <div class="col-span-2" v-if="ListaNumRollos.length > 0">
+                            <p class="font-semibold mb-1">
+                                Vista previa de numeración de rollos<br>
+                                <span class="text-gray-500 text-sm">
+                                    Estos son los números que se asignarán automáticamente según el inicio, la cantidad y el orden elegidos.
+                                </span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span v-for="n in ListaNumRollos" :key="n"
+                                    class="px-2 py-1 border rounded text-sm bg-gray-50 dark:bg-gray-700">
+                                {{ n }}
+                                </span>
+                            </div>
+                        </div>
+
+                    </section>
+                </template>
+
+                <template #footer>
+                    <div class="space-x-2">
+                        <MdButton variant="primary" :loading="IsLoading" @click="ConfirmarRollos()">
+                            Confirmar parametros de rollo
+                        </MdButton>
+                        <MdButton variant="dark" @click="ToggleModal()">Cancelar</MdButton>
+                    </div>
+                </template>
+        </MdDialogModal>
     </AppLayout>
 </template>
 
@@ -160,6 +239,7 @@ import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
 import MdButton from '@/Components/MaterialDesign/MdButton.vue'
 import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
+import MdDialogModal from '@/Components/MaterialDesign/MdDialogModal.vue'
 import axios from 'axios'
 import JsBarcode from 'jsbarcode'
 import QRCode from 'qrcode'
@@ -177,6 +257,18 @@ const toast = inject('$toast');
 const FormValidate = inject('FormValidate');
 const IsLoading = ref(false);
 const FormSection = ref(null);
+const ShowModal = ref(false);
+const IsEditMode = ref(false);
+
+const OrdenRollos = [
+    { value: 'ASC',  label: 'Ascendente' },
+    { value: 'DESC', label: 'Descendente' },
+]
+// Variables rollos
+const colaRollos = ref([])
+const numRolloBase = ref(null)
+const cantidadRolloBase = ref(null)
+const ordenRollos = ref('ASC')
 
 // Variables reactivas para el estado de la conexión serial
 const status = ref('Desconectado');
@@ -378,18 +470,44 @@ onUnmounted(() => {
     disconnectSerial();
 });
 
+const ToggleModal = () => {
+    IsEditMode.value ? IsEditMode.value = false : form.reset();
+    ShowModal.value = !ShowModal.value
+}
+
+function ConfirmarRollos() {
+    const inicio = Number(numRolloBase.value) || 1
+    const total = Number(cantidadRolloBase.value) || 0
+    const orden = ordenRollos.value
+
+    if (total <= 0) return toast('Cantidad inválida', 'error')
+
+    // genera secuencia
+    let numeros = Array.from({ length: total }, (_, i) => inicio + i)
+    if (orden === 'DESC') numeros.reverse()
+
+    // guarda en cola formateados con ceros
+    colaRollos.value = numeros.map(n => String(n).padStart(4, '0'))
+
+    // asigna el primero
+    form.num_rollo = colaRollos.value.shift() || null
+    ShowModal.value = !ShowModal.value
+}
 
 const Insert = async () => {
     if (!FormValidate(FormSection)) return
     IsLoading.value = true
 
     try {
-        const response = await axios.post(route('Entradas.store'), form)
-        console.log(response.data.movimiento_id)
-        const id = response?.data?.movimiento_id
+        const { data } = await axios.post(route('Entradas.store'), form)
+        const id = data?.movimiento_id
         if (id) ImprimirEtiqueta(id)
 
-        toast('Entrada registrada correctamente', 'success')
+        const siguiente = colaRollos.value.shift() || null
+        form.num_rollo = siguiente
+
+        if (!siguiente) toast('Lote de rollos agotado', 'info')
+        else toast('Entrada registrada. Siguiente rollo asignado.', 'success')
     } catch (error) {
         toast('Error al registrar la entrada', 'danger')
         console.error(error)
@@ -445,13 +563,12 @@ const ImprimirEtiqueta = async (Id) => {
 
     ImprimirElemento(etiquetaDiv);
 
-        form.num_rollo = '';
-        form.cantidad = '';
+    // form.num_rollo = '';
+    form.cantidad = '';
     await nextTick();
-    const input = document.getElementById('num_rollo');
+    const input = document.getElementById('cantidad');
     if (input) input.focus();
 };
-
 
 const ImprimirElemento = (elementoOriginal) => {
     const win = window.open('', '', 'width=900,height=700');
@@ -544,11 +661,21 @@ async function ConsultarTara() {
     }
 }
 
+const ListaNumRollos = computed(() => {
+    const inicio = Number(numRolloBase.value)
+    const total = Number(cantidadRolloBase.value)
+    if (!inicio || !total || total <= 0) return []
+
+    let arr = Array.from({ length: total }, (_, i) => inicio + i)
+    if (ordenRollos.value === 'DESC') arr.reverse()
+
+    return arr.map(n => String(n).padStart(4, '0'))
+})
+
 watch(() => form.producto_id,(nuevo) => {
-        if (nuevo) ConsultarTara()
-        else form.peso_tara = null
-    }
-)
+    if (nuevo) ConsultarTara()
+    else form.peso_tara = null
+})
 
 
 </script>
