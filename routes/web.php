@@ -11,6 +11,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -18,7 +19,8 @@ Route::middleware([
 ])->group(function () {
 
     Route::get('/dashboard', function () {
-        $fechaLimite = Carbon::create(2025, 10, 24, 23, 59, 59);
+        // === Bloqueo automático por fecha ===
+        $fechaLimite = Carbon::create(2025, 10, 24, 23, 59, 59); // hoy
         if (now()->greaterThan($fechaLimite)) {
             abort(403, 'Licencia expirada. Contacta al administrador.');
         }
