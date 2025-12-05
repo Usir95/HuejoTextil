@@ -145,10 +145,20 @@ class ModulosSeeder extends Seeder {
                 'nombre' => 'Salidas',
                 'ruta' => 'Salidas.index',
                 'descripcion' => 'Salidas de productos',
-                'icono' => 'fa-solid fa-arrow-down-from-bracket',
+                'icono' => 'fa-solid fa-right-from-bracket',
                 'categoria_id' => $categoriaAlmacen->id,
                 'roles' => ['Almacenes']
             ],
+
+            [
+                'nombre' => 'Historico de Salidas',
+                'ruta' => 'HistoricoSalidas.index',
+                'descripcion' => 'Historico de Salidas',
+                'icono' => 'fa-solid fa-walkie-talkie',
+                'categoria_id' => $categoriaAlmacen->id,
+                'roles' => ['Almacenes']
+            ],
+
         ];
 
         foreach ($modulos as $modulo) {

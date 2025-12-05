@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\Almacenes\EntradasController;
 use App\Http\Controllers\Almacenes\HistoricoEntradasController;
+use App\Http\Controllers\Almacenes\HistoricoSalidasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
 use App\Http\Controllers\Almacenes\ProductosTerminadosController;
 use App\Http\Controllers\Almacenes\ReporteEntradasController;
@@ -37,3 +38,9 @@ Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->n
 Route::resource('/Salidas', SalidasController::class)->names('Salidas');
 Route::get('/Salidas/buscar/{movimiento}', [SalidasController::class, 'BuscarMovimiento'])->name('Salidas.BuscarMovimiento');
 Route::post('/Salidas/{movimiento}/salida', [SalidasController::class, 'RegistrarSalida'])->name('Salidas.RegistrarSalida');
+
+
+Route::resource('/HistoricoSalidas', HistoricoSalidasController::class)->names('HistoricoSalidas');
+Route::post('/HistoricoSalidas/FiltrarSalidas', [HistoricoSalidasController::class, 'FiltrarSalidas'])->name('HistoricoSalidas.FiltrarSalidas');
+Route::post('/HistoricoSalidas/ExpotarPedido', [HistoricoSalidasController::class, 'ExpotarPedido'])->name('HistoricoSalidas.ExpotarPedido');
+Route::post('/HistoricoSalidas/ObtenerSalida', [HistoricoSalidasController::class, 'ObtenerSalida'])->name('HistoricoSalidas.ObtenerSalida');
