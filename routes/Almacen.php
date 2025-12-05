@@ -6,6 +6,7 @@ use App\Http\Controllers\Almacenes\HistoricoEntradasController;
 use App\Http\Controllers\Almacenes\PedidosClientesController;
 use App\Http\Controllers\Almacenes\ProductosTerminadosController;
 use App\Http\Controllers\Almacenes\ReporteEntradasController;
+use App\Http\Controllers\Almacenes\SalidasController;
 use App\Http\Controllers\Catalogos\ClientesController;
 use App\Http\Controllers\Catalogos\ColoresController;
 use App\Http\Controllers\Catalogos\TiposProductosController;
@@ -32,3 +33,7 @@ Route::resource('/Entradas', EntradasController::class)->names('Entradas');
 Route::post('/Entradas/FiltrarPorducto', [EntradasController::class, 'FiltrarPorducto'])->name('Entradas.FiltrarPorducto');
 
 Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->names('ProductosTerminados');
+
+Route::resource('/Salidas', SalidasController::class)->names('Salidas');
+Route::get('/Salidas/buscar/{movimiento}', [SalidasController::class, 'BuscarMovimiento'])->name('Salidas.BuscarMovimiento');
+Route::post('/Salidas/{movimiento}/salida', [SalidasController::class, 'RegistrarSalida'])->name('Salidas.RegistrarSalida');

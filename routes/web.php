@@ -20,7 +20,7 @@ Route::middleware([
 
     Route::get('/dashboard', function () {
         // === Bloqueo automático el 15 de noviembre ===
-        $fechaLimite = Carbon::create(2025, 11, 15, 23, 59, 59);
+        $fechaLimite = Carbon::create(2026, 01, 15, 23, 59, 59);
         if (now()->greaterThan($fechaLimite)) {
             abort(403, 'Licencia expirada. Contacta al administrador.');
         }
