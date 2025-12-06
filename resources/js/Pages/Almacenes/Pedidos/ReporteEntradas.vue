@@ -154,7 +154,7 @@ const ImprimirReporteEtiquetas = () => {
         img, svg { display:block; }
         .page { width:102mm; height:51mm; page-break-after:always; }
         .etiqueta-print {
-            box-sizing:border-box; width:102mm; height:51mm; padding:3mm;
+            box-sizing:border-box; width:102mm; height:51mm; padding:6mm;
             display:flex; flex-direction:column; gap:1mm; font-size:9pt; font-family:system-ui,sans-serif;
             -webkit-print-color-adjust:exact; print-color-adjust:exact;
         }
