@@ -107,6 +107,9 @@
     </style>
 </head>
 <body>
+    <div style="position: absolute; top: 10px; right: 20px; font-size: 9px; color: #444;">
+        Fecha de impresión: {{ now()->format('d/m/Y H:i:s') }}
+    </div>
 
     {{-- HEADER --}}
     <div class="header">
@@ -144,10 +147,10 @@
                 <th style="width: 4%;">N°</th>
                 <th style="width: 12%;">Tarjeta</th>
                 <th style="width: 10%;">Rollo</th>
+                <th style="width: 12%;">Cantidad</th>
                 <th>Producto</th>
                 <th style="width: 15%;">Color</th>
                 <th style="width: 15%;">Calidad</th>
-                <th style="width: 12%;">Cantidad</th>
             </tr>
         </thead>
         <tbody>
@@ -157,17 +160,16 @@
                 <td class="text-center">{{ $consecutivo++ }}</td>
                 <td class="text-center">{{ $mov->num_tarjeta }}</td>
                 <td class="text-center">{{ $mov->num_rollo }}</td>
+                <td class="text-right" style=" font-weight: bold;">
+                    {{ number_format($mov->cantidad, 2) }}
+                </td>
                 <td>{{ $mov->producto?->nombre }}</td>
                 <td>{{ $mov->color?->nombre }}</td>
                 <td>{{ $mov->tipoCalidad?->nombre }}</td>
-                <td class="text-right">
-                    {{ number_format($mov->cantidad, 2) }}
-                </td>
             </tr>
         @endforeach
 
-        {{-- si quieres dejar líneas vacías para que se vea llenito, puedes agregar más filas --}}
-        @for($i = $consecutivo; $i <= 25; $i++)
+        @for($i = $consecutivo; $i <= 30; $i++)
             <tr>
                 <td>&nbsp;</td>
                 <td></td>
@@ -181,29 +183,58 @@
         </tbody>
     </table>
 
-    {{-- FOOTER RESUMEN (similar al cuadrito de LETRA / MTS-KGS / ROLLOS) --}}
+    {{-- FOOTER RESUMEN sLETRA / MTS-KGS / ROLLOS) --}}
     <table class="footer-resumen">
         <thead>
             <tr>
                 <th style="width: 10%;">LETRA</th>
-                <th style="width: 45%;">MTS. o KGS.</th>
-                <th style="width: 45%;">ROLLOS</th>
+                <th style="width: 40%;">PRODUCTO / COLOR</th>
+                <th style="width: 25%;">MTS. o KGS.</th>
+                <th style="width: 25%;">ROLLOS</th>
             </tr>
         </thead>
         <tbody>
             @php
-                // aquí podrías agrupar por tipo, letra, etc.
-                // por ahora solo mostramos total en la fila "TOTAL"
+                $grupos = $salida->movimientos->groupBy(function ($mov) {
+                    $producto = $mov->producto->nombre ?? 'SIN PRODUCTO';
+                    $color    = $mov->color->nombre ?? '';
+                    return trim($producto . ' ' . $color);
+                });
+
+                $totalKgs = 0;
+                $totalRollos = 0;
+
+                $letras = range('A', 'Z');
+                $i = 0;
             @endphp
+
+            @foreach($grupos as $descripcion => $items)
+                @php
+                    $kgs = $items->sum('cantidad');
+                    $rollos = $items->count();
+                    $totalKgs += $kgs;
+                    $totalRollos += $rollos;
+                    $letra = $letras[$i++] ?? '';
+                @endphp
+                <tr>
+                    <td class="text-center">{{ $letra }}</td>
+                    <td>{{ $descripcion }}</td>
+                    <td class="text-right">{{ number_format($kgs, 2) }}</td>
+                    <td class="text-right">{{ $rollos }}</td>
+                </tr>
+            @endforeach
+
             <tr>
-                <td class="text-center">TOTAL</td>
-                <td class="text-right">{{ number_format($salida->total_kgs, 3) }}</td>
-                <td class="text-right">{{ $salida->total_rollos }}</td>
+                <td class="text-center"><strong>TOTAL</strong></td>
+                <td></td>
+                <td class="text-right"><strong>{{ number_format($totalKgs, 2) }}</strong></td>
+                <td class="text-right"><strong>{{ $totalRollos }}</strong></td>
             </tr>
         </tbody>
     </table>
 
-    {{-- CONDICIONES / PRECIO / PLAZO / OBSERVACIONES (simplificado) --}}
+
+    {{-- info pedido --}}
     <table class="fila-datos" style="margin-top: 10px;">
         <tr>
             <td class="label" style="width: 10%;">Precio:</td>
