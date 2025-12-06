@@ -32,6 +32,7 @@ Route::resource('/ReporteEntradas', ReporteEntradasController::class)->names('Re
 
 Route::resource('/Entradas', EntradasController::class)->names('Entradas');
 Route::post('/Entradas/FiltrarPorducto', [EntradasController::class, 'FiltrarPorducto'])->name('Entradas.FiltrarPorducto');
+Route::post('/Entradas/ObtenerTarjetasViajeras', [EntradasController::class, 'ObtenerTarjetasViajeras'])->name('Entradas.ObtenerTarjetasViajeras');
 
 Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->names('ProductosTerminados');
 
