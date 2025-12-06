@@ -76,6 +76,19 @@
                             :success="!form.errors.observaciones"
                         />
 
+                        <MdSelectSearchInput
+                            id="cliente_id"
+                            name="cliente_id"
+                            class="col-span-2"
+                            v-model="form.cliente_id"
+                            required
+                            label="Cliente"
+                            helper="Seleccione un cliente"
+                            :error="form.errors.cliente_id"
+                            :success="!form.errors.cliente_id"
+                            :options="Clientes"
+                        />
+
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Artículos</label>
                             <div v-for="(articulo, index) in form.articulos" :key="index" class="flex mt-2 gap-5">
@@ -132,13 +145,15 @@ import MdTextareaInput from '@/Components/MaterialDesign/MdTextareaInput.vue'
 import MdTextInput from '@/Components/MaterialDesign/MdTextInput.vue'
 import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
 import MdNumberInput from '@/Components/MaterialDesign/MdNumberInput.vue'
+import MdSelectSearchInput from '@/Components/MaterialDesign/MdSelectSearchInput.vue'
 
     /* ========================== Props ========================== */
     const props = defineProps({
         PedidosClientes: Object,
         Estatus: Array,
         FormasPagos: Array,
-        Productos: Array
+        Productos: Array,
+        Clientes: Array,
     })
 
     /* ========================== Refs ========================== */
