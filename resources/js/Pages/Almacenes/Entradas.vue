@@ -357,25 +357,13 @@ const connectSerial = async (forceNew = false) => {
     status.value = 'Buscando puerto serial...';
 
     try {
-        // Si no se fuerza nueva conexión y hay un puerto guardado, intentar usarlo
-        if (!forceNew && lastUsedPort.value) {
-            try {
-                portRef.value = lastUsedPort.value;
-                status.value = 'Intentando reconectar al último puerto...';
-                await portRef.value.open({ baudRate: 9600 });
-            } catch (reopenError) {
-                // Si falla la reconexión, solicitar nuevo puerto
-                console.warn('No se pudo reconectar al último puerto:', reopenError);
-                portRef.value = await navigator.serial.requestPort();
-                await portRef.value.open({ baudRate: 9600 });
-            }
-        } else {
-            // Solicita al usuario que seleccione un puerto serial
-            portRef.value = await navigator.serial.requestPort();
-            await portRef.value.open({ baudRate: 9600 });
-        }
+        // Siempre solicitar un puerto nuevo (no reutilizar referencias que pueden estar en estado inconsistente)
+        portRef.value = await navigator.serial.requestPort();
 
-        // Guardar el puerto para reconexiones futuras
+        // Abrir el puerto con la configuración correcta
+        await portRef.value.open({ baudRate: 9600 });
+
+        // Guardar la referencia del puerto para futuras reconexiones
         lastUsedPort.value = portRef.value;
 
         status.value = 'Conectado al puerto serial. Esperando datos...';
@@ -508,6 +496,8 @@ const cleanupConnection = async () => {
             // Cerrar el puerto si está abierto
             if (portRef.value.opened) {
                 await portRef.value.close();
+                // Esperar un poco para asegurar que el puerto se cierre completamente
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
         } catch (error) {
             console.warn('Error al cerrar puerto:', error);
@@ -516,9 +506,7 @@ const cleanupConnection = async () => {
         // Limpiar la referencia definitivamente
         portRef.value = null;
     }
-};
-
-/**
+};/**
  * @function disconnectSerial
  * @description Desconecta el puerto serial y reinicia el estado.
  */
