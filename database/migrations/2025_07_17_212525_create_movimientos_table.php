@@ -27,6 +27,9 @@ return new class extends Migration {
             $table->foreignId('usuario_id')->nullable()->constrained('usuarios')->nullOnDelete();
             $table->foreignId('almacen_id')->nullable()->constrained('almacenes')->nullOnDelete();
 
+            $table->foreignId('salida_id')->nullable()->constrained('salidas')->nullOnDelete();
+            $table->foreignId('pedido_id')->nullable()->constrained('pedidos')->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
         });

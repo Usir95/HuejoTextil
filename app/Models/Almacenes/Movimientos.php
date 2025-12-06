@@ -70,6 +70,10 @@ class Movimientos extends Model implements AuditableContract {
         return $this->belongsTo(TiposCalidades::class, 'tipo_calidad_id');
     }
 
+    public function salida() {
+        return $this->belongsTo(Salidas::class, 'salida_id');
+    }
+
     public function getCantidadAttribute($value)
     {
         return number_format((float)$value, 2, '.', '');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Almacenes;
 
 use App\Http\Controllers\Controller;
 use App\Models\Almacenes\Pedidos;
+use App\Models\Catalogos\Clientes;
 use App\Models\Catalogos\Productos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,11 +14,12 @@ use Inertia\Inertia;
 class PedidosClientesController extends Controller {
 
     public function index() {
-        $PedidosClientes = Pedidos::get();
+        $PedidosClientes = Pedidos::with('cliente')->get();
         $Productos = Productos::select('id as value', 'nombre as label')->get();
 
         $NombresEstados = ['Pendiente', 'En proceso', 'Completado', 'Cancelado'];
         $TiposPagos = ['Contado', 'Credito', 'Debito', 'Cheque', 'Transferencia'];
+        $Clientes        = Clientes::Catalogo();
 
         $Estatus = [];
         $FormasPagos = [];
@@ -36,7 +38,7 @@ class PedidosClientesController extends Controller {
             ];
         }
 
-        return Inertia::render('Almacenes/Pedidos/PedidosClientes', compact('PedidosClientes', 'Estatus', 'FormasPagos', 'Productos'));
+        return Inertia::render('Almacenes/Pedidos/PedidosClientes', compact('PedidosClientes', 'Estatus', 'FormasPagos', 'Productos', 'Clientes'));
     }
 
     public function store(Request $request) {
@@ -96,4 +98,31 @@ class PedidosClientesController extends Controller {
         Pedidos::findOrFail($id)->delete();
         return back()->with('success', 'Pedido eliminado');
     }
+
+    public function Finalizar(Request $request, Pedidos $pedido) {
+        try {
+            if (in_array(strtolower($pedido->estado_pedido), ['Completado', 'Cancelado'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El pedido ya está finalizado o cancelado.',
+                ], 422);
+            }
+
+            $pedido->update([
+                'estado_pedido' => 'Completado',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Pedido #{$pedido->id} Completado correctamente.",
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al Completado el pedido: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

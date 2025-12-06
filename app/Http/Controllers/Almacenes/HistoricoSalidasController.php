@@ -10,8 +10,10 @@ use App\Models\Catalogos\Colores;
 use App\Models\Catalogos\Productos;
 use App\Models\Catalogos\TiposCalidades;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Exports\SalidaAlmacenExport;
+use App\Models\Almacenes\Salidas;
 use Maatwebsite\Excel\Facades\Excel;
 use Inertia\Inertia;
 
@@ -19,69 +21,64 @@ use Inertia\Inertia;
 class HistoricoSalidasController extends Controller {
 
     public function index() {
-        $Productos       = Productos::Catalogo();
-        $Colores         = Colores::Catalogo();
-        $TiposCalidades  = TiposCalidades::Catalogo();
-        $Almacenes       = Almacenes::Catalogo();
-        $Clientes        = Clientes::Catalogo();
-
-        $FechaLimite = Carbon::now()->subMonths(13)->startOfDay();
-
-        $Salidas = Movimientos::with('cliente', 'producto')
-            ->where('tipo_movimiento_id', 2)
-            ->whereDate('fecha_movimiento', '>=', $FechaLimite)
-            ->get();
-
-        $Salidas->transform(function ($item) {
-            $item->cantidad = (float) number_format($item->cantidad, 2, '.', '');
-            return $item;
-        });
+        $Clientes = Clientes::Catalogo();
 
         return Inertia::render('Almacenes/Inventarios/HistoricoSalidas', compact(
             'Clientes',
-            'Salidas',
-            'Productos',
-            'Colores',
-            'Clientes',
-            'TiposCalidades',
         ));
     }
 
     public function FiltrarSalidas(Request $request) {
-        $request->validate([
-            'cliente_id'  => 'nullable',
-            'num_tarjeta' => 'nullable',
+        $validated = $request->validate([
+            'cliente_id' => 'required|exists:clientes,id',
         ]);
 
-        $HistoricoSalidas = Movimientos::with('cliente', 'producto')
-            ->where('tipo_movimiento_id', 2)
-            ->when($request->cliente_id, function ($q) use ($request) {
-                $q->where('cliente_id', $request->cliente_id);
-            })
-            ->when($request->num_tarjeta, function ($q) use ($request) {
-                $q->where('num_tarjeta', $request->num_tarjeta);
-            })
-            ->orderByDesc('fecha_movimiento')
+        $salidas = Salidas::with([
+                'cliente',
+                'usuario',
+                'movimientos.producto',
+                'movimientos.color',
+                'movimientos.tipoCalidad',
+            ])
+            ->where('cliente_id', $validated['cliente_id'])
+            ->orderByDesc('fecha_salida')
+            ->orderByDesc('id')
             ->get();
 
-        $ResumenProductos = $HistoricoSalidas
-            ->groupBy(fn($item) => $item->producto->nombre ?? 'Sin nombre')
-            ->map(function ($items, $nombre) {
-                $first = $items->first();
+        $data = $salidas->map(function ($s) {
 
+            $detalle = $s->movimientos->map(function ($m) {
                 return [
-                    'item_id'  => $first->id,
-                    'producto' => $nombre,
-                    'rollos'   => $items->count(),
-                    'total_kg' => round($items->sum('cantidad'), 2),
+                    'id'            => $m->id,
+                    'producto'      => $m->producto?->nombre,
+                    'producto_id'   => $m->producto_id,
+                    'color'         => $m->color?->nombre,
+                    'color_id'      => $m->color_id,
+                    'calidad'       => $m->tipoCalidad?->nombre,
+                    'calidad_id'    => $m->tipo_calidad_id,
+                    'num_tarjeta'   => $m->num_tarjeta,
+                    'num_rollo'     => $m->num_rollo,
+                    'cantidad'      => $m->cantidad,
                 ];
-            })
-            ->values();
+            });
 
-        return [
-            'salidas' => $HistoricoSalidas,
-            'resumen' => $ResumenProductos,
-        ];
+            return [
+                'id'           => $s->id,
+                'fecha'        => optional($s->fecha_salida)->format('Y-m-d'),
+                'pedido_id'    => $s->pedido_id,
+                'cliente'      => $s->cliente?->nombre,
+                'total_rollos' => $s->total_rollos,
+                'total_kgs'    => $s->total_kgs,
+                'estatus'      => $s->estatus,
+                'usuario'      => $s->usuario?->name,
+                'detalle'      => $detalle,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'salidas' => $data,
+        ]);
     }
 
     public function ObtenerSalida(Request $request) {
@@ -137,6 +134,33 @@ class HistoricoSalidasController extends Controller {
             new SalidaAlmacenExport($entradas, $resumen, $cliente, $articulo, $fecha),
             'SalidaAlmacen-' . now()->format('Ymd_His') . '.xlsx'
         );
+    }
+
+    public function GenerarPedido(Salidas $salida) {
+        $salida->load([
+            'cliente',
+            'usuario',
+            'movimientos.producto',
+            'movimientos.color',
+            'movimientos.tipoCalidad',
+        ]);
+
+        $empresaNombre   = 'HUEJOTEXTIL, S.A. de C.V.';
+        $tituloDocumento = 'SALIDA DE ALMACÉN DE PRODUCTO TERMINADO';
+
+        $articulo = optional($salida->movimientos->first()?->producto)->nombre ?? '';
+
+        $pdf = Pdf::loadView('pdf.salidas.hoja_salida', [
+            'salida'          => $salida,
+            'empresaNombre'   => $empresaNombre,
+            'tituloDocumento' => $tituloDocumento,
+            'articulo'        => $articulo,
+        ])->setPaper('letter', 'portrait');
+
+        $nombreArchivo = 'Salida_' . $salida->id . '.pdf';
+
+        return $pdf->stream($nombreArchivo);
+        // si quieres descargar directo: return $pdf->download($nombreArchivo);
     }
 
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\Catalogos\ClientesController;
 use App\Http\Controllers\Catalogos\ColoresController;
 use App\Http\Controllers\Catalogos\TiposProductosController;
 use App\Http\Controllers\ProductosController;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Catalogos\Productos;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,9 @@ Route::resource('/Clientes', ClientesController::class)->names('Clientes');
 Route::resource('/TiposProductos', TiposProductosController::class)->names('TiposProductos');
 Route::resource('/Productos', ProductosController::class)->names('Productos');
 Route::resource('/Colores', ColoresController::class)->names('Colores');
+
 Route::resource('/Pedidos', PedidosClientesController::class)->names('Pedidos');
+Route::post('/Pedidos/{pedido}/finalizar', [PedidosClientesController::class, 'Finalizar'])->name('Pedidos.Finalizar');
 
 Route::resource('/HistoricoEntradas', HistoricoEntradasController::class)->names('HistoricoEntradas');
 Route::post('/HistoricoEntradas/FiltrarEntradas', [HistoricoEntradasController::class, 'FiltrarEntradas'])->name('HistoricoEntradas.FiltrarEntradas');
@@ -36,11 +39,13 @@ Route::post('/Entradas/FiltrarPorducto', [EntradasController::class, 'FiltrarPor
 Route::resource('/ProductosTerminados', ProductosTerminadosController::class)->names('ProductosTerminados');
 
 Route::resource('/Salidas', SalidasController::class)->names('Salidas');
+Route::post('/Salidas/BuscarPedidos', [SalidasController::class, 'BuscarPedidos'])->name('Salidas.BuscarPedidos');
 Route::get('/Salidas/buscar/{movimiento}', [SalidasController::class, 'BuscarMovimiento'])->name('Salidas.BuscarMovimiento');
 Route::post('/Salidas/{movimiento}/salida', [SalidasController::class, 'RegistrarSalida'])->name('Salidas.RegistrarSalida');
-
+Route::post('/Salidas/salida-lote', [SalidasController::class, 'RegistrarSalidaLote'])->name('Salidas.RegistrarSalidaLote');
 
 Route::resource('/HistoricoSalidas', HistoricoSalidasController::class)->names('HistoricoSalidas');
 Route::post('/HistoricoSalidas/FiltrarSalidas', [HistoricoSalidasController::class, 'FiltrarSalidas'])->name('HistoricoSalidas.FiltrarSalidas');
 Route::post('/HistoricoSalidas/ExpotarPedido', [HistoricoSalidasController::class, 'ExpotarPedido'])->name('HistoricoSalidas.ExpotarPedido');
 Route::post('/HistoricoSalidas/ObtenerSalida', [HistoricoSalidasController::class, 'ObtenerSalida'])->name('HistoricoSalidas.ObtenerSalida');
+Route::get('/HistoricoSalidas/{salida}/GenerarPedido', [HistoricoSalidasController::class, 'GenerarPedido'])->name('HistoricoSalidas.GenerarPedido');
