@@ -14,12 +14,14 @@
                     :options="Clientes"
                 />
 
-                <MdTextInput
+                <MdSelectSearchInput
                     id="num_tarjeta"
                     name="num_tarjeta"
                     v-model="form.num_tarjeta"
                     label="Tarjeta viajera"
-                    helper="Ingrese el numero de tarjeta"
+                    helper="Seleccione una tarjeta viajera"
+                    :options="TarjetasViajeras"
+                    :disabled="CargandoTarjetas || !form.cliente_id"
                 />
 
                 <div>
@@ -55,7 +57,7 @@
     </template>
 
 <script setup>
-import { ref, inject, defineProps, nextTick, computed } from 'vue'
+import { ref, inject, defineProps, nextTick, computed, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import AgGrid from '@/Components/Dependencies/AgGrid.vue'
@@ -75,11 +77,41 @@ const IsLoading = ref(false)
 const IsEditMode = ref(false)
 const HistoricoEntradas = ref([])
 const ResumenEntradas = ref([])
+const TarjetasViajeras = ref([])
+const CargandoTarjetas = ref(false)
 
 const form = useForm({
     id: '',
     cliente_id: '',
     num_tarjeta: '',
+})
+
+// Watch para detectar cambios en cliente_id
+watch(() => form.cliente_id, async (nuevoClienteId) => {
+    if (!nuevoClienteId) {
+        TarjetasViajeras.value = []
+        form.num_tarjeta = ''
+        return
+    }
+
+    CargandoTarjetas.value = true
+    try {
+        const { data } = await axios.post(route('Entradas.ObtenerTarjetasViajeras'), {
+            cliente_id: nuevoClienteId,
+        })
+        TarjetasViajeras.value = data.tarjetas || []
+
+        // Notificar si no hay tarjetas disponibles
+        if (TarjetasViajeras.value.length === 0) {
+            toast('No hay tarjetas viajeras registradas para este cliente', 'warning')
+        }
+    } catch (error) {
+        console.error('Error al obtener tarjetas viajeras:', error)
+        toast('Error al cargar las tarjetas viajeras', 'danger')
+        TarjetasViajeras.value = []
+    } finally {
+        CargandoTarjetas.value = false
+    }
 })
 
 /* ========================== Búsqueda ========================== */

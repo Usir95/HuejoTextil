@@ -177,6 +177,28 @@ class EntradasController extends Controller {
         ];
     }
 
+    public function ObtenerTarjetasViajeras(Request $request) {
+        $validated = $request->validate([
+            'cliente_id' => 'required|integer|exists:clientes,id',
+        ]);
+
+        // Obtener todas las tarjetas viajeras únicas de este cliente
+        $tarjetas = Movimientos::where('cliente_id', $validated['cliente_id'])
+            ->select('num_tarjeta')
+            ->distinct()
+            ->orderBy('num_tarjeta', 'asc')
+            ->pluck('num_tarjeta')
+            ->map(fn($tarjeta) => [
+                'value' => $tarjeta,
+                'label' => 'TV: ' . $tarjeta,
+            ])
+            ->values();
+
+        return response()->json([
+            'tarjetas' => $tarjetas,
+        ]);
+    }
+
 
 
 }
