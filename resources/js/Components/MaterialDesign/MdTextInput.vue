@@ -58,6 +58,7 @@
 
         <!-- Input principal -->
         <input :id="id" :type="type" :name="name" ref="inputRef"
+        autocomplete="off"
             class="w-full h-10 border rounded-xl text-gray-800 dark:text-gray-100 placeholder-white focus:outline-none focus:ring-2 transition-all duration-300 ease-in-out shadow-sm focus:shadow-md"
             :class="{
                 'opacity-50 cursor-not-allowed': disabled || readonly,
