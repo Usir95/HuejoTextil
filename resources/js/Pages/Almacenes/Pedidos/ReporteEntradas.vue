@@ -27,7 +27,6 @@
                 </div>
             </section>
 
-            <!-- Agrega bajo tu <section> principal -->
             <section class="mt-6">
                 <div class="flex items-center gap-3">
                     <MdButton :loading="IsLoading" @click="ImprimirReporteEtiquetas">Imprimir reporte etiquetas</MdButton>
@@ -74,8 +73,8 @@ const props = defineProps({
 const toast = inject('$toast')
 const IsLoading = ref(false)
 const IsEditMode = ref(false)
-const HistoricoEntradas = ref([])     // listado de rollos
-const ResumenEntradas = ref([])       // si tu API lo envía
+const HistoricoEntradas = ref([])
+const ResumenEntradas = ref([])
 
 const form = useForm({
     id: '',
@@ -155,7 +154,7 @@ const ImprimirReporteEtiquetas = () => {
         img, svg { display:block; }
         .page { width:102mm; height:51mm; page-break-after:always; }
         .etiqueta-print {
-            box-sizing:border-box; width:102mm; height:51mm; padding:1mm;
+            box-sizing:border-box; width:102mm; height:51mm; padding:3mm;
             display:flex; flex-direction:column; gap:1mm; font-size:9pt; font-family:system-ui,sans-serif;
             -webkit-print-color-adjust:exact; print-color-adjust:exact;
         }
@@ -171,7 +170,7 @@ const ImprimirReporteEtiquetas = () => {
         .sum-head { font-weight:700; border-bottom:0.2mm solid #000; padding-bottom:0.5mm; }
         .sum-foot { border-top:0.2mm solid #000; margin-top:0.5mm; padding-top:0.5mm; font-weight:700; }
 
-        @media screen { .page { margin:8px auto; outline:1px dashed #ccc; } }
+        @media screen { .page { margin:8px auto; outline:1px dashed #ccc; padding:4mm; } }
         @media print  { html, body { width:102mm; height:51mm; } }
         </style>`;
 
