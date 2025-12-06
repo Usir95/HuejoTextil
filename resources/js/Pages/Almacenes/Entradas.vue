@@ -482,6 +482,7 @@ const readSerialData = async () => {
  * Útil para limpiar estado antes de reconectar.
  */
 const cleanupConnection = async () => {
+    // Primero, cancelar y liberar el lector
     if (readerRef.value) {
         try {
             await readerRef.value.cancel();
@@ -492,17 +493,28 @@ const cleanupConnection = async () => {
         readerRef.value = null;
     }
 
+    // Luego, cerrar el puerto completamente
     if (portRef.value) {
         try {
+            // Cancelar el stream legible si está bloqueado
             if (portRef.value.readable && portRef.value.readable.locked) {
-                await portRef.value.readable.cancel();
+                try {
+                    await portRef.value.readable.cancel();
+                } catch (e) {
+                    console.warn('Error al cancelar stream:', e);
+                }
             }
+
+            // Cerrar el puerto si está abierto
             if (portRef.value.opened) {
                 await portRef.value.close();
             }
         } catch (error) {
             console.warn('Error al cerrar puerto:', error);
         }
+
+        // Limpiar la referencia definitivamente
+        portRef.value = null;
     }
 };
 
@@ -513,7 +525,7 @@ const cleanupConnection = async () => {
 const disconnectSerial = async () => {
     await cleanupConnection();
 
-    portRef.value = null;
+    // cleanupConnection ya deja portRef.value como null
     isConnected.value = false;
     isConnecting.value = false;
     isPaused.value = false;
@@ -611,9 +623,12 @@ const Insert = async () => {
     IsLoading.value = true
 
     try {
+        // Guardar el número de rollo actual ANTES de actualizar
+        const rolloActual = form.num_rollo
+
         const { data } = await axios.post(route('Entradas.store'), form)
         const id = data?.movimiento_id
-        if (id) ImprimirEtiqueta(id)
+        if (id) ImprimirEtiqueta(id, rolloActual)
 
         const siguiente = colaRollos.value.shift() || null
         form.num_rollo = siguiente
@@ -628,7 +643,7 @@ const Insert = async () => {
     }
 }
 
-const ImprimirEtiqueta = async (Id) => {
+const ImprimirEtiqueta = async (Id, numRollo) => {
     const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
     const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
@@ -650,7 +665,7 @@ const ImprimirEtiqueta = async (Id) => {
             <div style="display:flex; align-items:flex-start; justify-content:flex-start; gap:4mm;">
                 <div style="flex:1; font-size:6mm; font-weight:bold; line-height:1.4; text-align:left;">
                     <div style="text-align:left; font-size:4mm;">${codigo}</div>
-                    <div style="text-align:left; font-size:7mm;">TV: ${form.num_tarjeta} # ROLLO: ${form.num_rollo}</div>
+                    <div style="text-align:left; font-size:7mm;">TV: ${form.num_tarjeta} # ROLLO: ${numRollo}</div>
                     <div style="text-align:left; font-size:6mm;">${producto} ${color} (${tipo_calidad})</div>
                     <div style="text-align:left; font-size:8mm;">PESO NETO: ${cantidad}</div>
                 </div>
