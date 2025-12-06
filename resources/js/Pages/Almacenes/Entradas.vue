@@ -308,6 +308,7 @@ const lastUsedPort = ref(null); // Guardar referencia del último puerto usado
 // Referencias para el objeto SerialPort y el lector de flujo
 let portRef = ref(null);
 let readerRef = ref(null);
+let readableStreamClosed = null; // <-- nueva
 
 // Propiedad computada para la clase de estilo del mensaje de estado
 const statusClass = computed(() => {
@@ -350,21 +351,31 @@ const connectSerial = async (forceNew = false) => {
         return;
     }
 
-    // Limpiar estado previo si hay errores residuales
+    // Limpia cualquier conexión previa
     await cleanupConnection();
 
     isConnecting.value = true;
     status.value = 'Buscando puerto serial...';
 
     try {
-        // Siempre solicitar un puerto nuevo (no reutilizar referencias que pueden estar en estado inconsistente)
-        portRef.value = await navigator.serial.requestPort();
+        // 1) Usar el puerto anterior si existe y NO se fuerza uno nuevo
+        if (!forceNew && lastUsedPort.value) {
+            portRef.value = lastUsedPort.value;
+        } else {
+            // 2) Pedir un nuevo puerto al usuario
+            portRef.value = await navigator.serial.requestPort();
+            lastUsedPort.value = portRef.value;
+        }
+
+        // Por seguridad, intenta cerrar si estuviera abierto
+        try {
+            await portRef.value.close();
+        } catch (e) {
+            // Si ya estaba cerrado, ignoramos el error
+        }
 
         // Abrir el puerto con la configuración correcta
         await portRef.value.open({ baudRate: 9600 });
-
-        // Guardar la referencia del puerto para futuras reconexiones
-        lastUsedPort.value = portRef.value;
 
         status.value = 'Conectado al puerto serial. Esperando datos...';
         isConnected.value = true;
@@ -373,7 +384,7 @@ const connectSerial = async (forceNew = false) => {
 
         // Configura el TextDecoder para leer los datos como texto
         const textDecoder = new TextDecoderStream();
-        const readableStreamClosed = portRef.value.readable.pipeTo(textDecoder.writable);
+        readableStreamClosed = portRef.value.readable.pipeTo(textDecoder.writable);
         readerRef.value = textDecoder.readable.getReader();
 
         // Inicia la lectura continua de datos
@@ -403,6 +414,7 @@ const connectSerial = async (forceNew = false) => {
         readerRef.value = null;
     }
 };
+
 
 /**
  * @function readSerialData
@@ -470,46 +482,47 @@ const readSerialData = async () => {
  * Útil para limpiar estado antes de reconectar.
  */
 const cleanupConnection = async () => {
-    // Primero, cancelar y liberar el lector
+    // 1) Cancelar y liberar el lector
     if (readerRef.value) {
         try {
             await readerRef.value.cancel();
+        } catch (error) {
+            console.warn('Error al cancelar lector:', error);
+        }
+
+        try {
             readerRef.value.releaseLock();
         } catch (error) {
-            console.warn('Error al liberar lector:', error);
+            console.warn('Error al liberar lock del lector:', error);
         }
+
         readerRef.value = null;
     }
 
-    // Luego, cerrar el puerto completamente
+    // 2) Esperar a que se cierre el stream de lectura (si existe)
+    if (readableStreamClosed) {
+        try {
+            await readableStreamClosed;
+        } catch (error) {
+            // Es normal que lance error al cancelar, lo ignoramos
+        }
+        readableStreamClosed = null;
+    }
+
+    // 3) Cerrar el puerto
     if (portRef.value) {
         try {
-            // Cancelar el stream legible si está bloqueado
-            if (portRef.value.readable && portRef.value.readable.locked) {
-                try {
-                    await portRef.value.readable.cancel();
-                } catch (e) {
-                    console.warn('Error al cancelar stream:', e);
-                }
-            }
-
-            // Cerrar el puerto si está abierto
-            if (portRef.value.opened) {
-                await portRef.value.close();
-                // Esperar un poco para asegurar que el puerto se cierre completamente
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
+            await portRef.value.close();
         } catch (error) {
             console.warn('Error al cerrar puerto:', error);
         }
 
-        // Limpiar la referencia definitivamente
+        // NO tocamos lastUsedPort aquí, solo limpiamos la referencia actual
         portRef.value = null;
     }
-};/**
- * @function disconnectSerial
- * @description Desconecta el puerto serial y reinicia el estado.
- */
+};
+
+
 const disconnectSerial = async () => {
     await cleanupConnection();
 
@@ -532,9 +545,9 @@ const forceNewConnection = async () => {
     await disconnectSerial();
     lastUsedPort.value = null;
     toast('Puerto serial olvidado. Selecciona un nuevo puerto.', 'info');
-    // Pequeño delay para asegurar limpieza completa
+
     setTimeout(() => {
-        connectSerial(true);
+        connectSerial(true); // aquí sí se forzará un nuevo requestPort
     }, 300);
 };
 
