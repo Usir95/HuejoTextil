@@ -11,8 +11,8 @@ use App\Models\Catalogos\Productos;
 use App\Models\Catalogos\TiposCalidades;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use App\Exports\SalidaAlmacenExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Inertia\Inertia;
 
 
@@ -125,40 +125,19 @@ class HistoricoSalidasController extends Controller {
         ];
     }
 
-    public function ExpotarPedido(Request $request): StreamedResponse {
-        $entradas = $request->input('entradas', []);
-        $resumen = $request->input('resumen', []);
+    public function ExpotarPedido(Request $request) {
+        $entradas = $request->input('salidas', []);
+        $resumen  = $request->input('resumen', []);
 
-        return response()->streamDownload(function () use ($entradas, $resumen) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Tarjeta', 'Cliente', 'Rollo', 'Producto', 'Cantidad', 'Calidad', 'Fecha']);
+        $cliente  = $entradas[0]['cliente']['nombre'] ?? '';
+        $articulo = $request->input('articulo', '');
+        $fecha    = $entradas[0]['fecha_movimiento'] ?? null;
 
-            foreach ($entradas as $item) {
-                fputcsv($handle, [
-                    $item['num_tarjeta'] ?? '',
-                    $item['cliente']['nombre'] ?? '',
-                    $item['num_rollo'] ?? '',
-                    $item['producto']['nombre'] ?? '',
-                    $item['cantidad'] ?? '',
-                    ($item['tipo_calidad_id'] == 1 ? 'Buena' : 'Regular'),
-                    $item['fecha_movimiento'] ?? '',
-                ]);
-            }
-
-            fputcsv($handle, ['']);
-
-            fputcsv($handle, ['Producto', 'Rollos', 'Total KG']);
-
-            foreach ($resumen as $res) {
-                fputcsv($handle, [
-                    $res['producto'] ?? '',
-                    $res['rollos'] ?? '',
-                    $res['total_kg'] ?? '',
-                ]);
-            }
-
-            fclose($handle);
-        }, 'HistoricoEntradas.csv');
+        return Excel::download(
+            new SalidaAlmacenExport($entradas, $resumen, $cliente, $articulo, $fecha),
+            'SalidaAlmacen-' . now()->format('Ymd_His') . '.xlsx'
+        );
     }
+
 
 }

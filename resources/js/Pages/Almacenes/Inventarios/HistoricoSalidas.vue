@@ -59,7 +59,7 @@
             </section>
 
             <div class="flex justify-center">
-                <MdButton class="mt-4" @click="ExportarCSV()">Exportar CSV</MdButton>
+                <MdButton class="mt-4" @click="ExportarSalidas()">Exportar CSV</MdButton>
             </div>
 
             <MdDialogModal v-if="ShowModalEdit" :show="ShowModalEdit" @close="ToggleModalEdit" maxWidth="3xl">
@@ -340,10 +340,12 @@ import QRCode from 'qrcode'
         }
     }
 
-    const ExportarCSV = async () => {
+    const ExportarSalidas = async () => {
         try {
-            const response = await axios.post(route('HistoricoSalidas.ExpotarPedido'),{
-                    entradas: HistoricoSalidas.value,
+            const response = await axios.post(
+                route('HistoricoSalidas.ExpotarPedido'),
+                {
+                    salidas: HistoricoSalidas.value,
                     resumen: ResumenSalidas.value
                 },
                 {
@@ -351,20 +353,29 @@ import QRCode from 'qrcode'
                 }
             );
 
-            const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            });
+
             const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
+
             const fecha = new Date().toISOString().slice(0, 10);
-            link.setAttribute('download', `HistoricoSalidas-${fecha}.csv`);
+
+            // NOMBRE .xlsx (no .csv)
+            link.setAttribute("download", `SalidaAlmacen-${fecha}.xlsx`);
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
         } catch (error) {
-            toast('Error al exportar CSV', 'error');
+            toast("Error al exportar Excel", "error");
             console.error(error);
         }
-    }
+    };
+
 
     const upsertLocal = (row) => {
         const i = HistoricoSalidas.value.findIndex(r => r.id === row.id);
