@@ -9,25 +9,46 @@
         <!-- Interfaz de Conexión de Báscula Serial -->
         <section ref="FormSection">
             <div class="col-span-2 flex flex-col items-center justify-center py-2 mx-4 my-2 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                <button
-                    @click="connectSerial"
-                    :disabled="isConnecting || isConnected"
-                    class="px-6 py-2  font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {{ isConnecting ? 'Conectando...' : (isConnected ? 'Conectado' : 'Conectar Báscula') }}
-                </button>
+                <div class="flex gap-2">
+                    <button
+                        @click="connectSerial(false)"
+                        :disabled="isConnecting || isConnected"
+                        class="px-6 py-2 font-semibold text-white bg-green-600 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {{ isConnecting ? 'Conectando...' : (isConnected ? 'Conectado' : (lastUsedPort ? 'Reconectar Báscula' : 'Conectar Báscula')) }}
+                    </button>
+
+                    <button
+                        v-if="!isConnected && !isConnecting && lastUsedPort"
+                        @click="forceNewConnection"
+                        class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition duration-200 ease-in-out"
+                        title="Seleccionar un nuevo puerto"
+                    >
+                        <i class="fa fa-refresh mr-1"></i> Nuevo Puerto
+                    </button>
+                </div>
 
                 <p class="mt-4 text-sm text-gray-600 dark:text-gray-400 text-center">
                     Estado: <span :class="statusClass">{{ status }}</span>
                 </p>
 
-                <button
-                    v-if="isConnected"
-                    @click="disconnectSerial"
-                    class="mt-4 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200 ease-in-out"
-                >
-                    Desconectar
-                </button>
+                <div v-if="isConnected" class="flex gap-2 mt-4">
+                    <button
+                        @click="togglePause"
+                        class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 transition duration-200 ease-in-out"
+                        :class="isPaused ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500' : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'"
+                    >
+                        <i :class="isPaused ? 'fa fa-play' : 'fa fa-pause'" class="mr-1"></i>
+                        {{ isPaused ? 'Reanudar lectura' : 'Pausar lectura' }}
+                    </button>
+
+                    <button
+                        @click="disconnectSerial"
+                        class="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition duration-200 ease-in-out"
+                    >
+                        Desconectar
+                    </button>
+                </div>
             </div>
             <div class="flex justify-center my-4">
                 <button @click="ToggleModal()" class="w-96 bg-blue-500 rounded-xl">
@@ -280,7 +301,9 @@ const ordenRollos = ref('ASC')
 const status = ref('Desconectado');
 const isConnecting = ref(false);
 const isConnected = ref(false);
+const isPaused = ref(false); // Control de pausa
 const currentUnit = ref(''); // La bascula manda unidades
+const lastUsedPort = ref(null); // Guardar referencia del último puerto usado
 
 // Referencias para el objeto SerialPort y el lector de flujo
 let portRef = ref(null);
@@ -288,6 +311,7 @@ let readerRef = ref(null);
 
 // Propiedad computada para la clase de estilo del mensaje de estado
 const statusClass = computed(() => {
+    if (isPaused.value) return 'text-blue-600 font-semibold';
     if (isConnected.value) return 'text-green-600 font-semibold';
     if (isConnecting.value) return 'text-yellow-600 font-semibold';
     return 'text-red-600';
@@ -317,24 +341,42 @@ const form = useForm({
  * @function connectSerial
  * @description Inicia el proceso de conexión al puerto serial usando la Web Serial API.
  * Solicita al usuario que seleccione un puerto, lo abre y comienza a leer los datos.
+ * @param {boolean} forceNew - Si es true, fuerza una nueva selección de puerto
  */
-const connectSerial = async () => {
+const connectSerial = async (forceNew = false) => {
     if (!('serial' in navigator)) {
         status.value = 'Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.';
         toast('Tu navegador no soporta la Web Serial API. Usa Chrome o Edge.', 'danger');
         return;
     }
 
+    // Limpiar estado previo si hay errores residuales
+    await cleanupConnection();
+
     isConnecting.value = true;
     status.value = 'Buscando puerto serial...';
 
     try {
-        // Solicita al usuario que seleccione un puerto serial
-        portRef.value = await navigator.serial.requestPort();
+        // Si no se fuerza nueva conexión y hay un puerto guardado, intentar usarlo
+        if (!forceNew && lastUsedPort.value) {
+            try {
+                portRef.value = lastUsedPort.value;
+                status.value = 'Intentando reconectar al último puerto...';
+                await portRef.value.open({ baudRate: 9600 });
+            } catch (reopenError) {
+                // Si falla la reconexión, solicitar nuevo puerto
+                console.warn('No se pudo reconectar al último puerto:', reopenError);
+                portRef.value = await navigator.serial.requestPort();
+                await portRef.value.open({ baudRate: 9600 });
+            }
+        } else {
+            // Solicita al usuario que seleccione un puerto serial
+            portRef.value = await navigator.serial.requestPort();
+            await portRef.value.open({ baudRate: 9600 });
+        }
 
-        // Abre el puerto con la configuración de la báscula LP7516
-        // El baud rate de 9600 es común para la LP7516.
-        await portRef.value.open({ baudRate: 9600 });
+        // Guardar el puerto para reconexiones futuras
+        lastUsedPort.value = portRef.value;
 
         status.value = 'Conectado al puerto serial. Esperando datos...';
         isConnected.value = true;
@@ -350,16 +392,18 @@ const connectSerial = async () => {
         readSerialData();
 
     } catch (error) {
-        let errorMessage = 'Error desconocido al conectar.'; // Mensaje por defecto
+        let errorMessage = 'Error desconocido al conectar.';
 
         if (error.message) {
-        if (error.message.includes('No port selected by the user')) {
-            errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
-        } else if (error.message.includes('Failed to open serial port')) {
-            errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
-        } else {
-            errorMessage = `Error al conectar: ${error.message}`; // Mostrar el mensaje original si no es reconocido
-        }
+            if (error.message.includes('No port selected by the user')) {
+                errorMessage = 'Conexión cancelada: No se ha seleccionado ningún puerto.';
+            } else if (error.message.includes('Failed to open serial port')) {
+                errorMessage = 'Error al abrir el puerto: El puerto podría estar en uso o no disponible.';
+            } else if (error.message.includes('already open')) {
+                errorMessage = 'El puerto ya está abierto. Intenta desconectar primero.';
+            } else {
+                errorMessage = `Error al conectar: ${error.message}`;
+            }
         }
 
         status.value = errorMessage;
@@ -393,8 +437,8 @@ const readSerialData = async () => {
 
         const rawData = value.trim(); // Limpiar espacios en blanco
 
-        // Solo procesar lecturas estables (ST) de la báscula
-        if (rawData.startsWith('ST,')) {
+        // Solo procesar lecturas estables (ST) de la báscula si NO está pausado
+        if (!isPaused.value && rawData.startsWith('ST,')) {
             // Expresión regular para extraer el valor numérico y la unidad
             // Soporta signos (+/-), números con decimales y unidades (kg/lb)
             const weightMatch = rawData.match(/([+-]?\d+\.\d+)\s*(kg|lb)/i);
@@ -411,10 +455,15 @@ const readSerialData = async () => {
             console.warn('Datos estables sin formato de peso reconocido:', rawData);
             status.value = `Datos estables (formato desconocido): ${rawData}`;
             }
+        } else if (isPaused.value) {
+            // Si está pausado, solo registrar que hay datos pero no procesarlos
+            console.log('Lectura pausada. Datos ignorados:', rawData);
         } else {
             // Datos inestables (US) o de otro tipo, se pueden ignorar o registrar
             console.log('Datos inestables o no reconocidos:', rawData);
-            status.value = `Recibiendo datos inestables/otros: ${rawData}`;
+            if (!isPaused.value) {
+                status.value = `Recibiendo datos inestables/otros: ${rawData}`;
+            }
         }
         } catch (error) {
         status.value = `Error de lectura: ${error.message}`;
@@ -428,45 +477,102 @@ const readSerialData = async () => {
 };
 
 /**
+ * @function cleanupConnection
+ * @description Limpia los recursos de conexión sin mostrar mensajes al usuario.
+ * Útil para limpiar estado antes de reconectar.
+ */
+const cleanupConnection = async () => {
+    if (readerRef.value) {
+        try {
+            await readerRef.value.cancel();
+            readerRef.value.releaseLock();
+        } catch (error) {
+            console.warn('Error al liberar lector:', error);
+        }
+        readerRef.value = null;
+    }
+
+    if (portRef.value) {
+        try {
+            if (portRef.value.readable && portRef.value.readable.locked) {
+                await portRef.value.readable.cancel();
+            }
+            if (portRef.value.opened) {
+                await portRef.value.close();
+            }
+        } catch (error) {
+            console.warn('Error al cerrar puerto:', error);
+        }
+    }
+};
+
+/**
  * @function disconnectSerial
  * @description Desconecta el puerto serial y reinicia el estado.
  */
 const disconnectSerial = async () => {
-    if (readerRef.value) {
-        try {
-        await readerRef.value.cancel(); // Cancela cualquier lectura pendiente
-        readerRef.value.releaseLock(); // Libera el bloqueo del lector
-        } catch (error) {
-        console.error('Error al cancelar/liberar lector:', error);
-        }
-        readerRef.value = null;
-    }
-    if (portRef.value && portRef.value.opened) {
-        try {
-        await portRef.value.close();
-        } catch (error) {
-        console.error('Error al cerrar el puerto:', error);
-        }
-    }
+    await cleanupConnection();
+
     portRef.value = null;
     isConnected.value = false;
     isConnecting.value = false;
+    isPaused.value = false;
     status.value = 'Desconectado';
-    form.cantidad = ''; // Limpiar la cantidad al desconectar
+    form.cantidad = '';
     currentUnit.value = '';
     toast('Puerto serial desconectado', 'info');
     console.log('Puerto serial desconectado.');
 };
 
+/**
+ * @function forceNewConnection
+ * @description Limpia completamente la conexión y fuerza una nueva selección de puerto.
+ */
+const forceNewConnection = async () => {
+    await disconnectSerial();
+    lastUsedPort.value = null;
+    toast('Puerto serial olvidado. Selecciona un nuevo puerto.', 'info');
+    // Pequeño delay para asegurar limpieza completa
+    setTimeout(() => {
+        connectSerial(true);
+    }, 300);
+};
+
+/**
+ * @function togglePause
+ * @description Alterna entre pausar y reanudar la recepción de datos de la báscula.
+ */
+const togglePause = () => {
+    isPaused.value = !isPaused.value;
+    if (isPaused.value) {
+        status.value = 'Lectura pausada - Ingreso manual habilitado';
+        toast('Lectura de báscula pausada', 'info');
+    } else {
+        status.value = 'Lectura reanudada - Esperando datos...';
+        toast('Lectura de báscula reanudada', 'success');
+    }
+};
+
 // Maneja la desconexión inesperada del dispositivo
 onMounted(() => {
     if ('serial' in navigator) {
-        navigator.serial.addEventListener('disconnect', (event) => {
-        if (portRef.value && event.target === portRef.value) {
-            status.value = 'Báscula desconectada inesperadamente.';
-            toast('Báscula desconectada inesperadamente.', 'danger');
-            disconnectSerial(); // Llama a la función de desconexión para limpiar el estado
-        }
+        navigator.serial.addEventListener('disconnect', async (event) => {
+            if (portRef.value && event.target === portRef.value) {
+                status.value = 'Báscula desconectada inesperadamente.';
+                toast('Báscula desconectada inesperadamente. Puedes reconectar usando el mismo botón.', 'warning');
+
+                // Limpieza completa del estado
+                await cleanupConnection();
+                portRef.value = null;
+                isConnected.value = false;
+                isConnecting.value = false;
+                isPaused.value = false;
+                form.cantidad = '';
+                currentUnit.value = '';
+
+                // Mantener lastUsedPort para reconexión rápida
+                console.log('Desconexión inesperada manejada. Puerto guardado para reconexión.');
+            }
         });
     }
 });
