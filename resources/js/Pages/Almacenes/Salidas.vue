@@ -58,133 +58,136 @@
                 </section>
 
                 <!-- ======= DETALLE DEL ROLLO ESCANEADO ======= -->
-                <div v-if="rolloActual" class="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-4">
-                    <h2 class="text-lg font-bold mb-1">
-                        Rollo encontrado
-                    </h2>
+                <section class="h-[45vh] overflow-auto">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    <div v-if="rolloActual" class="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-4">
+                        <h2 class="text-lg font-bold mb-1">
+                            Rollo encontrado
+                        </h2>
 
-                        <div>
-                            <span class="font-semibold">Producto:</span>
-                            <span>{{ rolloActual.producto?.nombre }}</span>
-                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3 text-sm">
 
-                        <div>
-                            <span class="font-semibold">Código producto:</span>
-                            <span class="font-mono">{{ rolloActual.producto?.codigo }}</span>
-                        </div>
+                            <div class="col-span-2">
+                                <span class="font-semibold">Producto:</span>
+                                <span>{{ rolloActual.producto?.nombre }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Color:</span>
-                            <span>{{ rolloActual.color?.nombre }}</span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Código:</span>
+                                <span class="font-mono">{{ rolloActual.producto?.codigo }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Calidad:</span>
-                            <span>{{ rolloActual.tipo_calidad?.nombre }}</span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Color:</span>
+                                <span>{{ rolloActual.color?.nombre }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Tarjeta:</span>
-                            <span class="font-mono">{{ rolloActual.num_tarjeta }}</span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Calidad:</span>
+                                <span>{{ rolloActual.tipo_calidad?.nombre }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Rollo:</span>
-                            <span class="font-mono">{{ rolloActual.num_rollo }}</span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Tarjeta:</span>
+                                <span class="font-mono">{{ rolloActual.num_tarjeta }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Peso del rollo:</span>
-                            <span class="text-indigo-600 font-bold">
-                                {{ rolloActual.cantidad }} kg
-                            </span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Rollo:</span>
+                                <span class="font-mono">{{ rolloActual.num_rollo }}</span>
+                            </div>
 
-                        <div>
-                            <span class="font-semibold">Disponible total en inventario:</span>
-                            <span
-                                :class="rolloActual.cantidad_disponible > 0
-                                    ? 'text-emerald-600 font-bold'
-                                    : 'text-red-600 font-bold'"
-                            >
-                                {{ rolloActual.cantidad_disponible }} kg
-                            </span>
-                        </div>
+                            <div>
+                                <span class="font-semibold">Peso:</span>
+                                <span class="text-indigo-600 font-bold">
+                                    {{ rolloActual.cantidad }} kg
+                                </span>
+                            </div>
 
-                        <div class="md:col-span-2">
-                            <span class="font-semibold">Fecha de entrada:</span>
-                            <span>{{ rolloActual.fecha_movimiento }}</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- LISTA DE ROLLOS SELECCIONADOS -->
-                <div v-if="rollosSeleccionados.length" class="mt-4 bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-3">
-                    <h2 class="text-lg font-bold">
-                        Rollos seleccionados para salida ({{ rollosSeleccionados.length }})
-                    </h2>
-
-                    <div class="max-h-64 overflow-y-auto text-sm">
-                        <table class="w-full text-left text-xs md:text-sm">
-                            <thead>
-                                <tr class="border-b dark:border-slate-700">
-                                    <th class="py-1">Prod.</th>
-                                    <th class="py-1">Tarjeta</th>
-                                    <th class="py-1">Rollo</th>
-                                    <th class="py-1 text-right">Cantidad</th>
-                                    <th class="py-1 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="r in rollosSeleccionados"
-                                    :key="r.id"
-                                    class="border-b last:border-0 dark:border-slate-800"
+                            <div>
+                                <span class="font-semibold">Disponible total en inventario:</span>
+                                <span
+                                    :class="rolloActual.cantidad_disponible > 0
+                                        ? 'text-emerald-600 font-bold'
+                                        : 'text-red-600 font-bold'"
                                 >
-                                    <td class="py-1">
-                                        {{ r.producto?.nombre }}
-                                    </td>
-                                    <td class="py-1 font-mono">
-                                        {{ r.num_tarjeta }}
-                                    </td>
-                                    <td class="py-1 font-mono">
-                                        {{ r.num_rollo }}
-                                    </td>
-                                    <td class="py-1 text-right font-semibold">
-                                        {{ r.cantidad }} kg
-                                    </td>
-                                    <td class="py-1 text-right">
-                                        <MdButton
-                                            variant="danger"
-                                            size="xs"
-                                            @click="QuitarRollo(r.id)"
-                                        >
-                                            Quitar
-                                        </MdButton>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    {{ rolloActual.cantidad_disponible }} kg
+                                </span>
+                            </div>
+
+                            <div class="col-span-2">
+                                <span class="font-semibold">Fecha de entrada:</span>
+                                <span>{{ rolloActual.fecha_movimiento }}</span>
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="pt-3">
-                        <MdButton
-                            variant="primary"
-                            size="large"
-                            class="w-full py-3 text-base font-semibold"
-                            :loading="IsLoading"
-                            :disabled="!rollosSeleccionados.length"
-                            @click="ConfirmarSalidaLote"
-                        >
-                            Confirmar salida de {{ rollosSeleccionados.length }} rollos
-                        </MdButton>
-                    </div>
-                </div>
+                    <!-- LISTA DE ROLLOS SELECCIONADOS -->
+                    <div v-if="rollosSeleccionados.length" class="mt-4 bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-3">
+                        <h2 class="text-xl font-bold uppercase">
+                            Rollos seleccionados para salida ({{ rollosSeleccionados.length }})
+                        </h2>
 
+                        <div class="max-h-64 overflow-y-auto text-sm">
+                            <table class="w-full text-left text-xs md:text-sm">
+                                <thead>
+                                    <tr class="border-b dark:border-slate-700">
+                                        <th class="py-1">Prod.</th>
+                                        <th class="py-1">Tarjeta</th>
+                                        <th class="py-1">Rollo</th>
+                                        <th class="py-1 text-right">Cantidad</th>
+                                        <th class="py-1 text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="r in rollosSeleccionados"
+                                        :key="r.id"
+                                        class="border-b last:border-0 dark:border-slate-800"
+                                    >
+                                        <td class="py-1">
+                                            {{ r.producto?.nombre }}
+                                        </td>
+                                        <td class="py-1 font-mono">
+                                            {{ r.num_tarjeta }}
+                                        </td>
+                                        <td class="py-1 font-mono">
+                                            {{ r.num_rollo }}
+                                        </td>
+                                        <td class="py-1 text-right font-semibold">
+                                            {{ r.cantidad }} kg
+                                        </td>
+                                        <td class="py-1 text-right text-red-500">
+                                            <MdButton
+                                                variant="danger"
+                                                size="xs"
+                                                @click="QuitarRollo(r.id)"
+                                            >
+                                                Quitar <i class="fas fa-times"></i>
+                                            </MdButton>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="pt-3">
+                            <MdButton
+                                variant="primary"
+                                size="large"
+                                class="w-full py-3 text-base font-semibold"
+                                :loading="IsLoading"
+                                :disabled="!rollosSeleccionados.length"
+                                @click="ConfirmarSalidaLote"
+                            >
+                                Confirmar salida de {{ rollosSeleccionados.length }} rollos
+                            </MdButton>
+                        </div>
+                    </div>
+
+                </section>
 
             </div>
         </section>

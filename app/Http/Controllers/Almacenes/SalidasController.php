@@ -63,8 +63,32 @@ class SalidasController extends Controller {
 
     public function BuscarMovimiento($movimiento_id) {
         $Movimiento = Movimientos::with(['producto', 'color', 'tipoCalidad', 'tipoUnidad', 'almacen'])
-            ->find($movimiento_id);
+            ->where('id', $movimiento_id)
+            ->where('tipo_movimiento_id', 1)
+            ->first();
 
+        if (!$Movimiento) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El rollo no existe o no es un movimiento de entrada.',
+            ], 404);
+        }
+
+        // Verificar si YA tiene salida asociada
+        $yaSalio = Movimientos::where('tipo_movimiento_id', 2)
+            ->where('num_tarjeta', $Movimiento->num_tarjeta)
+            ->where('num_rollo', $Movimiento->num_rollo)
+            ->exists();
+
+        if ($yaSalio) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este rollo YA fue dado de salida.',
+                'codigo_error' => 'YA_SALIO'
+            ], 409);
+        }
+
+        // Buscar inventario actual
         $Inventario = Inventarios::where('producto_id', $Movimiento->producto_id)
             ->where('color_id', $Movimiento->color_id)
             ->where('tipo_calidad_id', $Movimiento->tipo_calidad_id)
