@@ -56,6 +56,17 @@
                             :success="!form.errors.tipo_producto_id"
                         />
 
+                        <MdTextInput
+                            id="tara"
+                            name="tara"
+                            label="Tara"
+                            v-model="form.tara"
+                            required="false"
+                            helper="Tara del producto (hasta 3 decimales). Ej: 0.250"
+                            :error="form.errors.tara"
+                            :success="!form.errors.tara"
+                        />
+
                         <MdSelectInput
                             id="unidad_id"
                             name="unidad_id"
@@ -111,7 +122,8 @@ import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
         codigo: '',
         nombre: '',
         tipo_producto_id: '',
-        unidad_id: ''
+        unidad_id: '',
+        tara: null,
     })
 
     const columnas = [
@@ -119,6 +131,7 @@ import MdSelectInput from '@/Components/MaterialDesign/MdSelectInput.vue'
         { headerName: 'Codigo', field: 'codigo' },
         { headerName: 'Tipo Producto', field: 'tipo_producto.nombre' },
         { headerName: 'Unidad', field: 'unidad_medida.nombre' },
+        { headerName: 'Tara', field: 'tara' },
         {
             headerName: 'Acciones',
             field: 'acciones',

@@ -34,6 +34,7 @@ class ProductosController extends Controller {
             'nombre' => 'required|string|max:125',
             'tipo_producto_id' => 'nullable|exists:tipos_productos,id',
             'unidad_id' => 'nullable|exists:unidades,id',
+            'tara' => ['nullable'],
         ]);
 
         Productos::create($data);
@@ -48,6 +49,7 @@ class ProductosController extends Controller {
             'nombre' => 'required|string|max:125',
             'tipo_producto_id' => 'nullable|exists:tipos_productos,id',
             'unidad_id' => 'nullable|exists:unidades,id',
+            'tara' => ['nullable'],
         ]);
 
         $producto->update($data);
