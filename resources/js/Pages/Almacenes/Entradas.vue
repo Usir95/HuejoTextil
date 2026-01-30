@@ -624,10 +624,15 @@ const Insert = async () => {
     IsLoading.value = true
 
     try {
-        // Guardar el número de rollo actual ANTES de actualizar
         const rolloActual = form.num_rollo
 
-        const { data } = await axios.post(route('Entradas.store'), form)
+        const payload = {
+            ...form,
+            cantidad: cantidadNeta.value,
+        };
+
+        const { data } = await axios.post(route('Entradas.store'), payload)
+
         const id = data?.movimiento_id
         if (id) ImprimirEtiqueta(id, rolloActual)
 
@@ -644,12 +649,13 @@ const Insert = async () => {
     }
 }
 
+
 const ImprimirEtiqueta = async (Id, numRollo) => {
     const producto = props.Productos.find(p => p.value === form.producto_id)?.label || '';
     const color = props.Colores.find(c => c.value === form.color_id)?.label || '';
     const calidad = props.TiposCalidades.find(c => c.value === form.tipo_calidad_id)?.label || '';
     const tipo_calidad = form.tipo_calidad_id;
-    const cantidad = Number(form.cantidad || 0).toFixed(2);
+    const cantidad = Number(cantidadNeta.value || 0).toFixed(2);
 
 
     const codigo = `PROD-${form.producto_id}-COL-${form.color_id}-CAL-${form.tipo_calidad_id}-MOV-${Id}`;
@@ -789,20 +795,28 @@ async function ConsultarTara() {
     }
 }
 
-const ImprimirReporte = (id) => {
+const ImprimirReporte = () => {
     confirm(
         '¿Estás seguro?',
         'Irás a la impresión del reporte de esta entrada.',
         'Ir a imprimir',
         'Cancelar',
         () => {
-            window.location.href = route('ReporteEntradas.index', id)
+            const qs = new URLSearchParams();
+
+            if (form.cliente_id) qs.set('cliente_id', form.cliente_id);
+            if (form.num_tarjeta) qs.set('num_tarjeta', form.num_tarjeta);
+
+            const url = qs.toString()
+                ? `${route('ReporteEntradas.index')}?${qs.toString()}`
+                : route('ReporteEntradas.index');
+
+            window.location.href = url;
         },
-        () => {
-        console.log('Acción cancelada')
-        }
+        () => {}
     )
 }
+
 
 const ListaNumRollos = computed(() => {
     const inicio = Number(numRolloBase.value)
@@ -814,6 +828,17 @@ const ListaNumRollos = computed(() => {
 
     return arr.map(n => String(n).padStart(4, '0'))
 })
+
+const cantidadNeta = computed(() => {
+    const cantidad = Number(form.cantidad ?? 0);
+    const tara = Number(form.peso_tara ?? 0);
+
+    if (!isConnected.value) {
+        return Math.max(0, +(cantidad - tara).toFixed(3));
+    }
+
+    return +(cantidad.toFixed(3));
+});
 
 watch(() => form.producto_id,(nuevo) => {
     if (nuevo) ConsultarTara()
